@@ -43,10 +43,19 @@ function bot_run (server, responses)
         if data:find('PING') then
             irc.pong(client, sname)
         elseif data:find('PRIVMSG ' .. server.handle .. ' :reload') then
-            break
+            for _, v in pairs(server.admins) do
+                if data:find('^:' .. v) then
+                    client:close()
+                    return
+                end
+            end
         elseif data:find('PRIVMSG ' .. server.handle .. ' :die') then
-            client:close()
-            os.exit()
+            for _, v in pairs(server.admins) do
+                if data:find('^:' .. v) then
+                    client:close()
+                    os.exit()
+                end
+            end
         elseif data:find('PRIVMSG') then
             local ptn = '(%S+) (%S+) (%S+) (.*)'
             local _, _, mask, _, target, text = data:find(ptn)

@@ -5,6 +5,9 @@ return
   , ['handle']   = 'hgctl'
   , ['ident']    = 'hgctl'
   , ['gecos']    = '🐼'
+  , ['admins']   =
+      { '.*@perses.halosgho.st'
+      }
   , ['channels'] =
       { '##meskarune'
       }
