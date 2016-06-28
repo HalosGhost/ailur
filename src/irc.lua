@@ -75,7 +75,7 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
     else
         for k, v in pairs(ms['irc_factoids']) do
             if msg:find(prefix .. k .. '$') then
-                v(c, tgt)
+                v(c, tgt, msg)
             end
         end
     end

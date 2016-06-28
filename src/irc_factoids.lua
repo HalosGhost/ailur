@@ -12,4 +12,9 @@ return
           local case = { 'so', 'not', 'true', 'false' }
           c:send('PRIVMSG ' .. t .. ' :' .. prob[math.random(#prob)] .. ' ' .. case[math.random(#prob)] .. '\r\n')
       end
+  , ['say.*']           =
+      function (c, t, msg)
+          local _, _, m = msg:find('say%s*(.*)')
+          c:send('PRIVMSG ' .. t .. ' :' .. m .. '\r\n')
+      end
   }
