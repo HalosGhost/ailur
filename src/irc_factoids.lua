@@ -2,8 +2,16 @@ self =
   { ['ping']            = function (ms, c, t) ms['irc'].privmsg(c, t, '🐼') end
   , ['hello']           = function (ms, c, t) ms['irc'].privmsg(c, t, 'hai') end
   , ['are you a bot%?'] = function (ms, c, t) ms['irc'].privmsg(c, t, 'A bot? Me? Never!') end
-  , ['ugm']             = function (ms, c, t) ms['irc'].privmsg(c, t, 'Good (ugt) morning to all!') end
-  , ['ugn']             = function (ms, c, t) ms['irc'].privmsg(c, t, 'Good (ugt) night to all!') end
+  , ['ug[maen]']        =
+      function (ms, c, t, msg)
+          local map = { ['m'] = 'Morning'
+                      , ['a'] = 'Afternoon'
+                      , ['e'] = 'Evening'
+                      , ['n'] = 'Night'
+                      }
+          local _, _, l = msg:find('ug(.)')
+          ms['irc'].privmsg(c, t, 'Good (ugt) ' .. map[l] .. ' to all!')
+      end
   , ['source']          = function (ms, c, t) ms['irc'].privmsg(c, t, 'cf. <https://github.com/HalosGhost/irc_bot>') end
   , ['jæja']            = function (ms, c, t) ms['irc'].privmsg(c, t, 'jæja') end
   , ['die']             =
