@@ -1,4 +1,4 @@
-return
+self =
   { ['ping']            = function (ms, c, t) ms['irc'].privmsg(c, t, '🐼') end
   , ['hello']           = function (ms, c, t) ms['irc'].privmsg(c, t, 'hai') end
   , ['are you a bot%?'] = function (ms, c, t) ms['irc'].privmsg(c, t, 'A bot? Me? Never!') end
@@ -6,6 +6,13 @@ return
   , ['ugn']             = function (ms, c, t) ms['irc'].privmsg(c, t, 'Good (ugt) night to all!') end
   , ['source']          = function (ms, c, t) ms['irc'].privmsg(c, t, 'cf. <https://github.com/HalosGhost/irc_bot>') end
   , ['jæja']            = function (ms, c, t) ms['irc'].privmsg(c, t, 'jæja') end
+  , ['listfacts']       =
+      function (ms, c, t)
+          local list = ''
+          for k in pairs(self) do
+              list = "'" .. k .. "' " .. list
+          end; ms['irc'].privmsg(c, t, list)
+      end
   , ['is.*']            =
       function (ms, c, t)
           math.randomseed(os.time())
@@ -21,3 +28,5 @@ return
           ms['irc'].privmsg(c, t, m)
       end
   }
+
+return self
