@@ -6,6 +6,13 @@ self =
   , ['ugn']             = function (ms, c, t) ms['irc'].privmsg(c, t, 'Good (ugt) night to all!') end
   , ['source']          = function (ms, c, t) ms['irc'].privmsg(c, t, 'cf. <https://github.com/HalosGhost/irc_bot>') end
   , ['jæja']            = function (ms, c, t) ms['irc'].privmsg(c, t, 'jæja') end
+  , ['die']             =
+      function (ms, c, _, _, auth)
+          if auth then
+              c:close()
+              os.exit()
+          end
+      end
   , ['listfacts']       =
       function (ms, c, t)
           local list = ''

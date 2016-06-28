@@ -69,13 +69,10 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
                 end
             end
         end
-    elseif msg:find(prefix .. 'die') and authed then
-        c:close()
-        os.exit()
     else
         for k, v in pairs(ms['irc_factoids']) do
             if msg:find(prefix .. k .. '$') then
-                v(ms, c, tgt, msg)
+                v(ms, c, tgt, msg, authed)
             end
         end
     end
