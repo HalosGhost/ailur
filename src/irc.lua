@@ -56,8 +56,15 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
     local tgt = target:find('^#') and target or mask
     local prefix = tgt:find('^#') and '^hgctl.%s*' or '^'
 
-    if msg:find(prefix .. 'reload .+') and authed then
-        local _, _, what = msg:find('reload (.+)')
+    if not msg:find(prefix) then return true end
+
+    local _, _, key = msg:find(prefix .. '(.*)')
+    local basic = ms['irc_factoids'][key]
+
+    if basic ~= nil then
+        irc.privmsg(c, tgt, basic)
+    elseif key:find('^%s*reload .+') and authed then
+        local _, _, what = key:find('reload (.+)')
         if what == 'all' then
             irc.privmsg(c, tgt, 'Tada!')
             return false
@@ -70,9 +77,9 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
             end
         end
     else
-        for k, v in pairs(ms['irc_factoids']) do
-            if msg:find(prefix .. k .. '$') then
-                v(ms, c, tgt, msg, authed)
+        for k, v in pairs(ms['irc_aliases']) do
+            if key:find('^%s*' .. k .. '$') then
+                v(ms, c, tgt, key, authed)
             end
         end
     end
