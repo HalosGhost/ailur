@@ -49,32 +49,30 @@ irc.authorized = function (c, nw, mask)
 end
 
 irc.react_to_privmsg = function (c, nw, ms, hotload, text)
-    print(text)
-
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
     local authed = irc.authorized(c, nw, mask .. hn)
 
     local tgt = target:find('^#') and target or mask
-    local prefix = tgt:find('^#') and ':hgctl.%s*' or ''
+    local prefix = tgt:find('^#') and '^hgctl.%s*' or '^'
 
-    if msg:find('reload .+') and authed then
+    if msg:find(prefix .. 'reload .+') and authed then
         local _, _, what = msg:find('reload (.+)')
         if what == 'all' then
-            print('reloading everything')
+            irc.privmsg(c, tgt, 'Tada!')
             return false
         else
             for k in pairs(ms) do
                 if what == k then
-                    print('reloading ' .. k)
+                    irc.privmsg(c, tgt, 'Tada!')
                     hotload(ms, k)
                 end
             end
         end
-    elseif msg:find('die') and authed then
+    elseif msg:find(prefix .. 'die') and authed then
         c:close()
         os.exit()
-    elseif msg:find('say .*') then
+    elseif msg:find(prefix .. 'say .*') then
         local _, _, mtext = msg:find('say (.*)')
         irc.privmsg(c, tgt, mtext)
     end
