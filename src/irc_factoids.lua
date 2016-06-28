@@ -1,20 +1,23 @@
 return
-  { ['ping']            = function (c, t) c:send('PRIVMSG ' .. t .. ' :🐼\r\n') end
-  , ['hello']           = function (c, t) c:send('PRIVMSG ' .. t .. ' :hai\r\n') end
-  , ['are you a bot%?'] = function (c, t) c:send('PRIVMSG ' .. t .. ' :A bot? Me? Never!\r\n') end
-  , ['ugm']             = function (c, t) c:send('PRIVMSG ' .. t .. ' :Good (ugt) morning to all!\r\n') end
-  , ['ugn']             = function (c, t) c:send('PRIVMSG ' .. t .. ' :Good (ugt) night to all!\r\n') end
-  , ['source']          = function (c, t) c:send('PRIVMSG ' .. t .. ' :cf. <https://github.com/HalosGhost/irc_bot>\r\n') end
+  { ['ping']            = function (ms, c, t) ms['irc'].privmsg(c, t, '🐼') end
+  , ['hello']           = function (ms, c, t) ms['irc'].privmsg(c, t, 'hai') end
+  , ['are you a bot%?'] = function (ms, c, t) ms['irc'].privmsg(c, t, 'A bot? Me? Never!') end
+  , ['ugm']             = function (ms, c, t) ms['irc'].privmsg(c, t, 'Good (ugt) morning to all!') end
+  , ['ugn']             = function (ms, c, t) ms['irc'].privmsg(c, t, 'Good (ugt) night to all!') end
+  , ['source']          = function (ms, c, t) ms['irc'].privmsg(c, t, 'cf. <https://github.com/HalosGhost/irc_bot>') end
+  , ['jæja']            = function (ms, c, t) ms['irc'].privmsg(c, t, 'jæja') end
   , ['is.*']            =
-      function (c, t)
+      function (ms, c, t)
           math.randomseed(os.time())
           local prob = { 'certainly', 'possibly', 'categorically' }
           local case = { 'so', 'not', 'true', 'false' }
-          c:send('PRIVMSG ' .. t .. ' :' .. prob[math.random(#prob)] .. ' ' .. case[math.random(#prob)] .. '\r\n')
+          r1 = math.random(#prob)
+          r2 = math.random(#case)
+          ms['irc'].privmsg(c, t, prob[r1] .. ' ' .. case[r2])
       end
   , ['say.*']           =
-      function (c, t, msg)
+      function (ms, c, t, msg)
           local _, _, m = msg:find('say%s*(.*)')
-          c:send('PRIVMSG ' .. t .. ' :' .. m .. '\r\n')
+          ms['irc'].privmsg(c, t, m)
       end
   }
