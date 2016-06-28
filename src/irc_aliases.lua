@@ -47,6 +47,14 @@ local self =
           local _, _, m = msg:find('say%s*(.*)')
           ms['irc'].privmsg(c, t, m)
       end
+  , ['give%s+%S+.+'] =
+      function (ms, c, t, msg)
+          local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
+          local thing = ms['irc_factoids'][what]
+          if thing ~= nil then
+              ms['irc'].privmsg(c, t, to .. ': ' .. thing)
+          end
+      end
   }
 
 return self
