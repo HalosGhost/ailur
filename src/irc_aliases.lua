@@ -1,4 +1,4 @@
-self =
+local self =
   { ['ug[maen]'] =
       function (ms, c, t, msg)
           local map = { ['m'] = 'Morning'
@@ -23,7 +23,7 @@ self =
   , ['listaliases'] =
       function (ms, c, t)
           local list = ''
-          for k in pairs(self) do
+          for k in pairs(ms['irc_aliases']) do
               list = "'" .. k .. "' " .. list
           end; ms['irc'].privmsg(c, t, list)
       end
