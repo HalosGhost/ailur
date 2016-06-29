@@ -29,7 +29,6 @@ local self =
       end
   , ['is.*'] =
       function (ms, c, t)
-          math.randomseed(os.time())
           local prob =
             { 'certainly', 'possibly', 'categorically', 'negatively'
             , 'positively', 'without-a-doubt', 'maybe', 'perhaps', 'doubtfully'
@@ -54,6 +53,18 @@ local self =
           if thing ~= nil then
               ms.irc.privmsg(c, t, to .. ': ' .. thing)
           end
+      end
+  , ['hatroulette'] =
+      function (ms, c, t, _, _, sndr)
+          local ar = { '-', '+' }
+          local md = { 'q', 'b', 'v', 'o' }
+          local res = ar[math.random(#ar)] .. md[math.random(#md)]
+
+          if t:byte() == 35 then
+              ms.irc.privmsg(c, t, sndr .. ' rolls for a ' .. res .. '!')
+          end
+
+          ms.irc.modeset(c, t, sndr, res)
       end
   }
 

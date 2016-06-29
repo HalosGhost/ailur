@@ -26,6 +26,14 @@ irc.privmsg = function (c, target, msg)
     c:send('PRIVMSG ' .. target .. ' :' .. msg .. '\r\n')
 end
 
+irc.modeset = function (c, target, recipient, mode)
+    if target:byte() == 35 then
+        c:send('MODE ' .. target .. ' ' .. mode .. ' ' .. recipient .. '\r\n')
+    else
+        irc.privmsg(c, target, 'Cannot set modes in query')
+    end
+end
+
 irc.get_sname = function (c)
     local sname = ''
     while sname == '' do
@@ -79,7 +87,7 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
     else
         for k, v in pairs(ms.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
-                v(ms, c, tgt, key, authed)
+                v(ms, c, tgt, key, authed, mask)
             end
         end
     end
@@ -88,6 +96,8 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
 end
 
 irc.react_loop = function (c, nw, sname, ms, hotload)
+    math.randomseed(os.time())
+
     local keepalive = true
     while keepalive do
         local data = c:receive('*l')
