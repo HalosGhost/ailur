@@ -7,7 +7,7 @@ local self =
                       , ['n'] = 'Night'
                       }
           local _, _, l = msg:find('ug(.)')
-          ms['irc'].privmsg(c, t, 'Good (ugt) ' .. map[l] .. ' to all!')
+          ms.irc.privmsg(c, t, 'Good (ugt) ' .. map[l] .. ' to all!')
       end
   , ['die'] =
       function (ms, c, _, _, auth)
@@ -16,16 +16,16 @@ local self =
   , ['listfacts'] =
       function (ms, c, t)
           local list = ''
-          for k in pairs(ms['irc_factoids']) do
+          for k in pairs(ms.irc_factoids) do
               list = "'" .. k .. "' " .. list
-          end; ms['irc'].privmsg(c, t, list)
+          end; ms.irc.privmsg(c, t, list)
       end
   , ['listaliases'] =
       function (ms, c, t)
           local list = ''
-          for k in pairs(ms['irc_aliases']) do
+          for k in pairs(ms.irc_aliases) do
               list = "'" .. k .. "' " .. list
-          end; ms['irc'].privmsg(c, t, list)
+          end; ms.irc.privmsg(c, t, list)
       end
   , ['is.*'] =
       function (ms, c, t)
@@ -40,19 +40,19 @@ local self =
           r1 = math.random(#prob)
           r2 = math.random(#case)
           r3 = math.random(#punct)
-          ms['irc'].privmsg(c, t, prob[r1] .. ' ' .. case[r2] .. punct[r3])
+          ms.irc.privmsg(c, t, prob[r1] .. ' ' .. case[r2] .. punct[r3])
       end
   , ['say.*'] =
       function (ms, c, t, msg)
           local _, _, m = msg:find('say%s*(.*)')
-          ms['irc'].privmsg(c, t, m)
+          ms.irc.privmsg(c, t, m)
       end
   , ['give%s+%S+.+'] =
       function (ms, c, t, msg)
           local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
-          local thing = ms['irc_factoids'][what]
+          local thing = ms.irc_factoids[what]
           if thing ~= nil then
-              ms['irc'].privmsg(c, t, to .. ': ' .. thing)
+              ms.irc.privmsg(c, t, to .. ': ' .. thing)
           end
       end
   }

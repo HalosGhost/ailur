@@ -59,7 +59,7 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
     if not msg:find(prefix) then return true end
 
     local _, _, key = msg:find(prefix .. '(.*)')
-    local basic = ms['irc_factoids'][key]
+    local basic = ms.irc_factoids[key]
 
     if basic ~= nil then
         irc.privmsg(c, tgt, basic)
@@ -77,7 +77,7 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
             end
         end
     else
-        for k, v in pairs(ms['irc_aliases']) do
+        for k, v in pairs(ms.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
                 v(ms, c, tgt, key, authed)
             end
@@ -101,7 +101,7 @@ irc.react_loop = function (c, nw, sname, ms, hotload)
 end
 
 irc.bot = function (ms, hotload)
-    local nw = ms['irc_network']
+    local nw = ms.irc_network
     local c = irc.init(nw)
     if not c then
         print('failed to initialize irc network')

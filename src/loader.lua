@@ -8,9 +8,9 @@ while true do
 
     hotload(ms, 'modlist')
 
-    for _, v in ipairs(ms['modlist']) do
+    for _, v in ipairs(ms.modlist) do
         hotload(ms, v)
     end
 
-    ms['irc'].bot(ms, hotload)
+    ms.irc.bot(ms, hotload)
 end
