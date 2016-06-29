@@ -91,6 +91,7 @@ irc.react_loop = function (c, nw, sname, ms, hotload)
     local keepalive = true
     while keepalive do
         local data = c:receive('*l')
+        io.stdout:write(ms.debug and data .. '\n' or '')
 
         if data == ('PING ' .. sname) then
             irc.pong(c, sname)
