@@ -6,7 +6,7 @@ return
   , ['ident']    = 'hgctl'
   , ['gecos']    = '🐼'
   , ['admins']   =
-      { '.*@perses.halosgho.st'
+      { '.*@.*%.halosgho%.st'
       }
   , ['channels'] =
       { '##meskarune'
