@@ -66,6 +66,22 @@ local self =
 
           ms.irc.modeset(c, t, sndr, res)
       end
+  , ['..%s+.+'] =
+      function (ms, c, t, msg, authed)
+          local _, _, mode, recipient = msg:find('(..)%s+(.+)')
+
+          if authed then
+              ms.irc.modeset(c, t, recipient, mode)
+              ms.irc.privmsg(c, t, "Tada!")
+          end
+      end
+  , ['kick%s+.+'] =
+      function (ms, c, t, msg, authed)
+          local _, _, recipient, message = msg:find('kick%s+(.+)%s+(.*)')
+          message = message or recipient
+
+          ms.irc.kick(c, t, recipient, message)
+      end
   }
 
 return self

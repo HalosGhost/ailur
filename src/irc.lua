@@ -34,6 +34,14 @@ irc.modeset = function (c, target, recipient, mode)
     end
 end
 
+irc.kick = function (c, target, recipient, message)
+    if target:byte() == 35 then
+        c:send('KICK ' .. target .. ' ' .. recipient .. ' :' .. message .. '\r\n')
+    else
+        irc.privmsg(c, target, 'Cannot kick in query')
+    end
+end
+
 irc.get_sname = function (c)
     local sname = ''
     while sname == '' do
