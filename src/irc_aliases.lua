@@ -80,7 +80,9 @@ local self =
           local _, _, recipient, message = msg:find('kick%s+(.+)%s+(.*)')
           message = message or recipient
 
-          ms.irc.kick(c, t, recipient, message)
+          if authed then
+              ms.irc.kick(c, t, recipient, message)
+          end
       end
   }
 
