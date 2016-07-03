@@ -64,7 +64,7 @@ irc.authorized = function (c, nw, mask)
     return authed
 end
 
-irc.react_to_privmsg = function (c, nw, ms, hotload, text)
+irc.react_to_privmsg = function (c, nw, ms, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
     local authed = irc.authorized(c, nw, mask .. hn)
@@ -85,7 +85,7 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
     else
         for k, v in pairs(ms.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
-                v(ms, c, tgt, key, authed, mask, hotload)
+                v(ms, c, tgt, key, authed, mask)
             end
         end
     end
@@ -93,7 +93,7 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
     return true
 end
 
-irc.react_loop = function (c, nw, sname, ms, hotload)
+irc.react_loop = function (c, nw, sname, ms)
     math.randomseed(os.time())
 
     local keepalive = true
@@ -104,12 +104,12 @@ irc.react_loop = function (c, nw, sname, ms, hotload)
         if data == ('PING ' .. sname) then
             irc.pong(c, sname)
         elseif data:find('PRIVMSG') then
-            keepalive = irc.react_to_privmsg(c, nw, ms, hotload, data)
+            keepalive = irc.react_to_privmsg(c, nw, ms, data)
         end
     end
 end
 
-irc.bot = function (ms, hotload)
+irc.bot = function (ms)
     local nw = ms.irc_network
     local c = irc.init(nw)
     if not c then
@@ -122,7 +122,7 @@ irc.bot = function (ms, hotload)
     local sname = irc.get_sname(c)
     irc.joinall(c, nw)
 
-    irc.react_loop(c, nw, sname, ms, hotload)
+    irc.react_loop(c, nw, sname, ms)
     c:close()
 end
 
