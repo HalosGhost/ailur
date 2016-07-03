@@ -79,23 +79,13 @@ irc.react_to_privmsg = function (c, nw, ms, hotload, text)
 
     if basic ~= nil then
         irc.privmsg(c, tgt, basic)
-    elseif key:find('^%s*reload .+') and authed then
-        local _, _, what = key:find('reload (.+)')
-        if what == 'all' then
-            irc.privmsg(c, tgt, 'Tada!')
-            return false
-        else
-            for k in pairs(ms) do
-                if what == k then
-                    irc.privmsg(c, tgt, 'Tada!')
-                    hotload(ms, k)
-                end
-            end
-        end
+    elseif key:find('^%s*restart') and authed then
+        irc.privmsg(c, tgt, 'Tada!')
+        return false
     else
         for k, v in pairs(ms.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
-                v(ms, c, tgt, key, authed, mask)
+                v(ms, c, tgt, key, authed, mask, hotload)
             end
         end
     end
