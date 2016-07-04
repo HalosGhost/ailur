@@ -1,17 +1,29 @@
 local self =
   { ['ug[maen]'] =
-      function (ms, c, t, msg)
+      function (ms, c, t, msg, _, s)
           local map = { ['m'] = 'Morning'
                       , ['a'] = 'Afternoon'
                       , ['e'] = 'Evening'
                       , ['n'] = 'Night'
                       }
           local _, _, l = msg:find('ug(.)')
-          ms.irc.privmsg(c, t, 'Good (ugt) ' .. map[l] .. ' to all!')
+          ms.irc.privmsg(c, t, 'Good (ugt) ' .. map[l] .. ' to all ' .. s.. '!')
       end
   , ['die'] =
-      function (ms, c, _, _, auth)
+      function (_, c, _, _, auth)
           if auth then c:close(); os.exit() end
+      end
+  , ['reload%s+.+'] =
+      function (ms, c, t, msg, authed)
+          if not authed then return end
+
+          local _, _, what = msg:find('reload%s+(.+)')
+          for k in pairs(ms) do
+              if what == k then
+                  ms.irc.privmsg(c, t, 'Tada!')
+                  ms.loader.hl(ms, k)
+              end
+          end
       end
   , ['listfacts'] =
       function (ms, c, t)
