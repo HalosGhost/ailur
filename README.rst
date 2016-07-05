@@ -1,7 +1,7 @@
 Bot
 ===
 
-This is an experimental IRC bot writeen entirely in lua.
+This is an experimental IRC bot written entirely in lua.
 
 It exists almost exclusively to help me learn about the IRC protocol and to allow for quick prototyping before I actually dive in and code a bot in C.
 
