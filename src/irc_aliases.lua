@@ -102,6 +102,15 @@ local self =
           attr = attr == '' and attr or (' ' .. attr)
           ms.irc.privmsg(c, t, sndr .. ': No, \x1Dyou\x1D' .. attr .. '!')
       end
+  , ['test%s*.*'] =
+      function (ms, c, t, msg)
+          local _, _, test = msg:find('test%s*(.*)')
+          test = test == '' and test or (' ' .. test)
+
+          local rest = { '3PASS', '5FAIL', '5\x02PANIC\x02' }
+          local res = rest[math.random(#rest)]
+          ms.irc.privmsg(c, t, 'Testing' .. test .. ': [\x03' .. res .. '\x03]')
+      end
   }
 
 return self
