@@ -107,8 +107,11 @@ local self =
           local _, _, test = msg:find('test%s*(.*)')
           test = test == '' and test or (' ' .. test)
 
+          local prob = math.random()
           local rest = { '3PASS', '5FAIL', '5\x02PANIC\x02' }
-          local res = rest[math.random(#rest)]
+          local res = prob < 0.45 and rest[1] or
+                      prob < 0.9  and rest[2] or rest[3]
+
           ms.irc.privmsg(c, t, 'Testing' .. test .. ': [\x03' .. res .. '\x03]')
       end
   }
