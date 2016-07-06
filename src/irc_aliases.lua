@@ -96,6 +96,11 @@ local self =
               ms.irc.kick(c, t, recipient, message)
           end
       end
+  , ['you%s+.+'] =
+      function (ms, c, t, msg, _, sndr)
+          local _, _, attr = msg:find('you%s+(.+)')
+          ms.irc.privmsg(c, t, sndr .. ': No, \x1Dyou\x1D ' .. attr .. '!')
+      end
   }
 
 return self
