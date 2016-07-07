@@ -109,8 +109,8 @@ local self =
 
           local prob = math.random()
           local rest = { '3PASS', '5FAIL', '5\x02PANIC\x02' }
-          local res = prob < 0.45 and rest[1] or
-                      prob < 0.9  and rest[2] or rest[3]
+          local res = prob < 0.01 and rest[3] or
+                      prob < 0.49 and rest[2] or rest[1]
 
           ms.irc.privmsg(c, t, 'Testing' .. test .. ': [\x03' .. res .. '\x03]')
       end
