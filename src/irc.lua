@@ -42,10 +42,11 @@ irc.kick = function (c, target, recipient, message)
     end
 end
 
-irc.get_sname = function (c)
+irc.get_sname = function (c, ms)
     local sname = ''
     while sname == '' do
         local data = c:receive('*l')
+        if ms.debug then print(data) end
 
         if data:find('376') or data:find('422') then
             _, _, sname = data:find('(%S+)')
@@ -119,7 +120,7 @@ irc.bot = function (ms)
 
     irc.conn(c, nw)
 
-    local sname = irc.get_sname(c)
+    local sname = irc.get_sname(c, ms)
     irc.joinall(c, nw)
 
     irc.react_loop(c, nw, sname, ms)
