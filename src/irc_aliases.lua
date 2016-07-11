@@ -98,10 +98,11 @@ local self =
               ms.irc.kick(c, t, recipient, message)
           end
       end
-  , ['you%s*.*'] =
+  , ['you.*'] =
       function (ms, c, t, msg, _, sndr)
-          local _, _, attr = msg:find('you%s*(.*)')
-          attr = attr == '' and attr or (' ' .. attr)
+          local _, _, attr = msg:find('you(.*)')
+          --attr = attr == '' and attr or (' ' .. attr)
+          attr = attr == nil and '' or attr
           ms.irc.privmsg(c, t, sndr .. ': No, \x1Dyou\x1D' .. attr .. '!')
       end
   , ['test%s*.*'] =
