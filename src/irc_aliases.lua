@@ -65,11 +65,7 @@ local self =
           if thing ~= nil then
               ms.irc.privmsg(c, t, to .. ': ' .. thing)
           else
-              for k, v in pairs(ms.irc_aliases) do
-                  if what:find('%s*' .. k .. '$') then
-                      v(ms, c, t, what, false, sndr)
-                  end
-              end
+              ms.irc.privmsg(c, t, sndr .. ': `give` only works with factoids')
           end
       end
   , ['hatroulette'] =
