@@ -117,6 +117,26 @@ local self =
 
           ms.irc.privmsg(c, t, 'Testing' .. test .. ': [\x03' .. res .. '\x03]')
       end
+  , ['roll%s+%d+d%d+'] =
+      function (ms, c, t, msg)
+          local _, _, numdice, numsides = msg:find('roll%s*(%d+)d(%d+)')
+          local rands = ''
+
+          numdice = math.tointeger(numdice)
+          numsides = math.tointeger(numsides)
+          local invalid = function (n)
+              return not (math.type(n) == 'integer' and n >= 1)
+          end
+
+          if invalid(numdice) or invalid(numsides) then return end
+
+          for i=1,numdice do
+              rands = math.random(numsides) .. ' ' .. rands
+              if rands:len() > 510 then break end
+          end
+
+          ms.irc.privmsg(c, t, rands)
+      end
   }
 
 return self
