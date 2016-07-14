@@ -80,9 +80,9 @@ local self =
 
           ms.irc.modeset(c, t, sndr, res)
       end
-  , ['..%s+.+'] =
+  , ['[+-][bqvo]%s+.+'] =
       function (ms, c, t, msg, authed)
-          local _, _, mode, recipient = msg:find('(..)%s+(.+)')
+          local _, _, mode, recipient = msg:find('([+-][bqvo])%s+(.+)')
 
           if authed then
               ms.irc.modeset(c, t, recipient, mode)
