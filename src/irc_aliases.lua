@@ -118,7 +118,7 @@ local self =
           ms.irc.privmsg(c, t, 'Testing' .. test .. ': [\x03' .. res .. '\x03]')
       end
   , ['roll%s+%d+d%d+'] =
-      function (ms, c, t, msg)
+      function (ms, c, t, msg, _, sndr)
           local _, _, numdice, numsides = msg:find('roll%s*(%d+)d(%d+)')
           local rands = ''
 
@@ -135,7 +135,7 @@ local self =
               if rands:len() > 510 then break end
           end
 
-          ms.irc.privmsg(c, t, rands)
+          ms.irc.privmsg(c, t, sndr .. ': ' .. rands)
       end
   }
 
