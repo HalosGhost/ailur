@@ -6,6 +6,7 @@ local self =
   , ['jæja']           = 'jæja'
   , ['help']           = 'see `listfacts` and `listaliases`'
   , ['﻿']         = 'Halp! I\'ze been haXXed!'
+  , ['stahp']          = 'ಠ_ಠ'
   }
 
 return self
