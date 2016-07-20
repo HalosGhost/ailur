@@ -89,9 +89,9 @@ local self =
               ms.irc.privmsg(c, t, "Tada!")
           end
       end
-  , ['kick%s+.+'] =
+  , ['kick%s+%S+%s*.*'] =
       function (ms, c, t, msg, authed)
-          local _, _, recipient, message = msg:find('kick%s+(.+)%s+(.*)')
+          local _, _, recipient, message = msg:find('kick%s+(%S+)%s*(.*)')
           message = message or recipient
 
           if authed then
