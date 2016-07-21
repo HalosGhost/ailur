@@ -71,7 +71,15 @@ local self =
   , ['hatroulette'] =
       function (ms, c, t, _, _, sndr)
           local ar = { '-', '+' }
-          local md = { 'q', 'b', 'v', 'o' }
+          local md = { 'q', 'b', 'v', 'o', 'kick'}
+          local mode_roll = md[math.random(#md)]
+
+          if mode_roll == 'kick' then
+              ms.irc.privmsg(c, t, sndr .. ' rolls for a kick!')
+              ms.irc.kick(c, t, sndr, 'You asked for this')
+              return
+          end
+
           local res = ar[math.random(#ar)] .. md[math.random(#md)]
 
           if t:byte() == 35 then
