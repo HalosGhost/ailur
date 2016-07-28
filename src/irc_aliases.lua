@@ -80,7 +80,7 @@ local self =
               return
           end
 
-          local res = ar[math.random(#ar)] .. md[math.random(#md)]
+          local res = ar[math.random(#ar)] .. mode_roll
 
           if t:byte() == 35 then
               ms.irc.privmsg(c, t, sndr .. ' rolls for a ' .. res .. '!')
