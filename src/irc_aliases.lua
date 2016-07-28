@@ -109,7 +109,6 @@ local self =
   , ['you.*'] =
       function (ms, c, t, msg, _, sndr)
           local _, _, attr = msg:find('you(.*)')
-          --attr = attr == '' and attr or (' ' .. attr)
           attr = attr == nil and '' or attr
           ms.irc.privmsg(c, t, sndr .. ': No, \x1Dyou\x1D' .. attr .. '!')
       end
