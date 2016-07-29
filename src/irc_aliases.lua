@@ -144,6 +144,12 @@ local self =
 
           ms.irc.privmsg(c, t, sndr .. ': ' .. rands)
       end
+  , ['bloat%s*.*'] =
+      function (ms, c, t, msg, _, sndr)
+          local _, _, target = msg:find('bloat%s*(.*)')
+          target = target == '' and sndr or target
+          ms.irc.privmsg(c, t, target .. ' is bloat.')
+      end
   }
 
 return self
