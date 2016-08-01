@@ -7,7 +7,7 @@ local self =
                       , ['n'] = 'Night'
                       }
           local _, _, l = msg:find('ug(.)')
-          ms.irc.privmsg(c, t, 'Good (ugt) ' .. map[l] .. ' to all ' .. s.. '!')
+          ms.irc.privmsg(c, t, s .. ' says “Good (ugt) ' .. map[l] .. ' to all!”')
       end
   , ['die'] =
       function (_, c, _, _, auth)
