@@ -3,8 +3,7 @@ local irc = {}
 local socket = require 'socket'
 
 irc.init = function (stbl)
-    local c = socket.connect(stbl.address, stbl.port)
-    return c
+    return socket.connect(stbl.address, stbl.port)
 end
 
 irc.conn = function (c, stbl)
@@ -71,7 +70,7 @@ irc.react_to_privmsg = function (c, nw, ms, text)
     local authed = irc.authorized(c, nw, mask .. hn)
 
     local tgt = target:find('^#') and target or mask
-    local prefix = '^' .. (tgt:find('^#') and ms.irc_network.handle or '') .. '.%s+'
+    local prefix = '^' .. (tgt:find('^#') and ms.irc_network.handle or '') .. '.?%s+'
 
     if not msg:find(prefix) then return true end
 
