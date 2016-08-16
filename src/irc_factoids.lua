@@ -9,6 +9,7 @@ local self =
   , ['stahp']          = 'ಠ_ಠ'
   , ['best']           = 'Use what is best for \x1Dyou!\x1D'
   , ['halosghost']     = 'Do what feels right!'
+  , ['ugt']            = 'http://www.total-knowledge.com/~ilya/mips/ugt.html'
   }
 
 return self
