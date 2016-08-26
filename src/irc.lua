@@ -1,9 +1,13 @@
 local irc = {}
 
 local socket = require 'socket'
+local ssl = require 'ssl'
 
 irc.init = function (stbl)
-    return socket.connect(stbl.address, stbl.port)
+    local bare = socket.connect(stbl.address, stbl.port)
+    local conn = ssl.wrap(bare, stbl.sslparams)
+    conn:dohandshake()
+    return conn
 end
 
 irc.conn = function (c, stbl)
