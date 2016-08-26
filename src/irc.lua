@@ -64,10 +64,10 @@ irc.authorized = function (c, nw, mask)
     return authed
 end
 
-irc.react_to_privmsg = function (c, nw, ms, text)
+irc.react_to_privmsg = function (c, ms, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
-    local authed = irc.authorized(c, nw, mask .. hn)
+    local authed = irc.authorized(c, ms.irc_network, mask .. hn)
 
     local tgt = target:find('^#') and target or mask
     local prefix = '^' .. (tgt:find('^#') and ms.irc_network.handle or '') .. '.?%s+'
@@ -93,7 +93,7 @@ irc.react_to_privmsg = function (c, nw, ms, text)
     return true
 end
 
-irc.react_loop = function (c, nw, sname, ms)
+irc.react_loop = function (c, sname, ms)
     math.randomseed(os.time())
 
     local keepalive = true
@@ -104,25 +104,24 @@ irc.react_loop = function (c, nw, sname, ms)
         if data == ('PING ' .. sname) then
             irc.pong(c, sname)
         elseif data:find('PRIVMSG') then
-            keepalive = irc.react_to_privmsg(c, nw, ms, data)
+            keepalive = irc.react_to_privmsg(c, ms, data)
         end
     end
 end
 
 irc.bot = function (ms)
-    local nw = ms.irc_network
-    local c = irc.init(nw)
+    local c = irc.init(ms.irc_network)
     if not c then
         print('failed to initialize irc network')
         return
     end
 
-    irc.conn(c, nw)
+    irc.conn(c, ms.irc_network)
 
     local sname = irc.get_sname(c, ms)
-    irc.joinall(c, nw)
+    irc.joinall(c, ms.irc_network)
 
-    irc.react_loop(c, nw, sname, ms)
+    irc.react_loop(c, sname, ms)
     c:close()
 end
 
