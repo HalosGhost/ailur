@@ -150,6 +150,14 @@ local self =
           target = target == '' and sndr or target
           ms.irc.privmsg(c, t, target .. ' is bloat.')
       end
+  , ['[ <]?https?://[^> ]+[ >]?'] =
+      function (ms, c, t, msg)
+          local _, _, url = msg:find('[ <]?(https?://[^> ]+)[ >]?')
+          if url ~= nil then
+              title = ms.get_url_title(url)
+              ms.irc.privmsg(c, t, title)
+          end
+      end
   }
 
 return self
