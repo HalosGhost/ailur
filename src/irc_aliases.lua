@@ -39,6 +39,13 @@ local self =
               list = "'" .. k .. "' " .. list
           end; ms.irc.privmsg(c, t, list)
       end
+  , ['listmods'] =
+      function (ms, c, t)
+          local list = ''
+          for k in pairs(ms) do
+              list = "'" .. k .. "' " .. list
+          end; ms.irc.privmsg(c, t, list)
+      end
   , ['is.*'] =
       function (ms, c, t)
           local prob =
