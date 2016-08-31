@@ -165,6 +165,33 @@ local self =
               ms.irc.privmsg(c, t, title)
           end
       end
+  , ['rot13%s.*'] =
+      function (ms, c, t, msg)
+          local _, _, text = msg:find('rot13%s(.*)')
+          if text ~= nil then
+              chars = {}
+              for i=1,text:len() do
+                  chars[i] = text:byte(i)
+              end
+
+              rotted = ""
+              for i=1,#chars do
+                  letter = chars[i]
+                  if letter >= 65 and letter < 91 then
+                      offset = letter - 65
+                      letter = string.char(65 + ((offset + 13) % 26))
+                  elseif letter >= 97 and letter < 123 then
+                      offset = letter - 97
+                      letter = string.char(97 + ((offset + 13) % 26))
+                  else
+                      letter = string.char(chars[i])
+                  end
+                  rotted = rotted .. letter
+              end
+
+              ms.irc.privmsg(c, t, rotted)
+          end
+      end
   }
 
 return self
