@@ -196,6 +196,15 @@ local self =
       function (ms, c, t, msg, authed)
           if authed then return true end
       end
+  , ['update'] =
+      function (ms, c, t, msg, authed)
+          if authed then
+              _, _, status = os.execute('git pull origin master')
+              if status == 0 then
+                  ms.irc.privmsg(c, t, "Tada!")
+              end
+          end
+      end
   }
 
 return self
