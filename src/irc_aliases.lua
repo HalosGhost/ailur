@@ -193,11 +193,11 @@ local self =
           end
       end
   , ['restart'] =
-      function (ms, c, t, msg, authed)
+      function (_, _, _, _, authed)
           if authed then return true end
       end
   , ['update'] =
-      function (ms, c, t, msg, authed)
+      function (ms, c, t, _, authed)
           if authed then
               _, _, status = os.execute('git pull origin master')
               if status == 0 then
