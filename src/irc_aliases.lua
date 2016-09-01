@@ -25,26 +25,21 @@ local self =
               end
           end
       end
-  , ['listfacts'] =
-      function (ms, c, t)
+  , ['list%s*(%S+)'] =
+      function (ms, c, t, msg)
           local list = ''
-          for k in pairs(ms.irc_factoids) do
-              list = "'" .. k .. "' " .. list
-          end; ms.irc.privmsg(c, t, list)
-      end
-  , ['listaliases'] =
-      function (ms, c, t)
-          local list = ''
-          for k in pairs(ms.irc_aliases) do
-              list = "'" .. k .. "' " .. list
-          end; ms.irc.privmsg(c, t, list)
-      end
-  , ['listmods'] =
-      function (ms, c, t)
-          local list = ''
-          for k in pairs(ms) do
-              list = "'" .. k .. "' " .. list
-          end; ms.irc.privmsg(c, t, list)
+          local what = msg:find('list%s*(%S+)')
+
+          local tables = { ['factoids'] = ms.irc_factoids
+                         , ['aliases']  = ms.irc_aliases
+                         , ['modules']  = ms
+                         }
+
+          if what ~= nil and tables[what] ~= nil then
+              for k in pairs(tables[what]) do
+                  list = "'" .. k .. "' " .. list
+              end; ms.irc.privmsg(c, t, list)
+          end
       end
   , ['is.*'] =
       function (ms, c, t)
