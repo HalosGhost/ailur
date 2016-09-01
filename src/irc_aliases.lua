@@ -192,6 +192,10 @@ local self =
               ms.irc.privmsg(c, t, rotted)
           end
       end
+  , ['restart'] =
+      function (ms, c, t, msg, authed)
+          if authed then return true end
+      end
   }
 
 return self

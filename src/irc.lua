@@ -83,13 +83,11 @@ irc.react_to_privmsg = function (c, ms, text)
 
     if basic ~= nil then
         irc.privmsg(c, tgt, basic)
-    elseif key:find('^%s*restart') and authed then
-        irc.privmsg(c, tgt, 'Tada!')
-        return false
     else
         for k, v in pairs(ms.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
-                v(ms, c, tgt, key, authed, mask)
+                ret = v(ms, c, tgt, key, authed, mask)
+                if ret then return false end
             end
         end
     end
