@@ -7,6 +7,7 @@ return
   , ['gecos']    = '🐼'
   , ['admins']   =
       { '.*@.*%.halosgho%.st'
+      , '.*@unaffiliated/meskarune'
       }
   , ['channels'] =
       { '##meskarune'
