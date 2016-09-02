@@ -61,8 +61,8 @@ end
 
 irc.authorized = function (c, nw, mask)
     local authed = nil
-    for _, v in pairs(nw.admins) do
-        authed = authed or mask:find(v)
+    for k in pairs(nw.admins) do
+        authed = authed or mask:find(k)
     end
 
     return authed
