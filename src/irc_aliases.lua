@@ -34,6 +34,7 @@ local self =
                          , ['factoids'] = ms.irc_factoids
                          , ['aliases']  = ms.irc_aliases
                          , ['modules']  = ms
+                         , ['admins']   = ms.irc_network.admins
                          }
 
           local the_table = {}
