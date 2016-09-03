@@ -11,6 +11,7 @@ local self =
   , ['halosghost']     = 'Do what feels right!'
   , ['ugt']            = 'http://www.total-knowledge.com/~ilya/mips/ugt.html'
   , ['when']           = 'Should Happen Any Day Now™'
+  , ['thanks']         = "You're welcome, meatbag."
   }
 
 return self
