@@ -79,6 +79,7 @@ irc.react_to_privmsg = function (c, ms, text)
     if not msg:find(prefix) then return true end
 
     local _, _, key = msg:find(prefix .. '(.*)')
+    if key == nil then return true end
     local basic = ms.irc_factoids[key]
 
     if basic ~= nil then
