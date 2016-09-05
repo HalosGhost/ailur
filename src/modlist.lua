@@ -1,5 +1,5 @@
 return
-  { 'loader'
+  { 'coreload'
   , 'irc'
   , 'get_url_title'
   , 'irc_aliases'

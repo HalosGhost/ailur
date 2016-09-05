@@ -1,11 +1,11 @@
 while true do
     local ms = {}
-    ms.loader = require 'loader'
+    ms.coreload = require 'coreload'
 
-    ms.loader.hl(ms, 'modlist')
+    ms.coreload(ms, 'modlist')
 
     for _, v in ipairs(ms.modlist) do
-        ms.loader.hl(ms, v)
+        ms.coreload(ms, v)
     end
 
     ms.irc.bot(ms)

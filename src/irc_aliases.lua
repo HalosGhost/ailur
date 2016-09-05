@@ -21,7 +21,7 @@ local self =
           for k in pairs(ms) do
               if what == k then
                   ms.irc.privmsg(c, t, 'Tada!')
-                  ms.loader.hl(ms, k)
+                  ms.coreload(ms, k)
               end
           end
       end
