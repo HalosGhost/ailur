@@ -12,7 +12,7 @@ local self =
   , ['ugt']            = 'http://www.total-knowledge.com/~ilya/mips/ugt.html'
   , ['when']           = 'Should Happen Any Day Now™'
   , ['thanks']         = "You're welcome, meatbag."
-  , ['next']           = 'Another satisfied customer. \x1b[3mNext!'
+  , ['next']           = 'Another satisfied customer. \x1DNext!\x1D'
   }
 
 return self
