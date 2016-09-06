@@ -1,5 +1,6 @@
 return
   { 'coreload'
+  , 'extload'
   , 'irc'
   , 'get_url_title'
   , 'irc_aliases'
