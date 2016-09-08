@@ -207,6 +207,10 @@ local self =
               end
           end
       end
+  , ['judges'] =
+      function (ms, c, t, _, _, sndr)
+          ms.irc.privmsg(c, t, "So close, but " .. sndr .. " won by a nose!")
+      end
   }
 
 return self
