@@ -15,9 +15,13 @@ irc.conn = function (c, stbl)
     c:send('USER ' .. stbl.ident  .. ' * 8 :' .. stbl.gecos .. '\r\n')
 end
 
+irc.join = function (c, channel)
+    c:send('JOIN ' .. channel .. '\r\n')
+end
+
 irc.joinall = function (c, stbl)
     for _, v in pairs(stbl.channels) do
-        c:send('JOIN ' .. v .. '\r\n')
+        irc.join(c, v)
     end
 end
 

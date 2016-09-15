@@ -211,6 +211,15 @@ local self =
       function (ms, c, t, _, _, sndr)
           ms.irc.privmsg(c, t, "So close, but " .. sndr .. " won by a nose!")
       end
+  , ['join%s+%S+'] =
+      function (ms, c, t, msg, authed)
+          if authed then
+              local _, _, chan = msg:find('join%s+(%S+)')
+              if chan then
+                  ms.irc.join(c, chan)
+              end
+          end
+      end
   }
 
 return self
