@@ -217,6 +217,7 @@ local self =
               local _, _, chan = msg:find('join%s+(%S+)')
               if chan then
                   ms.irc.join(c, chan)
+                  ms.irc.privmsg(c, t, 'Tada!')
               end
           end
       end
