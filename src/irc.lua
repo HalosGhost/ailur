@@ -78,7 +78,7 @@ irc.react_to_privmsg = function (c, ms, text)
     local authed = irc.authorized(c, ms.irc_network, mask .. hn)
 
     local tgt = target:find('^#') and target or mask
-    local prefix = '^' .. (tgt:find('^#') and ms.irc_network.handle or '') .. '.?%s+'
+    local prefix = '^' .. (tgt:find('^#') and ms.irc_network.handle .. '.?%s+' or '')
 
     if not msg:find(prefix) then return true end
 
