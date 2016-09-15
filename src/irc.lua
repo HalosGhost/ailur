@@ -84,7 +84,7 @@ irc.react_to_privmsg = function (c, ms, text)
 
     local _, _, key = msg:find(prefix .. '(.*)')
     if key == nil then return true end
-    local basic = ms.irc_factoids[key]
+    local basic = ms.irc_factoids[key:gsub("^%s*(.-)%s*$", "%1")]
 
     if basic ~= nil then
         irc.privmsg(c, tgt, basic)
