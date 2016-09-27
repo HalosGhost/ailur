@@ -237,8 +237,8 @@ local self =
           if resp then
               if ms.debug then print(resp) end
               local res = json.decode(resp)
-              local lnk = res[4][1] ~= '' and res[4][1] or 'No results'
-              local dsc = res[3][1] ~= '' and ' - ' .. res[3][1] or ''
+              local lnk = (res[4][1] and res[4][1] ~= '') and res[4][1] or 'No results'
+              local dsc = (res[3][1] and res[3][1] ~= '') and ' - ' .. res[3][1] or ''
               ms.irc.privmsg(c, t, lnk .. dsc)
               return
           end
