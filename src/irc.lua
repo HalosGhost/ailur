@@ -106,13 +106,15 @@ irc.react_loop = function (c, sname, ms)
     local keepalive = true
     while keepalive do
         local data = c:receive('*l')
-        io.stdout:write(ms.debug and data .. '\n' or '')
+        if not data then goto continue end
+        if ms.debug then io.stdout:write(data .. '\n') end
 
         if data == ('PING ' .. sname) then
             irc.pong(c, sname)
         elseif data:find('PRIVMSG') then
             keepalive = irc.react_to_privmsg(c, ms, data)
         end
+        ::continue::
     end
 end
 
