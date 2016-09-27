@@ -225,9 +225,9 @@ local self =
               end
           end
       end
-  , ['wiki%s+%.+'] =
+  , ['wiki%s+.+'] =
       function (ms, c, t, msg)
-          local _, _, search = msg:find('wiki%s+(%.+)')
+          local _, _, search = msg:find('wiki%s+(.+)')
           if not search then
               ms.irc.privmsg(c, t, 'You want me to search for what?')
           end
