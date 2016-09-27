@@ -239,7 +239,7 @@ local self =
               local res = json.decode(resp)
               local lnk = res[4][1] ~= '' and res[4][1] or 'Something went wrong'
               local dsc = res[3][1] ~= '' and res[3][1] or 'No description found'
-              ms.irc.privmsg(c, t, link .. ' - ' .. desc)
+              ms.irc.privmsg(c, t, lnk .. ' - ' .. dsc)
               return
           end
       end
