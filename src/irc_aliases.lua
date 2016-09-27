@@ -228,18 +228,20 @@ local self =
   , ['wiki%s+%.+'] =
       function (ms, c, t, msg)
           local _, _, search = msg:find('wiki%s+(%.+)')
+          if not search then
+              ms.irc.privmsg(c, t, 'You want me to search for what?')
+          end
+
           local q = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search='
           local resp = https.request(q .. url.escape(search))
-          if ms.debug then print(resp) end
           if resp then
+              if ms.debug then print(resp) end
               local res = json.decode(resp)
               local lnk = res[4][1] ~= '' and res[4][1] or 'Something went wrong'
               local dsc = res[3][1] ~= '' and res[3][1] or 'No description found'
               ms.irc.privmsg(c, t, link .. ' - ' .. desc)
               return
           end
-
-          ms.irc.privmsg(c, t, 'Something went wrong')
       end
   }
 
