@@ -230,6 +230,7 @@ local self =
           local _, _, search = msg:find('wiki%s+(%.+)')
           local q = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search='
           local resp = https.request(q .. url.escape(search))
+          if ms.debug then print(resp) end
           if resp then
               local res = json.decode(resp)
               local lnk = res[4][1] ~= '' and res[4][1] or 'Something went wrong'
