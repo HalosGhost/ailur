@@ -9,10 +9,11 @@ local self =
   , ['stahp']          = 'ಠ_ಠ'
   , ['best']           = 'Use what is best for \x1Dyou!\x1D'
   , ['halosghost']     = 'Do what feels right!'
-  , ['ugt']            = 'http://www.total-knowledge.com/~ilya/mips/ugt.html'
+  , ['ugt']            = '<http://www.total-knowledge.com/~ilya/mips/ugt.html>'
   , ['when']           = 'Should Happen Any Day Now™'
   , ['thanks']         = "You're welcome, meatbag."
   , ['next']           = 'Another satisfied customer. \x1DNext!\x1D'
+  , ['how do I panda?'] = '<https://2.bp.blogspot.com/-Ctjx0gkGz3s/T-ouomdvt7I/AAAAAAAAGL8/DDk7I33PbOM/s1600/how+to+be+a+panda.jpg>'
   }
 
 return self
