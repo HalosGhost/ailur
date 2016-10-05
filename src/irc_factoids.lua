@@ -14,6 +14,7 @@ local self =
   , ['thanks']         = "You're welcome, meatbag."
   , ['next']           = 'Another satisfied customer. \x1DNext!\x1D'
   , ['how do I panda?'] = '<https://2.bp.blogspot.com/-Ctjx0gkGz3s/T-ouomdvt7I/AAAAAAAAGL8/DDk7I33PbOM/s1600/how+to+be+a+panda.jpg>'
+  , ['stats']          = 'Friendly Reminder: personal experience is not equivalent to statistical relevance'
   }
 
 return self
