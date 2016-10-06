@@ -253,6 +253,16 @@ local self =
               ms.irc.privmsg(c, t, 'Tada!')
           end
       end
+  , ["'.+' is nothing"] =
+      function (ms, c, t, msg)
+          local _, _, key = msg:find("'(.+)' is nothing")
+          if not key then
+              ms.irc.privmsg(c, t, '… what?')
+          else
+              ms.irc_factoids[key] = nil
+              ms.irc.privmsg(c, t, 'Tada!')
+          end
+      end
   }
 
 return self
