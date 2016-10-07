@@ -18,4 +18,5 @@ return
       , ['verify']   = 'none'
       , ['options']  = { 'all' }
       }
+  , ['dbpath']   = 'bot.db'
   }

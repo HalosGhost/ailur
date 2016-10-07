@@ -2,6 +2,7 @@ local irc = {}
 
 local socket = require 'socket'
 local ssl = require 'ssl'
+local sql = require 'lsqlite3'
 
 irc.init = function (stbl)
     local bare = socket.connect(stbl.address, stbl.port)
@@ -53,9 +54,9 @@ irc.get_sname = function (c, ms)
     local sname = ''
     while sname == '' do
         local data = c:receive('*l')
-        if ms.debug then print(data) end
+        if ms.debug and data then print(data) end
 
-        if data:find('376') or data:find('422') then
+        if data and (data:find('376') or data:find('422')) then
             _, _, sname = data:find('(%S+)')
         end
     end
@@ -84,7 +85,7 @@ irc.react_to_privmsg = function (c, ms, text)
 
     local _, _, key = msg:find(prefix .. '(.*)')
     if key == nil then return true end
-    local basic = ms.irc_factoids[key:gsub("^%s*(.-)%s*$", "%1")]
+    local basic = ms.irc_factoids.search(key:gsub("^%s*(.-)%s*$", "%1"))
 
     if basic ~= nil then
         irc.privmsg(c, tgt, basic)
@@ -125,12 +126,16 @@ irc.bot = function (ms)
         return
     end
 
+    db = nil
+    ms.irc_factoids.init(ms.irc_network.dbpath)
+
     irc.conn(c, ms.irc_network)
 
     local sname = irc.get_sname(c, ms)
     irc.joinall(c, ms.irc_network)
 
     irc.react_loop(c, sname, ms)
+    db:close()
     c:close()
 end
 
