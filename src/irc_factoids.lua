@@ -1,28 +1,34 @@
 local sql = require 'lsqlite3'
 
+local ins = nil
+local del = nil
+local sel = nil
+
 local self =
   { search = function (key)
-      local preamble = 'select value from factoids where key = "'
-      for v in db:urows( preamble .. key .. '"') do
+      sel:bind_names({ ['key'] = key })
+      for v in sel:urows() do
           return v
       end
     end
   , add = function (key, value)
-      local preamble = 'insert into factoids values ("' .. key
-      local res = db:exec(preamble .. '","' .. value .. '")')
-      if res == 0 then
-          return 'Tada!'
-      else
-          return db:errmsg()
-      end
+      ins:bind_names({ ['key'] = key, ['value'] = value })
+      local res = ins:step()
+      return (res == 101 and 'Tada!' or db:errmsg())
     end
   , remove = function (key)
-      local preamble = 'delete from factoids where key = "'
-      local res = db:exec(preamble .. key .. '"')
+      del:bind_names({ ['key'] = key })
+      local res = del:step()
+      return (res == 101 and 'Tada!' or db:errmsg())
     end
   , init = function (dbpath)
       db = sql.open(dbpath)
-      repeat until db:isopen()
+      if db == nil then
+          print('Failed to open the database')
+      end
+      ins = db:prepare('insert into factoids (key, value) values (:key, :value);')
+      del = db:prepare('delete from factoids where key = :key;')
+      sel = db:prepare('select value from factoids where key = :key;')
     end
   , cleanup = function ()
       db:close()
