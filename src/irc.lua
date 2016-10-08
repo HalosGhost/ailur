@@ -135,7 +135,7 @@ irc.bot = function (ms)
     irc.joinall(c, ms.irc_network)
 
     irc.react_loop(c, sname, ms)
-    db:close()
+    ms.irc_factoids.cleanup()
     c:close()
 end
 

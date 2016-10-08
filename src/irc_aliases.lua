@@ -249,7 +249,7 @@ local self =
           if not key or not val then
               ms.irc.privmsg(c, t, '… what?')
           else
-              ms.irc_factoids[key] = val
+              ms.irc_factoids.add(key, val)
               ms.irc.privmsg(c, t, 'Tada!')
           end
       end
@@ -259,7 +259,7 @@ local self =
           if not key then
               ms.irc.privmsg(c, t, '… what?')
           else
-              ms.irc_factoids[key] = nil
+              ms.irc_factoids.remove(key)
               ms.irc.privmsg(c, t, 'Tada!')
           end
       end
