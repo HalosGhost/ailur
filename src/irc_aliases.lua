@@ -74,7 +74,7 @@ local self =
   , ['give%s+%S+.+'] =
       function (ms, c, t, msg, _, sndr)
           local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
-          local thing = ms.irc_factoids[what:gsub("^%s*(.-)%s*$", "%1")]
+          local thing = ms.irc_factoids.search(what:gsub("^%s*(.-)%s*$", "%1"))
           if thing ~= nil then
               ms.irc.privmsg(c, t, to .. ': ' .. thing)
           else
