@@ -34,7 +34,7 @@ local self =
           local _, _, key = msg:find('numfacts%s*(.*)')
           ms.irc.privmsg(c, t, ms.irc_factoids.count(key))
       end
-  , ['list%s*(%S*)'] =
+  , ['list%s*%S*'] =
       function (ms, c, t, msg)
           local list = ''
           local _, _, what = msg:find('list%s*(%S*)')
