@@ -22,9 +22,13 @@ local self =
       end
     end
   , add = function (key, value)
+      del:reset()
+      del:bind_names({ ['key'] = key })
+      local res = del:step()
+
       ins:reset()
       ins:bind_names({ ['key'] = key, ['value'] = value })
-      local res = ins:step()
+      res = ins:step()
       return (res == 101 and 'Tada!' or db:errmsg())
     end
   , remove = function (key)
