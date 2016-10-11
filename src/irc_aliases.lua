@@ -40,7 +40,6 @@ local self =
           local _, _, what = msg:find('list%s*(%S*)')
 
           local tables = { ['all']      = tables
-                         , ['factoids'] = ms.irc_factoids
                          , ['aliases']  = ms.irc_aliases
                          , ['modules']  = ms
                          , ['admins']   = ms.irc_network.admins
