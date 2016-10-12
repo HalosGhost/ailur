@@ -4,14 +4,24 @@ local ins = nil
 local cnt = nil
 local del = nil
 local sel = nil
+local sim = nil
 
 local self =
-  { search = function (key)
+  { find = function (key)
       sel:reset()
       sel:bind_names({ ['key'] = key })
       for v in sel:urows() do
           return v
       end
+    end
+  , search = function (key)
+      sim:reset()
+      sim:bind_names({ ['key'] = key })
+      local list = ''
+      for v in sim:urows() do
+          list = "'" .. v .. "' " .. list
+      end
+      return list
     end
   , count = function (key)
       cnt:reset()
@@ -46,12 +56,14 @@ local self =
       cnt = db:prepare('select count(*) from factoids where key like :key;')
       del = db:prepare('delete from factoids where key = :key;')
       sel = db:prepare('select value from factoids where key = :key;')
+      sim = db:prepare('select value from factoids where key like :key;')
     end
   , cleanup = function ()
       ins:finalize()
       cnt:finalize()
       del:finalize()
       sel:finalize()
+      sim:finalize()
       db:close()
     end
   }

@@ -29,10 +29,16 @@ local self =
               end
           end
       end
-  , ['numfacts%s*.*'] =
+  , ['fact count%s*.*'] =
       function (ms, c, t, msg)
-          local _, _, key = msg:find('numfacts%s*(.*)')
+          local _, _, key = msg:find('fact count%s*(.*)')
           ms.irc.privmsg(c, t, ms.irc_factoids.count(key))
+      end
+  , ['fact search%s*.*'] =
+      function (ms, c, t, msg)
+          local _, _, key = msg:find('fact search%s*(.*)')
+          ms.irc_privmsg(c, t, ms.irc_factoids.search(key))
+
       end
   , ['list%s*%S*'] =
       function (ms, c, t, msg)
@@ -78,7 +84,7 @@ local self =
   , ['give%s+%S+.+'] =
       function (ms, c, t, msg, _, sndr)
           local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
-          local thing = ms.irc_factoids.search(what:gsub("^%s*(.-)%s*$", "%1"))
+          local thing = ms.irc_factoids.find(what:gsub("^%s*(.-)%s*$", "%1"))
           if thing ~= nil then
               ms.irc.privmsg(c, t, to .. ': ' .. thing)
           else
