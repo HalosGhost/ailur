@@ -37,7 +37,7 @@ local self =
   , ['fact search%s*.*'] =
       function (ms, c, t, msg)
           local _, _, key = msg:find('fact search%s*(.*)')
-          ms.irc_privmsg(c, t, ms.irc_factoids.search(key))
+          ms.irc.privmsg(c, t, ms.irc_factoids.search(key))
 
       end
   , ['list%s*%S*'] =
