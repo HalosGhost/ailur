@@ -15,6 +15,7 @@ local self =
       end
     end
   , search = function (key)
+      local key = key and '%' .. key .. '%' or '%'
       sim:reset()
       sim:bind_names({ ['key'] = key })
       local list = ''
@@ -56,7 +57,7 @@ local self =
       cnt = db:prepare('select count(*) from factoids where key like :key;')
       del = db:prepare('delete from factoids where key = :key;')
       sel = db:prepare('select value from factoids where key = :key;')
-      sim = db:prepare('select value from factoids where key like :key;')
+      sim = db:prepare('select key from factoids where key like :key;')
     end
   , cleanup = function ()
       ins:finalize()
