@@ -1,6 +1,7 @@
 local json = require 'json'
 local url = require 'socket.url'
 local https = require 'ssl.https'
+local mediawiki_alias = require 'mediawiki_alias'
 
 local self =
   { ['ug[maen]'] =
@@ -235,24 +236,10 @@ local self =
               end
           end
       end
-  , ['wiki%s+.+'] =
-      function (ms, c, t, msg)
-          local _, _, search = msg:find('wiki%s+(.+)')
-          if not search then
-              ms.irc.privmsg(c, t, 'You want me to search for what?')
-          end
-
-          local q = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search='
-          local resp = https.request(q .. url.escape(search))
-          if resp then
-              if ms.debug then print(resp) end
-              local res = json.decode(resp)
-              local lnk = (res[4][1] and res[4][1] ~= '') and res[4][1] or 'No results'
-              local dsc = (res[3][1] and res[3][1] ~= '') and ' - ' .. res[3][1] or ''
-              ms.irc.privmsg(c, t, '<' .. lnk .. '>' .. dsc)
-              return
-          end
-      end
+  , ['wiki%s+(.+)'] =
+      mediawiki_alias('wiki%s+(.+)', 'https://en.wikipedia.org/w/api.php')
+  , ['archwiki%s+.+'] =
+      mediawiki_alias('archwiki%s+(.+)', 'https://wiki.archlinux.org/api.php')
   , ["'.+' is '.+'"] =
       function (ms, c, t, msg)
           local _, _, key, val = msg:find("'(.+)' is '(.+)'")
