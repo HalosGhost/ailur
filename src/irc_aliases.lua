@@ -236,7 +236,7 @@ local self =
               end
           end
       end
-  , ['wiki%s+(.+)'] =
+  , ['wiki%s+.+'] =
       mediawiki_alias('wiki%s+(.+)', 'https://en.wikipedia.org/w/api.php')
   , ['archwiki%s+.+'] =
       mediawiki_alias('archwiki%s+(.+)', 'https://wiki.archlinux.org/api.php')
