@@ -82,9 +82,9 @@ local self =
           local _, _, m = msg:find('say%s+(.+)')
           ms.irc.privmsg(c, t, m)
       end
-  , ['me%s+.+'] =
+  , ['act%s+.+'] =
       function (ms, c, t, msg)
-          local _, _, m = msg:find('me%s+(.+)')
+          local _, _, m = msg:find('act%s+(.+)')
           ms.irc.privmsg(c, t, '\x01ACTION ' .. m .. '\x01')
       end
   , ['give%s+%S+.+'] =
