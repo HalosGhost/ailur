@@ -77,10 +77,15 @@ local self =
           r3 = math.random(#punct)
           ms.irc.privmsg(c, t, prob[r1] .. ' ' .. case[r2] .. punct[r3])
       end
-  , ['say.*'] =
+  , ['say%s+.+'] =
       function (ms, c, t, msg)
-          local _, _, m = msg:find('say%s*(.*)')
+          local _, _, m = msg:find('say%s+(.+)')
           ms.irc.privmsg(c, t, m)
+      end
+  , ['me%s+.+'] =
+      function (ms, c, t, msg)
+          local _, _, m = msg:find('me%s+(.+)')
+          ms.irc.privmsg(c, t, '\x01ACTION ' .. m .. '\x01')
       end
   , ['give%s+%S+.+'] =
       function (ms, c, t, msg, _, sndr)
