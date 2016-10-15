@@ -2,8 +2,8 @@ return
   { ['name']     = 'freenode'
   , ['address']  = 'chat.freenode.net'
   , ['port']     = 7000
-  , ['handle']   = 'hgctl'
-  , ['ident']    = 'hgctl'
+  , ['handle']   = 'pandactl'
+  , ['ident']    = 'pandactl'
   , ['gecos']    = '🐼'
   , ['admins']   =
       { ['.*@.*%.halosgho%.st'] = 1
