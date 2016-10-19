@@ -265,6 +265,19 @@ local self =
               ms.irc.privmsg(c, t, 'Tada!')
           end
       end
+  , ["pick%s+.+"] =
+      function (ms, c, t, msg)
+          local _, _, str = msg:find("pick%s+(.+)")
+          words = {}
+          if str then
+              for i in str:gmatch("%S+") do
+                  words[#words + 1] = i
+              end
+              --
+          end
+          local r = math.random(#words)
+          ms.irc.privmsg(c, t, words[r])
+      end
   }
 
 return self
