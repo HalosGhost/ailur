@@ -278,6 +278,12 @@ local self =
           local r = math.random(#words)
           ms.irc.privmsg(c, t, words[r])
       end
+  , ['uptime'] =
+      function (ms, c, t)
+          local upt = io.popen('uptime -p')
+          ms.irc.privmsg(c, t, upt:read('*line'))
+          upt:close()
+      end
   }
 
 return self
