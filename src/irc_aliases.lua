@@ -280,8 +280,22 @@ local self =
   , ['uptime'] =
       function (ms, c, t)
           local upt = io.popen('uptime -p')
-          ms.irc.privmsg(c, t, upt:read('*line'))
+          ms.irc.privmsg(c, t, upt:read())
           upt:close()
+      end
+  , ['stats'] =
+      function (ms, c, t)
+          local disk = 'df /dev/mapper/crypthome --output=pcent | tail -n 1'
+          local pipe = io.popen(disk)
+          local du = pipe:read('*number') .. '%'
+          pipe:close()
+          pipe = io.popen('free | tail -n 1')
+          local ram = pipe:read()
+          pipe:close()
+          local rampat = 'Mem:%s+(%d+)%s+%d+%s+%d+%s+%d+%s+%d+%s+(%d+)'
+          local _, _, tot, fre = ram:find(rampat)
+          local ru = string.format("%.f%%", fre / tot * 100)
+          ms.irc.privmsg(c, t, 'HDD: ' .. du .. ' full; RAM: ' .. ru .. ' free')
       end
   }
 
