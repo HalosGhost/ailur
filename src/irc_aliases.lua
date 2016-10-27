@@ -283,7 +283,7 @@ local self =
           ms.irc.privmsg(c, t, upt:read())
           upt:close()
       end
-  , ['stats'] =
+  , ['sysstats'] =
       function (ms, c, t)
           local disk = 'df /dev/mapper/crypthome --output=pcent | tail -n 1'
           local pipe = io.popen(disk)
