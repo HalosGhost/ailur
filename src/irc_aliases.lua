@@ -289,7 +289,7 @@ local self =
           local pipe = io.popen(disk)
           local du = pipe:read('*number') .. '%'
           pipe:close()
-          pipe = io.popen('free | tail -n 1')
+          pipe = io.popen('free | tail -n 2')
           local ram = pipe:read()
           pipe:close()
           local rampat = 'Mem:%s+(%d+)%s+%d+%s+%d+%s+%d+%s+%d+%s+(%d+)'
