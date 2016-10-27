@@ -285,7 +285,7 @@ local self =
       end
   , ['sysstats'] =
       function (ms, c, t)
-          local disk = 'df /dev/mapper/crypthome --output=pcent | tail -n 1'
+          local disk = 'df /dev/sda1 --output=pcent | tail -n 1'
           local pipe = io.popen(disk)
           local du = pipe:read('*number') .. '%'
           pipe:close()
