@@ -294,6 +294,8 @@ local self =
           pipe:close()
           local rampat = 'Mem:%s+(%d+)%s+%d+%s+%d+%s+%d+%s+%d+%s+(%d+)'
           local _, _, tot, fre = ram:find(rampat)
+          fre = fre or 0
+          tot = tot or 1
           local ru = string.format("%.f%%", fre / tot * 100)
           ms.irc.privmsg(c, t, 'HDD: ' .. du .. ' full; RAM: ' .. ru .. ' free')
       end
