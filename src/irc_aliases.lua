@@ -39,7 +39,6 @@ local self =
       function (ms, c, t, msg)
           local _, _, key = msg:find('fact search%s*(.*)')
           ms.irc.privmsg(c, t, ms.irc_factoids.search(key))
-
       end
   , ['list%s*%S*'] =
       function (ms, c, t, msg)
