@@ -272,7 +272,6 @@ local self =
               for i in str:gmatch("%S+") do
                   words[#words + 1] = i
               end
-              --
           end
           local r = math.random(#words)
           ms.irc.privmsg(c, t, words[r])
@@ -296,8 +295,8 @@ local self =
           local _, _, tot, fre = ram:find(rampat)
           fre = fre or 0
           tot = tot or 1
-          local ru = string.format("%.f%%", fre / tot * 100)
-          ms.irc.privmsg(c, t, 'HDD: ' .. du .. ' full; RAM: ' .. ru .. ' free')
+          local ru = ('%.f%%'):format(fre / tot * 100)
+          ms.irc.privmsg(c, t, ('HDD: %s full; RAM: %s free'):format(du, ru))
       end
   }
 
