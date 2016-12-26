@@ -298,6 +298,11 @@ local self =
           local ru = ('%.f%%'):format(fre / tot * 100)
           ms.irc.privmsg(c, t, ('HDD: %s full; RAM: %s free'):format(du, ru))
       end
+  , ['wa%s+.+'] =
+      function (ms, c, t, msg)
+          local _, _, cmd = msg:find('wa%s+(.+)')
+          ms.irc.privmsg(c, t, ms.query_wa(cmd))
+      end
   }
 
 return self
