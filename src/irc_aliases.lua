@@ -303,6 +303,15 @@ local self =
           local _, _, cmd = msg:find('wa%s+(.+)')
           ms.irc.privmsg(c, t, ms.query_wa(cmd))
       end
+  , ['weather%s+.+'] =
+      function (ms, c, t, msg)
+          local _, _, loc = msg:find('weather%s+(.+)')
+          local cmd = 'shaman -ml "%s"'
+          local pipe = io.popen(cmd:format(loc))
+          local res = pipe:read()
+          pipe:close()
+          ms.irc.privmsg(c, t, res)
+      end
   }
 
 return self
