@@ -310,7 +310,7 @@ local self =
           local pipe = io.popen(cmd:format(loc))
           local res = pipe:read()
           pipe:close()
-          ms.irc.privmsg(c, t, res)
+          if res and res ~= '' then ms.irc.privmsg(c, t, res) end
       end
   }
 
