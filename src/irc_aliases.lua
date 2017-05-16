@@ -89,11 +89,13 @@ local self =
   , ['give%s+%S+.+'] =
       function (ms, c, t, msg, _, sndr)
           local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
-          local thing = ms.irc_factoids.find(what:gsub("^%s*(.-)%s*$", "%1"))
-          if thing ~= nil then
-              ms.irc.privmsg(c, t, to .. ': ' .. thing)
-          else
-              ms.irc.privmsg(c, t, sndr .. ': `give` only works with factoids')
+          if what ~= nil then
+              local thing = ms.irc_factoids.find(what:gsub("^%s*(.-)%s*$", "%1"))
+              if thing ~= nil then
+                  ms.irc.privmsg(c, t, to .. ': ' .. thing)
+              else
+                  ms.irc.privmsg(c, t, sndr .. ': `give` only works with factoids')
+              end
           end
       end
   , ['hatroulette'] =
