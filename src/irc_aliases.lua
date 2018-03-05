@@ -71,9 +71,9 @@ local self =
             , 'arguably' }
           local case = { 'so', 'not', 'true', 'false' }
           local punct = { '.', '!', '…' }
-          r1 = math.random(#prob)
-          r2 = math.random(#case)
-          r3 = math.random(#punct)
+          local r1 = math.random(#prob)
+          local r2 = math.random(#case)
+          local r3 = math.random(#punct)
           ms.irc.privmsg(c, t, prob[r1] .. ' ' .. case[r2] .. punct[r3])
       end
   , ['say%s+.+'] =
@@ -91,11 +91,7 @@ local self =
           local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
           if what ~= nil then
               local thing = ms.irc_factoids.find(what:gsub("^%s*(.-)%s*$", "%1"))
-              if thing ~= nil then
-                  ms.irc.privmsg(c, t, to .. ': ' .. thing)
-              else
-                  ms.irc.privmsg(c, t, sndr .. ': `give` only works with factoids')
-              end
+              ms.irc.privmsg(c, t, to .. ': ' .. (thing or (sndr .. ' wanted you to have ' .. what)))
           end
       end
   , ['hatroulette'] =
