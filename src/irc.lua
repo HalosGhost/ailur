@@ -119,7 +119,7 @@ irc.react_loop = function (c, sname, ms)
     end
 end
 
-irc.bot = function (ms)
+irc.main = function (ms)
     local c = irc.init(ms.irc_network)
     if not c then
         print('failed to initialize irc network')
