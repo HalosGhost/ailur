@@ -50,7 +50,13 @@ local self =
     end
   , init = function (dbpath)
       db = sql.open(dbpath)
-      if db == nil then
+      local factinit = [=[
+        create table if not exists factoids (
+            key string not null,
+            value string not null
+        );
+      ]=]
+      if db == nil or db:exec(factinit) ~= sql.OK then
           print('Failed to open the database')
       end
       ins = db:prepare('insert or replace into factoids (key, value) values (:key, :value);')
