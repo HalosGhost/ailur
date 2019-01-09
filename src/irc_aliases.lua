@@ -62,6 +62,46 @@ local self =
               list = "'" .. k .. "' " .. list
           end; ms.irc.privmsg(c, t, list)
       end
+  , ['%-?%d+%.?%d*%s*.+%s+in%s+.+'] =
+      function (ms, c, t, msg)
+          local _, _, val, src, dest = msg:find('(%-?%d+%.?%d*)%s*(.+)%s+in%s+(.+)')
+          if ms.debug then
+              print(val, src, dest)
+          end
+
+          if src == dest then
+              ms.irc.privmsg(c, t, '… ' .. val .. src .. '… obviously…')
+              return
+          end
+
+          if ms.unit_conversion[src] == nil then
+              ms.irc.privmsg(c, t, 'I cannot convert ' .. src)
+              return
+          end
+
+          if ms.unit_conversion[src][dest] == nil then
+              ms.irc.privmsg(c, t, 'I cannot convert ' .. src .. ' to ' .. dest)
+              return
+          end
+
+          ms.irc.privmsg(c, t, val .. src .. ' is ' .. ms.unit_conversion[src][dest](val) .. dest)
+      end
+  , ['units%s*.*'] =
+      function (ms, c, t, msg)
+          local list = ''
+          local _, _, what = msg:find('units%s*(.*)')
+
+          local the_table = {}
+          if what == nil then
+              the_table = ms.unit_conversion
+          else
+              the_table = ms.unit_conversion[what] or ms.unit_conversion
+          end
+
+          for k in pairs(the_table) do
+              list = "'" .. k .. "' " .. list
+          end; ms.irc.privmsg(c, t, list)
+      end
   , ['is.*'] =
       function (ms, c, t)
           local prob =
