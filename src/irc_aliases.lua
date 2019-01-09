@@ -84,7 +84,7 @@ local self =
               return
           end
 
-          ms.irc.privmsg(c, t, val .. src .. ' is ' .. ms.unit_conversion[src][dest](val) .. dest)
+          ms.irc.privmsg(c, t, val .. src .. ' is ' .. ms.unit_conversion[src][dest](tonumber(val)) .. dest)
       end
   , ['units%s*.*'] =
       function (ms, c, t, msg)
