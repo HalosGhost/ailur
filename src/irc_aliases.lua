@@ -69,117 +69,54 @@ local self =
               print(val, src, dest)
           end
 
-          if tonumber(val) == nil then
+          if not tonumber(val) then
               ms.irc.privmsg(c, t, val .. ' is not a number I recognize')
               return
           end
           val = tonumber(val)
 
           if src == dest then
-              ms.irc.privmsg(c, t, '… ' .. val .. src .. '… obviously…')
+              ms.irc.privmsg(c, t, ('… %g %s… obviously…'):format(val, src))
               return
           end
 
-          local src_unit = ''
-          local pos = 0
-          for k, v in pairs(ms.units.unit_aliases) do
-              for _, u in ipairs(v) do
-                  pos = src:find('(' .. u .. ')$')
-                  if pos ~= nil then
-                      src_unit = k
-                      break
-                  end
-              end
-
-              if src_unit ~= '' then break end
-          end
-
-          if src_unit == '' or ms.units.convert[src_unit] == nil then
+          local src_unit, pos = ms.units.parse_unit(src)
+          if src_unit == '' or not ms.units.conversion[src_unit] then
               ms.irc.privmsg(c, t, 'I cannot convert ' .. src)
               return
           end
 
-          local val_adj = val
+          local val_adj = 1
           if pos > 1 then
               local prefix = src:sub(1, pos - 1)
-              for k, v in pairs(ms.units.si_aliases) do
-                  for _, p in ipairs(v) do
-                      if prefix == p then
-                          val_adj = val * 10 ^ ms.units.si[k]
-                          break
-                      end
-                  end
-
-                  if val_adj ~= val then break end
-              end
-
-              for k, v in pairs(ms.units.iec_aliases) do
-                  for _, p in ipairs(v) do
-                      if prefix == p then
-                          val_adj = val * 2 ^ ms.units.iec[k]
-                          break
-                      end
-                  end
-
-                  if val_adj ~= val then break end
-              end
+              val_adj = ms.units.parse_prefix(prefix, ms.units.si_aliases, 10, ms.units.si)
+              val_adj = val_adj or
+                  ms.units.parse_prefix(prefix, ms.units.iec_aliases, 2, ms.units.iec)
           end
           if ms.debug then print(val_adj) end
 
-          local dest_unit = ''
-          pos = 0
-          for k, v in pairs(ms.units.unit_aliases) do
-              for _, u in ipairs(v) do
-                  pos = dest:find('(' .. u .. ')$')
-                  if pos ~= nil then
-                      dest_unit = k
-                      break
-                  end
-              end
+          local dest_unit, pos = ms.units.parse_unit(dest)
 
-              if dest_unit ~= '' then break end
-          end
-
-          if src_unit ~= dest_unit and (dest_unit == '' or ms.units.convert[src_unit][dest_unit] == nil) then
+          if src_unit ~= dest_unit and (dest_unit == '' or not ms.units.conversion[src_unit][dest_unit]) then
               if ms.debug then print(dest_unit) end
-              ms.irc.privmsg(c, t, 'I cannot convert ' .. src .. ' to ' .. dest)
+              ms.irc.privmsg(c, t, ('I cannot convert %s to %s'):format(src, dest))
               return
           end
 
           local dest_adj = 1
           local dest_prefix = ''
           if pos > 1 then
-              local prefix = dest:sub(1, pos - 1)
-              for k, v in pairs(ms.units.si_aliases) do
-                  for _, p in ipairs(v) do
-                      if prefix == p then
-                          dest_adj = 10 ^ ms.units.si[k]
-                          dest_prefix = p
-                          break
-                      end
-                  end
-
-                  if dest_adj ~= 1 then break end
-              end
-
-              for k, v in pairs(ms.units.iec_aliases) do
-                  for _, p in ipairs(v) do
-                      if prefix == p then
-                          dest_adj = 2 ^ ms.units.iec[k]
-                          dest_prefix = p
-                          break
-                      end
-                  end
-
-                  if dest_adj ~= 1 then break end
-              end
+              dest_prefix = dest:sub(1, pos - 1)
+              dest_adj = ms.units.parse_prefix(dest_prefix, ms.units.si_aliases, 10, ms.units.si)
+              dest_adj = dest_adj or
+                  ms.units.parse_prefix(dest_prefix, ms.units.iec_aliases, 2, ms.units.iec)
           end
 
-          if src_unit == dest_unit then
-              ms.irc.privmsg(c, t, val .. ' ' .. src .. ' is ' .. val_adj / dest_adj .. ' ' .. dest_prefix .. dest_unit)
-          else
-              ms.irc.privmsg(c, t, val .. ' ' .. src .. ' is ' .. ms.units.convert[src_unit][dest_unit](val_adj) / dest_adj .. ' ' .. dest_prefix .. dest_unit)
-          end
+          local new_val = src_unit == dest_unit
+              and (val_adj * val / dest_adj)
+              or (ms.units.conversion[src_unit][dest_unit](val_adj * val) / dest_adj)
+
+          ms.irc.privmsg(c, t, ('%g %s is %g %s%s'):format(val, src, new_val, dest_prefix, dest_unit))
       end
   , ['units%s*.*'] =
       function (ms, c, t, msg)
@@ -188,9 +125,9 @@ local self =
 
           local the_table = {}
           if what == nil then
-              the_table = ms.units.convert
+              the_table = ms.units.conversion
           else
-              the_table = ms.units.convert[what] or ms.units.convert
+              the_table = ms.units.conversion[what] or ms.units.conversion
           end
 
           for k in pairs(the_table) do

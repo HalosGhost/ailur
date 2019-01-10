@@ -1,22 +1,22 @@
-local convert = {}
+local conversion = {}
 
-convert['°C'] = {}
-convert['°C']['°F'] = function(n) return n * 1.8 + 32 end
-convert['°C']['K']  = function(n) return n + 273.15 end
+conversion['°C'] = {}
+conversion['°C']['°F'] = function(n) return n * 1.8 + 32 end
+conversion['°C']['K']  = function(n) return n + 273.15 end
 
-convert['°F'] = {}
-convert['°F']['°C'] = function(n) return (n - 32) / 1.8 end
-convert['°F']['K']  = function(n) return convert['°C']['K'](convert['°F']['°C'](n)) end
+conversion['°F'] = {}
+conversion['°F']['°C'] = function(n) return (n - 32) / 1.8 end
+conversion['°F']['K']  = function(n) return conversion['°C']['K'](conversion['°F']['°C'](n)) end
 
-convert['K'] = {}
-convert['K']['°C']  = function(n) return n - 273.15 end
-convert['K']['°F']  = function(n) return convert['°C']['°F'](convert['K']['°C'](n)) end
+conversion['K'] = {}
+conversion['K']['°C']  = function(n) return n - 273.15 end
+conversion['K']['°F']  = function(n) return conversion['°C']['°F'](conversion['K']['°C'](n)) end
 
-convert['m'] = {}
-convert['m']['mi'] = function(n) return n * 0.00062137 end
+conversion['m'] = {}
+conversion['m']['mi'] = function(n) return n * 0.00062137 end
 
-convert['mi'] = {}
-convert['mi']['m'] = function(n) return n / 0.00062137 end
+conversion['mi'] = {}
+conversion['mi']['m'] = function(n) return n / 0.00062137 end
 
 local si = {
    ['y']  = -24,
@@ -94,13 +94,33 @@ local iec_aliases = {
     ['Yi'] = { 'Yi', 'yobi' },
 }
 
+local parse_unit = function(src)
+    local pos = 0
+    for k, v in pairs(unit_aliases) do
+        for _, u in ipairs(v) do
+            pos = src:find('(' .. u .. ')$')
+            if pos ~= nil then return k, pos end
+        end
+    end
+end
+
+local parse_prefix = function(prefix, aliases, base, magnitudes)
+    for k, v in pairs(aliases) do
+        for _, p in ipairs(v) do
+            if prefix == p then return base ^ magnitudes[k] end
+        end
+    end
+end
+
 local units = {
-    convert = convert,
+    conversion = conversion,
     si = si,
     iec = iec,
     unit_aliases = unit_aliases,
     si_aliases = si_aliases,
     iec_aliases = iec_aliases,
+    parse_unit = parse_unit,
+    parse_prefix = parse_prefix,
 }
 
 return units
