@@ -51,7 +51,7 @@ local self =
                          }
 
           local the_table = {}
-          if what == nil then
+          if not what then
               the_table = tables
           else
               the_table = tables[what] or tables
@@ -123,7 +123,7 @@ local self =
           local _, _, what = msg:find('units%s*(.*)')
 
           local the_table = {}
-          if what == nil then
+          if not what then
               the_table = ms.units.conversion
           else
               the_table = ms.units.conversion[what] or ms.units.conversion
@@ -160,7 +160,7 @@ local self =
   , ['give%s+%S+.+'] =
       function (ms, c, t, msg, _, sndr)
           local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
-          if what ~= nil then
+          if what then
               local thing = ms.irc_factoids.find(what:gsub("^%s*(.-)%s*$", "%1"))
               ms.irc.privmsg(c, t, to .. ': ' .. (thing or (sndr .. ' wanted you to have ' .. what)))
           end
@@ -206,7 +206,7 @@ local self =
   , ['you.*'] =
       function (ms, c, t, msg, _, sndr)
           local _, _, attr = msg:find('you(.*)')
-          attr = attr == nil and '' or attr
+          attr = attr or ''
           ms.irc.privmsg(c, t, sndr .. ': No, \x1Dyou\x1D' .. attr .. '!')
       end
   , ['test%s*.*'] =
@@ -219,7 +219,7 @@ local self =
           local res = prob < 0.01 and rest[3] or
                       prob < 0.49 and rest[2] or rest[1]
 
-          ms.irc.privmsg(c, t, 'Testing' .. test .. ': [\x03' .. res .. '\x03]')
+          ms.irc.privmsg(c, t, ('Testing%s: [\x03%s\x03]'):format(test, res))
       end
   , ['roll%s+%d+d%d+'] =
       function (ms, c, t, msg, _, sndr)
@@ -250,7 +250,7 @@ local self =
   , ['[ <]?https?://[^> ]+.*'] =
       function (ms, c, t, msg)
           local _, _, url = msg:find('[ <]?(https?://[^> ]+).*')
-          if url ~= nil then
+          if url then
               title = ms.get_url_title(url)
               ms.irc.privmsg(c, t, title)
           end
@@ -258,7 +258,7 @@ local self =
   , ['rot13%s.*'] =
       function (ms, c, t, msg)
           local _, _, text = msg:find('rot13%s(.*)')
-          if text ~= nil then
+          if text then
               chars = {}
               for i=1,text:len() do
                   chars[i] = text:byte(i)
