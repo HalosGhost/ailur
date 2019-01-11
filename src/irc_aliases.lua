@@ -25,8 +25,7 @@ local self =
           local _, _, what = msg:find('reload%s+(.+)')
           for k in pairs(ms) do
               if what == k then
-                  ms.irc.privmsg(c, t, 'Tada!')
-                  ms.coreload(ms, k)
+                  ms.irc.privmsg(c, t, ms.extload(ms, k))
               end
           end
       end

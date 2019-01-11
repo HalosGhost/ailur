@@ -2,10 +2,9 @@ return
   function (ms, m)
     local lib, err = loadfile(m .. '.lua')
     if not lib then
-        return err
+        return ('failed to load %s: %s'):format(m, err)
     end
     package.loaded[m] = lib()
-    if not ms.ext then ms.ext = {} end
-    ms.ext[m] = package.loaded[m]
-    return 'successfully loaded ' .. m
+    ms[m] = package.loaded[m]
+    return ('successfully loaded %s. Tada!'):format(m)
   end

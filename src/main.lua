@@ -2,12 +2,12 @@ local lfs = require 'lfs'
 
 while true do
     local ms = {}
-    ms.coreload = require 'coreload'
+    ms.extload = require 'extload'
 
     for f in lfs.dir(lfs.currentdir()) do
         local _, _, mod = f:find('(.+)%.lua$')
         if mod and mod ~= 'main' and not ms[mod] then
-            ms.coreload(ms, mod)
+            ms.extload(ms, mod)
         end
     end
 
