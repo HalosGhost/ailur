@@ -12,12 +12,12 @@ irc.init = function (stbl)
 end
 
 irc.conn = function (c, stbl)
-    c:send('NICK ' .. stbl.handle .. '\r\n')
-    c:send('USER ' .. stbl.ident  .. ' * 8 :' .. stbl.gecos .. '\r\n')
+    c:send(('NICK %s\r\n'):format(stbl.handle))
+    c:send(('USER %s * 8 :%s\r\n'):format(stbl.ident, stbl.gecos))
 end
 
 irc.join = function (c, channel)
-    c:send('JOIN ' .. channel .. '\r\n')
+    c:send(('JOIN %s\r\n'):format(channel))
 end
 
 irc.joinall = function (c, stbl)
@@ -27,16 +27,16 @@ irc.joinall = function (c, stbl)
 end
 
 irc.pong = function (c, sname)
-    c:send('PONG ' .. sname .. '\r\n')
+    c:send(('PONG %s\r\n'):format(sname))
 end
 
 irc.privmsg = function (c, target, msg)
-    c:send('PRIVMSG ' .. target .. ' :' .. msg .. '\r\n')
+    c:send(('PRIVMSG %s :%s\r\n'):format(target, msg))
 end
 
 irc.modeset = function (c, target, recipient, mode)
     if target:byte() == 35 then
-        c:send('MODE ' .. target .. ' ' .. mode .. ' ' .. recipient .. '\r\n')
+        c:send(('MODE %s %s %s\r\n'):format(target, mode, recipient))
     else
         irc.privmsg(c, target, 'Cannot set modes in query')
     end
@@ -44,7 +44,7 @@ end
 
 irc.kick = function (c, target, recipient, message)
     if target:byte() == 35 then
-        c:send('KICK ' .. target .. ' ' .. recipient .. ' :' .. message .. '\r\n')
+        c:send(('KICK %s %s :%s\r\n'):format(target, recipient, message))
     else
         irc.privmsg(c, target, 'Cannot kick in query')
     end
@@ -107,15 +107,15 @@ irc.react_loop = function (c, sname, ms)
     local keepalive = true
     while keepalive do
         local data = c:receive('*l')
-        if not data then goto continue end
-        if ms.debug then io.stdout:write(data .. '\n') end
+        if data then
+            if ms.debug then io.stdout:write(data .. '\n') end
 
-        if data == ('PING ' .. sname) then
-            irc.pong(c, sname)
-        elseif data:find('PRIVMSG') then
-            keepalive = irc.react_to_privmsg(c, ms, data)
+            if data == ('PING ' .. sname) then
+                irc.pong(c, sname)
+            elseif data:find('PRIVMSG') then
+                keepalive = irc.react_to_privmsg(c, ms, data)
+            end
         end
-        ::continue::
     end
 end
 
