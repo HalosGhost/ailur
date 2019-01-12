@@ -367,15 +367,6 @@ local self =
           local ru = ('%.f%%'):format(fre / tot * 100)
           ms.irc.privmsg(c, t, ('HDD: %s full; RAM: %s free'):format(du, ru))
       end
-  , ['weather%s+.+'] =
-      function (ms, c, t, msg)
-          local _, _, loc = msg:find('weather%s+(.+)')
-          local cmd = 'shaman -ml "%s"'
-          local pipe = io.popen(cmd:format(loc))
-          local res = pipe:read()
-          pipe:close()
-          if res and res ~= '' then ms.irc.privmsg(c, t, res) end
-      end
   }
 
 return self
