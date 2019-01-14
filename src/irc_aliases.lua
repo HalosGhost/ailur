@@ -50,12 +50,7 @@ local self =
                          , ['admins']   = ms.irc_network.admins
                          }
 
-          local the_table = {}
-          if not what then
-              the_table = tables
-          else
-              the_table = tables[what] or tables
-          end
+          local the_table = what and tables[what] or tables
 
           for k in pairs(the_table) do
               list = "'" .. k .. "' " .. list
