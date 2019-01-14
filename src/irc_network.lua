@@ -6,7 +6,7 @@ return
   , ['ident']    = 'pandactl'
   , ['gecos']    = '🐼'
   , ['admins']   =
-      { ['.*@.*%.halosgho%.st'] = 1
+      { ['.*@archlinux/support/halosghost'] = 1
       , ['.*@unaffiliated/meskarune'] = 2
       }
   , ['channels'] =
