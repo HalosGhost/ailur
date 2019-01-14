@@ -362,6 +362,12 @@ local self =
           local ru = ('%.f%%'):format(fre / tot * 100)
           ms.irc.privmsg(c, t, ('HDD: %s full; RAM: %s free'):format(du, ru))
       end
+  , ['version'] =
+      function (ms, c, t)
+          local upt = io.popen('printf \'0.r%s.%s\' "$(git rev-list --count HEAD)" "$(git log -1 --pretty=format:%h)"')
+          ms.irc.privmsg(c, t, upt:read())
+          upt:close()
+      end
   }
 
 return self
