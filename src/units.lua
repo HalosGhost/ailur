@@ -13,10 +13,10 @@ conversion['K']['°C']  = function(n) return n - 273.15 end
 conversion['K']['°F']  = function(n) return conversion['°C']['°F'](conversion['K']['°C'](n)) end
 
 conversion['m'] = {}
-conversion['m']['mi'] = function(n) return n * 0.00062137 end
+conversion['m']['mi']  = function(n) return n * 0.00062137 end
 
 conversion['mi'] = {}
-conversion['mi']['m'] = function(n) return n / 0.00062137 end
+conversion['mi']['m']  = function(n) return n / 0.00062137 end
 
 local si = {
    ['y']  = -24,
