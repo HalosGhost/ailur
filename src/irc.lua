@@ -84,7 +84,7 @@ irc.react_to_privmsg = function (c, ms, text)
     if not msg:find(prefix) then return true end
 
     local _, _, key = msg:find(prefix .. '(.*)')
-    if key == nil then return true end
+    if not key then return true end
     local basic = ms.irc_factoids.find(key:gsub("^%s*(.-)%s*$", "%1"))
 
     if basic ~= nil then
@@ -104,7 +104,7 @@ end
 irc.react_loop = function (c, sname, ms)
     math.randomseed(os.time())
 
-    if ms.nickpass == nil then
+    if not ms.nickpass then
         irc.joinall(c, ms.irc_network)
     else
         irc.privmsg(c, 'NickServ', 'identify ' .. ms.nickpass)

@@ -56,7 +56,7 @@ local self =
             value string not null
         );
       ]=]
-      if db == nil or db:exec(factinit) ~= sql.OK then
+      if not db or db:exec(factinit) ~= sql.OK then
           print('Failed to open the database')
       end
       ins = db:prepare('insert or replace into factoids (key, value) values (:key, :value);')
