@@ -104,6 +104,12 @@ end
 irc.react_loop = function (c, sname, ms)
     math.randomseed(os.time())
 
+    if ms.nickpass == nil then
+        irc.joinall(c, ms.irc_network)
+    else
+        irc.privmsg(c, 'NickServ', 'identify ' .. ms.nickpass)
+    end
+
     local keepalive = true
     while keepalive do
         local data = c:receive('*l')
@@ -114,6 +120,8 @@ irc.react_loop = function (c, sname, ms)
                 irc.pong(c, sname)
             elseif data:find('PRIVMSG') then
                 keepalive = irc.react_to_privmsg(c, ms, data)
+            elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
+                irc.joinall(c, ms.irc_network)
             end
         end
     end
@@ -132,7 +140,6 @@ irc.main = function (ms)
     irc.conn(c, ms.irc_network)
 
     local sname = irc.get_sname(c, ms)
-    irc.joinall(c, ms.irc_network)
 
     irc.react_loop(c, sname, ms)
     ms.irc_factoids.cleanup()
