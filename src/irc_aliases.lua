@@ -417,7 +417,7 @@ local self =
               if value == 'true' then
                   ms.config[setting] = true
               elseif value == 'false' then
-                  ms.config[setting] = true
+                  ms.config[setting] = false
               elseif tonumber(value) ~= nil then
                   ms.config[setting] = tonumber(value)
               else
