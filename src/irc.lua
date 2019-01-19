@@ -104,10 +104,10 @@ end
 irc.react_loop = function (c, sname, ms)
     math.randomseed(os.time())
 
-    if not ms.nickpass then
-        irc.joinall(c, ms.irc_network)
-    else
+    if ms.nickpass then
         irc.privmsg(c, 'NickServ', 'identify ' .. ms.nickpass)
+    else
+        irc.joinall(c, ms.irc_network)
     end
 
     local keepalive = true
