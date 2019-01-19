@@ -368,37 +368,10 @@ local self =
           ms.irc.privmsg(c, t, upt:read())
           upt:close()
       end
-  , ['hug%s.+'] =
-      function (ms, c, t, msg)
-          local _, _, recipient = msg:find('hug%s(.+)')
-          ms.irc.privmsg(c, t, recipient .. ': imma smother you in love')
-      end
   , ['who am I%?'] =
       function (ms, c, t, _, authed, sndr)
           local admin = authed and ', an admin' or ''
           ms.irc.privmsg(c, t, sndr .. admin)
-      end
-  , ['what is%s+.+%??'] =
-      function (ms, c, t, msg, _, sndr)
-          local _, _, thing = msg:find('what is%s+(.+)%??')
-          local responses = {
-              '\'tis a silly thing', 'not sure, haven\'t heard of it', 'it tastes good.',
-              'wouldn\'t want to be caught up in that', 'phhht', 'oh please',
-              'now hang on, iI\'llo ask the questions here.', 'is it tasty?',
-              'is that one of those genetically modified things?', 'isn\'t that what halfwit uses?',
-              'can you eat it?', 'oh yeah, I put one of those in my truck last year.',
-              'we don\'t talk about it.', 'I love it! Definitely my favorite flavor.',
-              'Meh, I prefer vanilla.', '\'tis a silly place.',
-              'don\'t get the cheap one, it won\'t last a month.',
-              'a type of bear, but grizzlies are still the coolest.'
-          }
-
-          local response = sndr .. ': ' .. thing .. '? ' .. responses[math.random(#responses)]
-          ms.irc.privmsg(c, t, response)
-      end
-  , ['sudo.*'] =
-      function (ms, c, t)
-          ms.irc.privmsg(c, t, 'Tada!')
       end
   , ['config%s+%S+%s+%S+%s*%S*'] =
       function (ms, c, t, msg, authed)

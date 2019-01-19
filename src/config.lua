@@ -6,8 +6,8 @@ config.dbpath = 'bot.db'
 config.irc = { name = 'freenode'
              , address = 'chat.freenode.net'
              , port = 7000
-             , handle = 'ailur'
-             , ident = 'ailur'
+             , handle = 'pandactl'
+             , ident = 'pandactl'
              , gecos = '🐼'
              , admins =
                  { ['.*@archlinux/support/halosghost'] = 1
