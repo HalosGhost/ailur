@@ -4,24 +4,24 @@ local socket = require 'socket'
 local ssl = require 'ssl'
 local sql = require 'lsqlite3'
 
-irc.init = function (stbl)
-    local bare = socket.connect(stbl.address, stbl.port)
-    local conn = ssl.wrap(bare, stbl.sslparams)
+irc.init = function (irc_config)
+    local bare = socket.connect(irc_config.address, irc_config.port)
+    local conn = ssl.wrap(bare, irc_config.sslparams)
     conn:dohandshake()
     return conn
 end
 
-irc.conn = function (c, stbl)
-    c:send(('NICK %s\r\n'):format(stbl.handle))
-    c:send(('USER %s * 8 :%s\r\n'):format(stbl.ident, stbl.gecos))
+irc.conn = function (c, irc_config)
+    c:send(('NICK %s\r\n'):format(irc_config.handle))
+    c:send(('USER %s * 8 :%s\r\n'):format(irc_config.ident, irc_config.gecos))
 end
 
 irc.join = function (c, channel)
     c:send(('JOIN %s\r\n'):format(channel))
 end
 
-irc.joinall = function (c, stbl)
-    for _, v in pairs(stbl.channels) do
+irc.joinall = function (c, channels)
+    for _, v in pairs(channels) do
         irc.join(c, v)
     end
 end
@@ -54,7 +54,7 @@ irc.get_sname = function (c, ms)
     local sname = ''
     while sname == '' do
         local data = c:receive('*l')
-        if ms.debug and data then print(data) end
+        if ms.config.debug and data then print(data) end
 
         if data and (data:find('376') or data:find('422')) then
             _, _, sname = data:find('(%S+)')
@@ -64,9 +64,9 @@ irc.get_sname = function (c, ms)
     return sname
 end
 
-irc.authorized = function (c, nw, mask)
+irc.authorized = function (c, irc_config, mask)
     local authed = nil
-    for k in pairs(nw.admins) do
+    for k in pairs(irc_config.admins) do
         authed = authed or mask:find(k)
     end
 
@@ -76,10 +76,10 @@ end
 irc.react_to_privmsg = function (c, ms, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
-    local authed = irc.authorized(c, ms.irc_network, mask .. hn)
+    local authed = irc.authorized(c, ms.config.irc, mask .. hn)
 
     local tgt = target:find('^#') and target or mask
-    local prefix = '^' .. (tgt:find('^#') and ms.irc_network.handle .. '.?%s+' or '')
+    local prefix = '^' .. (tgt:find('^#') and ms.config.irc.handle .. '.?%s+' or '')
 
     if not msg:find(prefix) then return true end
 
@@ -107,37 +107,37 @@ irc.react_loop = function (c, sname, ms)
     if ms.nickpass then
         irc.privmsg(c, 'NickServ', 'identify ' .. ms.nickpass)
     else
-        irc.joinall(c, ms.irc_network)
+        irc.joinall(c, ms.config.irc.channels)
     end
 
     local keepalive = true
     while keepalive do
         local data = c:receive('*l')
         if data then
-            if ms.debug then io.stdout:write(data .. '\n') end
+            if ms.config.debug then io.stdout:write(data .. '\n') end
 
             if data == ('PING ' .. sname) then
                 irc.pong(c, sname)
             elseif data:find('PRIVMSG') then
                 keepalive = irc.react_to_privmsg(c, ms, data)
             elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
-                irc.joinall(c, ms.irc_network)
+                irc.joinall(c, ms.config.irc.channels)
             end
         end
     end
 end
 
 irc.main = function (ms)
-    local c = irc.init(ms.irc_network)
+    local c = irc.init(ms.config.irc)
     if not c then
         print('failed to initialize irc network')
         return
     end
 
     db = nil
-    ms.irc_factoids.init(ms.irc_network.dbpath)
+    ms.irc_factoids.init(ms.config.dbpath)
 
-    irc.conn(c, ms.irc_network)
+    irc.conn(c, ms.config.irc)
 
     local sname = irc.get_sname(c, ms)
 

@@ -14,7 +14,7 @@ return
             local act = '?action=opensearch&format=json&search='
             local resp = https.request(apiurl .. act .. url.escape(search))
             if resp then
-                if ms.debug then print(resp) end
+                if ms.config.debug then print(resp) end
                 local res = json.decode(resp)
                 local lnk = (res[4][1] and res[4][1] ~= '') and res[4][1] or 'No results'
                 local dsc = (res[3][1] and res[3][1] ~= '') and ' - ' .. res[3][1] or ''

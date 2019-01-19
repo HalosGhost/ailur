@@ -1,6 +1,6 @@
-local json = require 'json'
-local url = require 'socket.url'
-local https = require 'ssl.https'
+-- local json = require 'json'
+-- local url = require 'socket.url'
+-- local https = require 'ssl.https'
 local mediawiki_alias = require 'mediawiki_alias'
 
 local self =
@@ -47,7 +47,7 @@ local self =
           local tables = { ['all']      = tables
                          , ['aliases']  = ms.irc_aliases
                          , ['modules']  = ms
-                         , ['admins']   = ms.irc_network.admins
+                         , ['config']   = ms.config
                          }
 
           local the_table = what and tables[what] or tables
@@ -59,7 +59,7 @@ local self =
   , ['%-?%d+%.?%d*%s*.+%s+in%s+.+'] =
       function (ms, c, t, msg)
           local _, _, val, src, dest = msg:find('(%-?%d+%.?%d*)%s*(.+)%s+in%s+(.+)')
-          if ms.debug then
+          if ms.config.debug then
               print(val, src, dest)
           end
 
@@ -87,12 +87,12 @@ local self =
               val_adj = val_adj or
                   ms.units.parse_prefix(prefix, ms.units.iec_aliases, 2, ms.units.iec)
           end
-          if ms.debug then print(val_adj) end
+          if ms.config.debug then print(val_adj) end
 
           local dest_unit, pos = ms.units.parse_unit(dest)
 
           if src_unit ~= dest_unit and (dest_unit == '' or not ms.units.conversion[src_unit][dest_unit]) then
-              if ms.debug then print(dest_unit) end
+              if ms.config.debug then print(dest_unit) end
               ms.irc.privmsg(c, t, ('I cannot convert %s to %s'):format(src, dest))
               return
           end
@@ -117,7 +117,7 @@ local self =
           local list = ''
           local _, _, what = msg:find('units%s*(.*)')
 
-          local the_table = {}
+          local the_table
           if not what then
               the_table = ms.units.conversion
           else
@@ -246,7 +246,7 @@ local self =
       function (ms, c, t, msg)
           local _, _, url = msg:find('[ <]?(https?://[^> ]+).*')
           if url then
-              title = ms.get_url_title(url)
+              local title = ms.get_url_title(url)
               ms.irc.privmsg(c, t, title)
           end
       end
@@ -254,19 +254,19 @@ local self =
       function (ms, c, t, msg)
           local _, _, text = msg:find('rot13%s(.*)')
           if text then
-              chars = {}
+              local chars = {}
               for i=1,text:len() do
                   chars[i] = text:byte(i)
               end
 
-              rotted = ""
+              local rotted = ""
               for i=1,#chars do
-                  letter = chars[i]
+                  local letter = chars[i]
                   if letter >= 65 and letter < 91 then
-                      offset = letter - 65
+                      local offset = letter - 65
                       letter = string.char(65 + ((offset + 13) % 26))
                   elseif letter >= 97 and letter < 123 then
-                      offset = letter - 97
+                      local offset = letter - 97
                       letter = string.char(97 + ((offset + 13) % 26))
                   else
                       letter = string.char(chars[i])
@@ -284,7 +284,7 @@ local self =
   , ['update'] =
       function (ms, c, t, _, authed)
           if authed then
-              _, _, status = os.execute('git pull origin master')
+              local _, _, status = os.execute('git pull origin master')
               if status == 0 then
                   ms.irc.privmsg(c, t, "Tada!")
               end
@@ -331,7 +331,7 @@ local self =
   , ["pick%s+.+"] =
       function (ms, c, t, msg)
           local _, _, str = msg:find("pick%s+(.+)")
-          words = {}
+          local words = {}
           if str then
               for i in str:gmatch("%S+") do
                   words[#words + 1] = i
@@ -367,6 +367,65 @@ local self =
           local upt = io.popen('printf \'0.r%s.%s\' "$(git rev-list --count HEAD)" "$(git log -1 --pretty=format:%h)"')
           ms.irc.privmsg(c, t, upt:read())
           upt:close()
+      end
+  , ['hug%s.+'] =
+      function (ms, c, t, msg)
+          local _, _, recipient = msg:find('hug%s(.+)')
+          ms.irc.privmsg(c, t, recipient .. ': imma smother you in love')
+      end
+  , ['who am I%?'] =
+      function (ms, c, t, _, authed, sndr)
+          local admin = authed and ', an admin' or ''
+          ms.irc.privmsg(c, t, sndr .. admin)
+      end
+  , ['what is%s+.+%??'] =
+      function (ms, c, t, msg, _, sndr)
+          local _, _, thing = msg:find('what is%s+(.+)%??')
+          local responses = {
+              '\'tis a silly thing', 'not sure, haven\'t heard of it', 'it tastes good.',
+              'wouldn\'t want to be caught up in that', 'phhht', 'oh please',
+              'now hang on, iI\'llo ask the questions here.', 'is it tasty?',
+              'is that one of those genetically modified things?', 'isn\'t that what halfwit uses?',
+              'can you eat it?', 'oh yeah, I put one of those in my truck last year.',
+              'we don\'t talk about it.', 'I love it! Definitely my favorite flavor.',
+              'Meh, I prefer vanilla.', '\'tis a silly place.',
+              'don\'t get the cheap one, it won\'t last a month.',
+              'a type of bear, but grizzlies are still the coolest.'
+          }
+
+          local response = sndr .. ': ' .. thing .. '? ' .. responses[math.random(#responses)]
+          ms.irc.privmsg(c, t, response)
+      end
+  , ['sudo.*'] =
+      function (ms, c, t)
+          ms.irc.privmsg(c, t, 'Tada!')
+      end
+  , ['config%s+%S+%s+%S+%s*%S*'] =
+      function (ms, c, t, msg, authed)
+          if not authed then return end
+
+          local _, _, action, setting, value = msg:find('config%s+(%S+)%s+(%S+)%s*(%S*)')
+
+          if action == 'toggle' and type(ms.config[setting]) == 'boolean' then
+              ms.config[setting] = not ms.config[setting]
+              ms.irc.privmsg(c, t, ('set %s to %s. Tada!'):format(setting, ms.config[setting]))
+          elseif action == 'get' then
+              ms.irc.privmsg(c, t, tostring(ms.config[setting]))
+          elseif action == 'type' then
+              ms.irc.privmsg(c, t, type(ms.config[setting]))
+          elseif action == 'set' then
+              if value == 'true' then
+                  ms.config[setting] = true
+              elseif value == 'false' then
+                  ms.config[setting] = true
+              elseif tonumber(value) ~= nil then
+                  ms.config[setting] = tonumber(value)
+              else
+                  ms.config[setting] = value
+              end
+
+              ms.irc.privmsg(c, t, 'Tada!')
+          end
       end
   }
 
