@@ -42,10 +42,10 @@ aliases['list%s*%S*'] = function (ms, c, t, msg)
     local _, _, what = msg:find('list%s*(%S*)')
 
     local tables = { ['all']      = tables
-                 , ['aliases']  = ms.irc_aliases
-                 , ['modules']  = ms
-                 , ['config']   = ms.config
-                 }
+                   , ['aliases']  = ms.irc_aliases
+                   , ['modules']  = ms
+                   , ['config']   = ms.config
+                   }
 
     local the_table = what and tables[what] or tables
 
@@ -347,7 +347,6 @@ aliases['uptime'] = function (ms, c, t)
     ms.irc.privmsg(c, t, upt:read())
     upt:close()
 end
-
 
 aliases['sysstats'] = function (ms, c, t)
     local disk = 'df /dev/sda1 --output=pcent | tail -n 1'
