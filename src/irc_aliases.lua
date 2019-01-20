@@ -1,6 +1,3 @@
--- local json = require 'json'
--- local url = require 'socket.url'
--- local https = require 'ssl.https'
 local mediawiki_alias = require 'mediawiki_alias'
 
 local self =
