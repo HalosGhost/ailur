@@ -57,8 +57,8 @@ end
 factoids.dbinit = function ()
     local factinit = [=[
       create table if not exists factoids (
-          key string not null,
-          value string not null
+          key text not null,
+          value text not null
       );
     ]=]
 
