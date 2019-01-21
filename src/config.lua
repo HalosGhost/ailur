@@ -1,6 +1,6 @@
 local config = {}
 
-config.debug = true
+config.debug = false
 config.dbpath = 'bot.db'
 
 config.irc = { name = 'freenode'

@@ -54,17 +54,18 @@ factoids.remove = function (key)
     return (res == 101 and 'Tada!' or db:errmsg())
 end
 
-factoids.init = function (dbpath)
-    db = sql.open(dbpath)
+factoids.dbinit = function ()
     local factinit = [=[
       create table if not exists factoids (
           key string not null,
           value string not null
       );
     ]=]
-    if not db or db:exec(factinit) ~= sql.OK then
-        print('Failed to open the database')
+
+    if db:exec(factinit) ~= sql.OK then
+        print('Failed to create the table factoids')
     end
+
     ins = db:prepare('insert or replace into factoids (key, value) values (:key, :value);')
     cnt = db:prepare('select count(*) from factoids where key like :key;')
     del = db:prepare('delete from factoids where key = :key;')
@@ -72,13 +73,12 @@ factoids.init = function (dbpath)
     sim = db:prepare('select key from factoids where key like :key;')
 end
 
-factoids.cleanup = function ()
+factoids.dbcleanup = function ()
     ins:finalize()
     cnt:finalize()
     del:finalize()
     sel:finalize()
     sim:finalize()
-    db:close()
 end
 
 return factoids

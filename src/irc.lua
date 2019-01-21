@@ -134,15 +134,14 @@ irc.main = function (ms)
         return
     end
 
-    db = nil
-    ms.irc_factoids.init(ms.config.dbpath)
+    ms.database.init(ms)
 
     irc.conn(c, ms.config.irc)
 
     local sname = irc.get_sname(c, ms)
 
     irc.react_loop(c, sname, ms)
-    ms.irc_factoids.cleanup()
+    ms.database.cleanup(ms)
     c:close()
 end
 
