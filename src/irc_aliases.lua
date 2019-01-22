@@ -279,8 +279,11 @@ aliases['rot13%s.*'] = function (ms, c, t, msg)
     end
 end
 
-aliases['restart'] = function (_, _, _, _, authed)
-    if authed then return true end
+aliases['restart'] = function (ms, _, _, _, authed)
+    if authed and ms.debug then
+        print('restarting')
+        return true
+    end
 end
 
 aliases['update'] = function (ms, c, t, _, authed)
@@ -399,6 +402,61 @@ aliases['config%s+%S+%s+%S+%s*%S*'] = function (ms, c, t, msg, authed)
         end
 
         ms.irc.privmsg(c, t, 'Tada!')
+    end
+end
+
+aliases['whitelist%s+%S+%s*%S*'] = function (ms, c, t, msg, _, sender)
+    local _, _, action, nick = msg:find('whitelist%s+(%S+)%s*(%S*)')
+
+    if action == 'status' and nick == '' then
+        local result = ms.irc_quotegrabs.whitelist_status(sender) and 'in' or 'out'
+        ms.irc.privmsg(c, t, ('%s: you are opted-%s for quotegrabs.'):format(sender, result))
+    elseif action == 'status' and nick ~= '' then
+        local result = ms.irc_quotegrabs.whitelist_status(nick) and 'in' or 'out'
+        ms.irc.privmsg(c, t, ('%s is opted-%s for quotegrabs.'):format(nick, result))
+    elseif action == 'optin' then
+        ms.irc_quotegrabs.whitelist_add(sender)
+        ms.irc.privmsg(c, t, sender .. ': Tada! You opted-in for quotegrabs.')
+    elseif action == 'optout' then
+        ms.irc_quotegrabs.whitelist_del(sender)
+        ms.irc.privmsg(c, t, sender .. ': Tada! You opted-out of quotegrabs.')
+    else
+        ms.irc.privmsg(c, t, 'whitelist [status|optin|optout]')
+    end
+end
+
+aliases['grab%s+%S+'] = function (ms, c, t, msg, _, sender)
+    local _, _, nick = msg:find('grab%s+(%S+)')
+    if nick == sender then return end
+
+    local last_msg = ms.irc_quotegrabs.last_msgs[t][nick]
+    if not last_msg then return end
+
+    ms.irc_quotegrabs.add(nick, last_msg)
+    ms.irc.privmsg(c, t, 'Tada!')
+end
+
+aliases['q%S*%s*%S*'] = function (ms, c, t, msg, authed)
+    local _, _, action, target = msg:find('q(%S*)%s*(%S*)')
+    local id, nick, quote
+
+    if action == '' then
+        id, nick, quote = ms.irc_quotegrabs.quote_nick(target)
+    elseif (action == 'id' or action == 'i') and target ~= '' then
+        id, nick, quote = ms.irc_quotegrabs.quote_id(target)
+    elseif (action == 'rand' or action == 'r') then
+        id, nick, quote = ms.irc_quotegrabs.quote_rand(target)
+    elseif (action == 'search' or action == 's') then
+        ms.irc.privmsg(c, t, ms.irc_quotegrabs.quote_search(target))
+    elseif (action == 'delete' or action == 'd') and target ~= '' then
+        if not authed then return end
+        ms.irc.privmsg(c, t, ms.irc_quotegrabs.delete(target))
+    else
+        ms.irc.privmsg(c, t, 'q[id|rand|search|delete|help] [target]')
+    end
+
+    if id and nick and quote then
+        ms.irc.privmsg(c, t, ('<%s> %s'):format(nick, quote))
     end
 end
 

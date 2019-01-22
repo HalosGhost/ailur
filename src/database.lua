@@ -6,7 +6,10 @@ local database = {}
 
 database.init = function (ms)
     db = sql.open(ms.config.dbpath)
-    if not db then print('Failed to open the database') end
+
+    if not db then
+        print('Failed to open the database')
+    end
 
     -- run the dbinit() function that any module exposes
     for m in pairs(ms) do

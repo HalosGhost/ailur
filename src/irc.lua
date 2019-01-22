@@ -77,13 +77,24 @@ irc.react_to_privmsg = function (c, ms, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
     local authed = irc.authorized(c, ms.config.irc, mask .. hn)
+    local from_channel = target:find('^#')
 
-    local tgt = target:find('^#') and target or mask
+    -- if whitelisted, put nick's last message in quotegrabs table
+    if from_channel and ms.irc_quotegrabs.whitelist_status(mask) then
+        -- create the table for the channel if it doesn't exist
+        if not ms.irc_quotegrabs.last_msgs[target] then
+            ms.irc_quotegrabs.last_msgs[target] = {}
+        end
+
+        ms.irc_quotegrabs.last_msgs[target][mask] = msg
+    end
+
+    local tgt = from_channel and target or mask
     local prefix = '^' .. (tgt:find('^#') and ms.config.irc.handle .. '.?%s+' or '')
 
     if not msg:find(prefix) then return true end
 
-    local _, _, key = msg:find(prefix .. '(.*)')
+    local _, _, key = msg:find(prefix .. '(.-)%s*$')
     if not key then return true end
     local basic = ms.irc_factoids.find(key:gsub("^%s*(.-)%s*$", "%1"))
 
