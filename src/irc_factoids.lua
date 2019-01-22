@@ -44,14 +44,14 @@ factoids.add = function (key, value)
     ins:reset()
     ins:bind_names({ ['key'] = key, ['value'] = value })
     res = ins:step()
-    return (res == 101 and 'Tada!' or db:errmsg())
+    return (res == sql.DONE and 'Tada!' or db:errmsg())
 end
 
 factoids.remove = function (key)
     del:reset()
     del:bind_names({ ['key'] = key })
     local res = del:step()
-    return (res == 101 and 'Tada!' or db:errmsg())
+    return (res == sql.DONE and 'Tada!' or db:errmsg())
 end
 
 factoids.dbinit = function ()
