@@ -23,6 +23,14 @@ aliases['reload%s+.+'] = function (ms, c, t, msg, authed)
     for k in pairs(ms) do
         if what == k then
             ms.irc.privmsg(c, t, ms.extload(ms, k))
+            return
+        end
+    end
+
+    for k in pairs(ms.plugins) do
+        if what == k then
+            ms.irc.privmsg(c, t, ms.extload(ms.plugins, k, 'plugins'))
+            return
         end
     end
 end
@@ -44,13 +52,14 @@ aliases['list%s*%S*'] = function (ms, c, t, msg)
     local tables = { ['all']      = tables
                    , ['aliases']  = ms.irc_aliases
                    , ['modules']  = ms
+                   , ['plugins']  = ms.plugins
                    , ['config']   = ms.config
                    }
 
     local the_table = what and tables[what] or tables
 
     for k in pairs(the_table) do
-        list = "'" .. k .. "' " .. list
+        list = ("'%s' %s"):format(k, list)
     end
 
     ms.irc.privmsg(c, t, list)
