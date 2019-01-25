@@ -289,8 +289,8 @@ aliases['rot13%s.*'] = function (ms, c, t, msg)
 end
 
 aliases['restart'] = function (ms, _, _, _, authed)
-    if authed and ms.debug then
-        print('restarting')
+    if authed then
+        if ms.config.debug then print('restarting') end
         return true
     end
 end
