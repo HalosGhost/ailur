@@ -96,9 +96,28 @@ irc.react_to_privmsg = function (c, ms, text)
 
     local _, _, key = msg:find(prefix .. '(.-)%s*$')
     if not key then return true end
+
+    local _, _, namespace, command = key:find('%s*(%S+)%s+(.*)')
     local basic = ms.irc_factoids.find(key:gsub("^%s*(.-)%s*$", "%1"))
 
-    if basic ~= nil then
+    local plugin = nil
+    for k in pairs(ms.plugins) do
+        if k == namespace then
+            plugin = ms.plugins[namespace]
+            break
+        end
+    end
+
+    if plugin then
+        plugin.main({
+            ['modules'] = ms,
+            ['connection'] = c,
+            ['target'] = tgt,
+            ['message'] = command,
+            ['authorized'] = authed,
+            ['sender'] = mask,
+        })
+    elseif basic ~= nil then
         irc.privmsg(c, tgt, basic)
     else
         for k, v in pairs(ms.irc_aliases) do
