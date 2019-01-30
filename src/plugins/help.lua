@@ -10,7 +10,6 @@ help.main = function(args)
         return
     end
 
-
     if args.modules.config.debug then
         print(mod, args.modules.plugins[mod], args.modules.plugins[mod].help)
     end
