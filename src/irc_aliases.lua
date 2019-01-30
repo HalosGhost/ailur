@@ -12,29 +12,6 @@ aliases['ug[maen]'] = function (ms, c, t, msg, _, s)
     ms.irc.privmsg(c, t, s .. ' says “Good (ugt) ' .. map[l] .. ' to all!”')
 end
 
-aliases['die'] = function (_, c, _, _, auth)
-    if auth then c:close(); os.exit() end
-end
-
-aliases['reload%s+.+'] = function (ms, c, t, msg, authed)
-    if not authed then return end
-
-    local _, _, what = msg:find('reload%s+(.+)')
-    for k in pairs(ms) do
-        if what == k then
-            ms.irc.privmsg(c, t, ms.extload(ms, k))
-            return
-        end
-    end
-
-    for k in pairs(ms.plugins) do
-        if what == k then
-            ms.irc.privmsg(c, t, ms.extload(ms.plugins, k, 'plugins'))
-            return
-        end
-    end
-end
-
 aliases['fact count%s*.*'] = function (ms, c, t, msg)
     local _, _, key = msg:find('fact count%s*(.*)')
     ms.irc.privmsg(c, t, ms.irc_factoids.count(key))
@@ -43,26 +20,6 @@ end
 aliases['fact search%s*.*'] = function (ms, c, t, msg)
     local _, _, key = msg:find('fact search%s*(.*)')
     ms.irc.privmsg(c, t, ms.irc_factoids.search(key))
-end
-
-aliases['list%s*%S*'] = function (ms, c, t, msg)
-    local list = ''
-    local _, _, what = msg:find('list%s*(%S*)')
-
-    local tables = { ['all']      = tables
-                   , ['aliases']  = ms.irc_aliases
-                   , ['modules']  = ms
-                   , ['plugins']  = ms.plugins
-                   , ['config']   = ms.config
-                   }
-
-    local the_table = what and tables[what] or tables
-
-    for k in pairs(the_table) do
-        list = ("'%s' %s"):format(k, list)
-    end
-
-    ms.irc.privmsg(c, t, list)
 end
 
 aliases['%-?%d+%.?%d*%s*.+%s+in%s+.+'] = function (ms, c, t, msg)
@@ -288,22 +245,6 @@ aliases['rot13%s.*'] = function (ms, c, t, msg)
     end
 end
 
-aliases['restart'] = function (ms, _, _, _, authed)
-    if authed then
-        if ms.config.debug then print('restarting') end
-        return true
-    end
-end
-
-aliases['update'] = function (ms, c, t, _, authed)
-    if authed then
-        local _, _, status = os.execute('git pull origin master')
-        if status == 0 then
-            ms.irc.privmsg(c, t, "Tada!")
-        end
-    end
-end
-
 aliases['judges'] = function (ms, c, t, _, _, sndr)
     ms.irc.privmsg(c, t, "So close, but " .. sndr .. " won by a nose!")
 end
@@ -374,17 +315,6 @@ aliases['sysstats'] = function (ms, c, t)
     tot = tot or 1
     local ru = ('%.f%%'):format(fre / tot * 100)
     ms.irc.privmsg(c, t, ('HDD: %s full; RAM: %s free'):format(du, ru))
-end
-
-aliases['version'] = function (ms, c, t)
-    local upt = io.popen('printf \'0.r%s.%s\' "$(git rev-list --count HEAD)" "$(git log -1 --pretty=format:%h)"')
-    ms.irc.privmsg(c, t, upt:read())
-    upt:close()
-end
-
-aliases['who am I%?'] = function (ms, c, t, _, authed, sndr)
-    local admin = authed and ', an admin' or ''
-    ms.irc.privmsg(c, t, sndr .. admin)
 end
 
 aliases['config%s+%S+%s+%S+%s*%S*'] = function (ms, c, t, msg, authed)

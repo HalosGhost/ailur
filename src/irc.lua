@@ -109,14 +109,15 @@ irc.react_to_privmsg = function (c, ms, text)
     end
 
     if plugin then
-        plugin.main({
-            ['modules'] = ms,
-            ['connection'] = c,
-            ['target'] = tgt,
-            ['message'] = command,
-            ['authorized'] = authed,
-            ['sender'] = mask,
+        ret = plugin.main({
+            modules = ms,
+            connection = c,
+            target = tgt,
+            message = command,
+            authorized = authed,
+            sender = mask,
         })
+        if ret then return false end
     elseif basic ~= nil then
         irc.privmsg(c, tgt, basic)
     else
