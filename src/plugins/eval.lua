@@ -48,6 +48,11 @@ eval.main = function (args)
         return
     end
 
+    if args.message:find('goto') then
+        args.modules.irc.privmsg(args.connection, args.target, 'goto is currently not supported')
+        return
+    end
+
     local safe_env = {
         sender   = args.sender,
         target   = args.target,
