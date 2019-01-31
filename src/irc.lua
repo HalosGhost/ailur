@@ -137,6 +137,7 @@ irc.react_loop = function (c, sname, ms)
 
     if ms.nickpass then
         irc.privmsg(c, 'NickServ', 'identify ' .. ms.nickpass)
+        ms.nickpass = nil -- make it harder to accidentally expose the nickpass, like with eval
     else
         irc.joinall(c, ms.config.irc.channels)
     end
