@@ -10,13 +10,13 @@ help.main = function(args)
         return
     end
 
-    if args.modules.config.debug then
-        print(mod, args.modules.plugins[mod], args.modules.plugins[mod].help)
-    end
-
     local usage = type(args.modules.plugins[mod]) == 'table'
         and args.modules.plugins[mod].help
         or 'No help available on that topic'
+
+    if args.modules.config.debug then
+        print(mod, args.modules.plugins[mod], usage)
+    end
 
     args.modules.irc.privmsg(args.connection, args.target, usage)
 end
