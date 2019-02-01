@@ -2,6 +2,8 @@ local eval = {}
 
 eval.help = 'eval <lua-expr>'
 
+-- Thouroughly copy tables to the safe env so that the
+-- sandbox can't change code outside of its environment.
 eval.deepcopy = function (orig)
     local orig_type = type(orig)
     local copy
@@ -17,18 +19,18 @@ eval.deepcopy = function (orig)
     return copy
 end
 
+-- A simple pretty printer for lua values.
 eval.inspect = function (thing)
     if type(thing) == 'table' then
         local formats = {
             ['table'] = '{…}',
             ['function'] = '<function>',
-            ['string'] = '"%s"',
+            ['string'] = '%q',
         }
 
         local result = ''
         for k, v in pairs(thing) do
-            local value_format = formats[type(v)] or '%s'
-            result = ('%s, %s = ' .. value_format):format(result, k, v)
+            result = ('%s, %s = ' .. (formats[type(v)] or '%s')):format(result, k, v)
         end
 
         return ('{ %s }'):format(result:sub(3))
@@ -43,19 +45,10 @@ eval.main = function (args)
         return
     end
 
-    if args.message:find('while') or args.message:find('for') or args.message:find('repeat') then
-        args.modules.irc.privmsg(args.connection, args.target, 'loops are currently not supported')
-        return
-    end
-
-    if args.message:find('goto') then
-        args.modules.irc.privmsg(args.connection, args.target, 'goto is currently not supported')
-        return
-    end
-
     local safe_env = {
         sender   = args.sender,
         target   = args.target,
+        message  = args.message,
         args     = args.authorized and eval.deepcopy(args) or nil,
         bit32    = eval.deepcopy(bit32),
         math     = eval.deepcopy(math),
@@ -68,7 +61,21 @@ eval.main = function (args)
         unpack   = unpack,
     }
 
-    local status, result = pcall(load('return ' .. args.message, nil, 't', safe_env))
+    local chunk = ('return ' .. (args.message:find(';') and '(function() %s; end)()' or '%s')):format(args.message)
+
+    local naughty_statements = { 'while', 'for', 'repeat', 'goto' }
+
+    for _, pattern in pairs(naughty_statements) do
+        local _, _, statement = chunk:find('(' .. pattern .. ')[%(%s]')
+        if statement then
+            args.modules.irc.privmsg(args.connection, args.target,
+                                     statement .. ' statements are not currently supported')
+            return
+        end
+    end
+
+    -- use pcall so we can catch errors that would otherwise kill the bot
+    local status, result = pcall(load(chunk, nil, 't', safe_env))
     if status then
         result = eval.inspect(result)
     end
