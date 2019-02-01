@@ -11,7 +11,7 @@ return function (url)
   local _, status_code = https.request(request)
 
   if status_code == 200 then
-      local _, _, title = body[1]:find('<title>(.*)</title>')
+      local _, _, title = body[1]:find('<title>(.-)</title>')
       if title ~= nil then
           return title
       end
