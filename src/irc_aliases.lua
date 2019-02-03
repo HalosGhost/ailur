@@ -282,22 +282,6 @@ aliases['uptime'] = function (ms, c, t)
     upt:close()
 end
 
-aliases['sysstats'] = function (ms, c, t)
-    local disk = 'df /dev/sda1 --output=pcent | tail -n 1'
-    local pipe = io.popen(disk)
-    local du = pipe:read('*number') .. '%'
-    pipe:close()
-    pipe = io.popen('free | tail -n 2')
-    local ram = pipe:read()
-    pipe:close()
-    local rampat = 'Mem:%s+(%d+)%s+%d+%s+%d+%s+%d+%s+%d+%s+(%d+)'
-    local _, _, tot, fre = ram:find(rampat)
-    fre = fre or 0
-    tot = tot or 1
-    local ru = ('%.f%%'):format(fre / tot * 100)
-    ms.irc.privmsg(c, t, ('HDD: %s full; RAM: %s free'):format(du, ru))
-end
-
 aliases['config%s+%S+%s+%S+%s*%S*'] = function (ms, c, t, msg, authed)
     if not authed then return end
 
