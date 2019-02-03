@@ -148,24 +148,6 @@ aliases['hatroulette'] = function (ms, c, t, _, _, sndr)
     ms.irc.modeset(c, t, sndr, res)
 end
 
-aliases['[+-][bqvo]%s+.+'] = function (ms, c, t, msg, authed)
-    local _, _, mode, recipient = msg:find('([+-][bqvo])%s+(.+)')
-
-    if authed then
-        ms.irc.modeset(c, t, recipient, mode)
-        ms.irc.privmsg(c, t, "Tada!")
-    end
-end
-
-aliases['kick%s+%S+%s*.*'] = function (ms, c, t, msg, authed)
-    local _, _, recipient, message = msg:find('kick%s+(%S+)%s*(.*)')
-    message = message or recipient
-
-    if authed then
-        ms.irc.kick(c, t, recipient, message)
-    end
-end
-
 aliases['you.*'] = function (ms, c, t, msg, _, sndr)
     local _, _, attr = msg:find('you(.*)')
     attr = attr or ''
