@@ -26,7 +26,7 @@ moderate.main = function (args)
     local _, _, action = args.message:find('(%S+)')
     local f = moderate[action]
 
-    if f then return f(args) end
+    if args.authorized and f then return f(args) end
 
     args.modules.irc.privmsg(args.connection, args.target, moderate.help)
 end
