@@ -117,7 +117,7 @@ end
 
 aliases['act%s+.+'] = function (ms, c, t, msg)
     local _, _, m = msg:find('act%s+(.+)')
-    ms.irc.privmsg(c, t, '\x01ACTION ' .. m .. '\x01')
+    ms.irc.privmsg(c, t, ('\x01ACTION %s\x01'):format(m))
 end
 
 aliases['give%s+%S+.+'] = function (ms, c, t, msg, _, sndr)
@@ -150,8 +150,7 @@ end
 
 aliases['you.*'] = function (ms, c, t, msg, _, sndr)
     local _, _, attr = msg:find('you(.*)')
-    attr = attr or ''
-    ms.irc.privmsg(c, t, sndr .. ': No, \x1Dyou\x1D' .. attr .. '!')
+    ms.irc.privmsg(c, t, ('%s: No, \x1Dyou\x1D%s!'):format(sndr, attr or ''))
 end
 
 aliases['test%s*.*'] = function (ms, c, t, msg)
@@ -179,11 +178,11 @@ aliases['roll%s+%d+d%d+'] = function (ms, c, t, msg, _, sndr)
     if invalid(numdice) or invalid(numsides) then return end
 
     for i=1,numdice do
-        rands = math.random(numsides) .. ' ' .. rands
+        rands = ('%d %s'):format(math.random(numsides), rands)
         if rands:len() > 510 then break end
     end
 
-    ms.irc.privmsg(c, t, sndr .. ': ' .. rands)
+    ms.irc.privmsg(c, t, ('%s: %s'):format(sndr, rands))
 end
 
 aliases['bloat%s*.*'] = function (ms, c, t, msg, _, sndr)
@@ -228,7 +227,7 @@ aliases['rot13%s.*'] = function (ms, c, t, msg)
 end
 
 aliases['judges'] = function (ms, c, t, _, _, sndr)
-    ms.irc.privmsg(c, t, "So close, but " .. sndr .. " won by a nose!")
+    ms.irc.privmsg(c, t, ('So close, but %s won by a nose!'):format(sndr))
 end
 
 aliases['join%s+%S+'] = function (ms, c, t, msg, authed)
