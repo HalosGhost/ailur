@@ -82,7 +82,7 @@ local h = ''
 for k in pairs(manage.commands) do
     h = ('%s|%s'):format(h, k)
 end
-manage.help = ('usage: <%s>'):format(h:sub(2))
+manage.help = ('usage: manage <%s>'):format(h:sub(2))
 
 manage.main = function (args)
     local _, _, action = args.message:find('(%S+)')
