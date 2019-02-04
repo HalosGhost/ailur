@@ -230,16 +230,6 @@ aliases['judges'] = function (ms, c, t, _, _, sndr)
     ms.irc.privmsg(c, t, ('So close, but %s won by a nose!'):format(sndr))
 end
 
-aliases['join%s+%S+'] = function (ms, c, t, msg, authed)
-    if authed then
-        local _, _, chan = msg:find('join%s+(%S+)')
-        if chan then
-            ms.irc.join(c, chan)
-            ms.irc.privmsg(c, t, 'Tada!')
-        end
-    end
-end
-
 aliases['wiki%s+.+'] = mediawiki_alias('wiki%s+(.+)', 'https://en.wikipedia.org/w/api.php')
 
 aliases['archwiki%s+.+'] = mediawiki_alias('archwiki%s+(.+)', 'https://wiki.archlinux.org/api.php')

@@ -18,6 +18,15 @@ moderate.commands['set-mode'] = function (args)
     args.modules.irc.modeset(args.connection, args.target, recipient, mode)
 end
 
+moderate.commands.join = function (args)
+    local _, _, channel = args.message:find('join%s+(%S+)')
+
+    if channel then
+        args.modules.irc.join(args.connection, channel)
+        args.modules.irc.privmsg(args.connection, args.target, ('Joined %s'):format(channel))
+    end
+end
+
 local h = ''
 for k in pairs(moderate.commands) do
     h = ('%s|%s'):format(h, k)
