@@ -128,26 +128,6 @@ aliases['give%s+%S+.+'] = function (ms, c, t, msg, _, sndr)
     end
 end
 
-aliases['hatroulette'] = function (ms, c, t, _, _, sndr)
-    local ar = { '-', '+' }
-    local md = { 'q', 'b', 'v', 'o', 'kick'}
-    local mode_roll = md[math.random(#md)]
-
-    if mode_roll == 'kick' then
-        ms.irc.privmsg(c, t, sndr .. ' rolls for a kick!')
-        ms.irc.kick(c, t, sndr, 'You asked for this')
-        return
-    end
-
-    local res = ar[math.random(#ar)] .. mode_roll
-
-    if t:byte() == 35 then
-        ms.irc.privmsg(c, t, sndr .. ' rolls for a ' .. res .. '!')
-    end
-
-    ms.irc.modeset(c, t, sndr, res)
-end
-
 aliases['you.*'] = function (ms, c, t, msg, _, sndr)
     local _, _, attr = msg:find('you(.*)')
     ms.irc.privmsg(c, t, ('%s: No, \x1Dyou\x1D%s!'):format(sndr, attr or ''))

@@ -27,6 +27,19 @@ moderate.commands.join = function (args)
     end
 end
 
+moderate.commands.hatroulette = function (args)
+    local md = { 'q', 'b', 'v', 'o', 'kick'}
+    local mode_roll = md[math.random(#md)]
+
+    local ar = { '-', '+' }
+    local mode_dir = mode_roll == 'kick' and '' or ar[math.random(#ar)]
+
+    local mode = ('%s%s'):format(mode_dir, mode_roll)
+
+    args.modules.irc.privmsg(args.connection, args.target, ('%s rolls for a %s!'):format(args.sender, mode))
+    args.modules.irc[mode == 'kick' and 'kick' or 'modeset'](args.connection, args.target, args.sender, mode)
+end
+
 local h = ''
 for k in pairs(moderate.commands) do
     h = ('%s|%s'):format(h, k)
