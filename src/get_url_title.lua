@@ -12,7 +12,7 @@ return function (url)
 
   if status_code == 200 then
       local _, _, title = body[1]:find('<title>(.-)</title>')
-      if title ~= nil then
+      if title then
           return title
       end
   end
