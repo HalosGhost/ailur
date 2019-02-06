@@ -9,13 +9,7 @@ return function (url)
   }
 
   local _, status_code = https.request(request)
+  local _, _, title = body[1]:find('<title>(.-)</title>')
 
-  if status_code == 200 then
-      local _, _, title = body[1]:find('<title>(.-)</title>')
-      if title then
-          return title
-      end
-  end
-
-  return 'Could not grab title'
+  return status_code == 200 and title or 'Could not grab title'
 end
