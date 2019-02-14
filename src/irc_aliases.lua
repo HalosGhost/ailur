@@ -9,7 +9,7 @@ aliases['ug[maen]'] = function (ms, c, t, msg, _, s)
                 , ['n'] = 'Night'
                 }
     local _, _, l = msg:find('ug(.)')
-    ms.irc.privmsg(c, t, s .. ' says “Good (ugt) ' .. map[l] .. ' to all!”')
+    ms.irc.privmsg(c, t, ('%s says “Good (ᴜɢᴛ) %s to all!”'):format(s, map[l]))
 end
 
 aliases['fact count%s*.*'] = function (ms, c, t, msg)
@@ -90,7 +90,7 @@ aliases['units%s*.*'] = function (ms, c, t, msg)
     end
 
     for k in pairs(the_table) do
-        list = "'" .. k .. "' " .. list
+        list = ("'%s' %s"):format(k, list)
     end; ms.irc.privmsg(c, t, list)
 end
 
@@ -107,7 +107,7 @@ aliases['is.*'] = function (ms, c, t)
     local r1 = math.random(#prob)
     local r2 = math.random(#case)
     local r3 = math.random(#punct)
-    ms.irc.privmsg(c, t, prob[r1] .. ' ' .. case[r2] .. punct[r3])
+    ms.irc.privmsg(c, t, ('%s %s%s'):format(prob[r1], case[r2], punct[r3]))
 end
 
 aliases['say%s+.+'] = function (ms, c, t, msg)
