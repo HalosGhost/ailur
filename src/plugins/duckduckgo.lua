@@ -29,6 +29,7 @@ duckduckgo.main = function(args)
 
     if not search then
         args.modules.irc.privmsg(args.connection, args.target, 'You want me to search for what?')
+        return
     end
 
     local target = search:find('^!')
