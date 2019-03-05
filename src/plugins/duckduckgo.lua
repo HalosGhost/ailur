@@ -13,11 +13,7 @@ end
 
 local bang = function(resp)
     local data = json.decode(resp)
-    if data and data.Redirect and data.Redirect ~= '' then
-        return data.Redirect
-    else
-        return 'No Results'
-    end
+    return data and data.Redirect and data.Redirect ~= '' and data.Redirect or 'No Results'
 end
 
 duckduckgo.main = function(args)
@@ -34,7 +30,7 @@ duckduckgo.main = function(args)
 
     local target = search:find('^!')
         and 'https://api.duckduckgo.com/?q=%s&format=json&no_html=1&no_redirect=1'
-        or 'https://duckduckgo.com/lite/?q=%s&kl=us-en&k1=-1&kd=-1&kp=1'
+        or  'https://duckduckgo.com/lite/?q=%s&kl=us-en&k1=-1&kd=-1&kp=1'
 
     local resp = https.request(target:format(url.escape(search)))
     if resp then
