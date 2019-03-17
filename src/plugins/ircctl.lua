@@ -50,7 +50,7 @@ ircctl.main = function (args)
     local _, _, action = args.message:find('(%S+)')
     local f = ircctl.commands[action]
 
-    if args.authorized and f then return f(args) end
+    if (args.authorized or f == 'hatroulette') and f then return f(args) end
 
     args.modules.irc.privmsg(args.connection, args.target, ircctl.help)
 end
