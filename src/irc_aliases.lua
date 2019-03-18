@@ -252,31 +252,4 @@ aliases['uptime'] = function (ms, c, t)
     upt:close()
 end
 
-aliases['config%s+%S+%s+%S+%s*%S*'] = function (ms, c, t, msg, authed)
-    if not authed then return end
-
-    local _, _, action, setting, value = msg:find('config%s+(%S+)%s+(%S+)%s*(%S*)')
-
-    if action == 'toggle' and type(ms.config[setting]) == 'boolean' then
-        ms.config[setting] = not ms.config[setting]
-        ms.irc.privmsg(c, t, ('set %s to %s. Tada!'):format(setting, ms.config[setting]))
-    elseif action == 'get' then
-        ms.irc.privmsg(c, t, tostring(ms.config[setting]))
-    elseif action == 'type' then
-        ms.irc.privmsg(c, t, type(ms.config[setting]))
-    elseif action == 'set' then
-        if value == 'true' then
-            ms.config[setting] = true
-        elseif value == 'false' then
-            ms.config[setting] = false
-        elseif tonumber(value) ~= nil then
-            ms.config[setting] = tonumber(value)
-        else
-            ms.config[setting] = value
-        end
-
-        ms.irc.privmsg(c, t, 'Tada!')
-    end
-end
-
 return aliases
