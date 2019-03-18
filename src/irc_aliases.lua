@@ -113,7 +113,10 @@ end
 aliases['give%s+%S+.+'] = function (ms, c, t, msg, _, sndr)
     local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
     if what then
-        local thing = ms.plugins.fact.find(what:gsub("^%s*(.-)%s*$", "%1"))
+        local thing = nil
+        if type(ms.plugins.fact) == 'table' and type(ms.plugins.fact.find) == 'function' then
+            thing = ms.plugins.fact.find(what:gsub("^%s*(.-)%s*$", "%1"))
+        end
         ms.irc.privmsg(c, t, to .. ': ' .. (thing or (sndr .. ' wanted you to have ' .. what)))
     end
 end
