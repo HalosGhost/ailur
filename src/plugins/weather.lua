@@ -29,7 +29,13 @@ plugin.main = function (args)
         return
     end
 
-    local coords = json.decode(body).results[1].geometry.location
+    local j = json.decode(body)
+    if j.status ~= 'OK' then
+        args.modules.irc.privmsg(args.connection, args.target, 'error fetching location coords: ' .. j.status)
+        return
+    end
+
+    local coords = j.results[1].geometry.location
 
     local weather_url = 'https://api.darksky.net/forecast/%s/%s,%s?units=auto'
     local body, code = https.request(weather_url:format(args.modules.config.weather.darksky_key,
