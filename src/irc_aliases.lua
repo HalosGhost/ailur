@@ -12,16 +12,6 @@ aliases['ug[maen]'] = function (ms, c, t, msg, _, s)
     ms.irc.privmsg(c, t, ('%s says “Good (ᴜɢᴛ) %s to all!”'):format(s, map[l]))
 end
 
-aliases['fact count%s*.*'] = function (ms, c, t, msg)
-    local _, _, key = msg:find('fact count%s*(.*)')
-    ms.irc.privmsg(c, t, ms.irc_factoids.count(key))
-end
-
-aliases['fact search%s*.*'] = function (ms, c, t, msg)
-    local _, _, key = msg:find('fact search%s*(.*)')
-    ms.irc.privmsg(c, t, ms.irc_factoids.search(key))
-end
-
 aliases['%-?%d+%.?%d*%s*.+%s+in%s+.+'] = function (ms, c, t, msg)
     local _, _, val, src, dest = msg:find('(%-?%d+%.?%d*)%s*(.+)%s+in%s+(.+)')
     if ms.config.debug then
@@ -123,7 +113,7 @@ end
 aliases['give%s+%S+.+'] = function (ms, c, t, msg, _, sndr)
     local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
     if what then
-        local thing = ms.irc_factoids.find(what:gsub("^%s*(.-)%s*$", "%1"))
+        local thing = ms.plugins.fact.find(what:gsub("^%s*(.-)%s*$", "%1"))
         ms.irc.privmsg(c, t, to .. ': ' .. (thing or (sndr .. ' wanted you to have ' .. what)))
     end
 end
@@ -213,26 +203,6 @@ end
 aliases['wiki%s+.+'] = mediawiki_alias('wiki%s+(.+)', 'https://en.wikipedia.org/w/api.php')
 
 aliases['archwiki%s+.+'] = mediawiki_alias('archwiki%s+(.+)', 'https://wiki.archlinux.org/api.php')
-
-aliases["'.+' is '.+'"] = function (ms, c, t, msg)
-    local _, _, key, val = msg:find("'(.+)' is '(.+)'")
-    if not key or not val then
-        ms.irc.privmsg(c, t, '… what?')
-    else
-        ms.irc_factoids.add(key, val)
-        ms.irc.privmsg(c, t, 'Tada!')
-    end
-end
-
-aliases["'.+' is nothing"] = function (ms, c, t, msg)
-    local _, _, key = msg:find("'(.+)' is nothing")
-    if not key then
-        ms.irc.privmsg(c, t, '… what?')
-    else
-        ms.irc_factoids.remove(key)
-        ms.irc.privmsg(c, t, 'Tada!')
-    end
-end
 
 aliases["pick%s+.+"] = function (ms, c, t, msg)
     local _, _, str = msg:find("pick%s+(.+)")

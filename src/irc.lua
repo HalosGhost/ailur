@@ -98,7 +98,7 @@ irc.react_to_privmsg = function (c, ms, text)
     if not key then return true end
 
     local _, _, namespace, command = key:find('%s*(%S+)%s*(.*)')
-    local basic = ms.irc_factoids.find(key:gsub("^%s*(.-)%s*$", "%1"))
+    local basic = ms.plugins.fact.find(key:gsub("^%s*(.-)%s*$", "%1"))
 
     local plugin = nil
     for k in pairs(ms.plugins) do
