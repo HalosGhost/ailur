@@ -2,13 +2,13 @@ local url = require 'socket.url'
 local https = require 'ssl.https'
 local json = require 'json'
 
-local weather = {}
+local plugin = {}
 
-weather.help = 'usage: weather <location>'
+plugin.help = 'usage: weather <location>'
 
-weather.main = function (args)
+plugin.main = function (args)
     if args.message == '' then
-        args.modules.irc.privmsg(args.connection, args.target, weather.help)
+        args.modules.irc.privmsg(args.connection, args.target, plugin.help)
         return
     end
 
@@ -53,4 +53,4 @@ weather.main = function (args)
     args.modules.irc.privmsg(args.connection, args.target, result)
 end
 
-return weather
+return plugin

@@ -2,9 +2,9 @@ local json = require 'json'
 local url = require 'socket.url'
 local https = require 'ssl.https'
 
-local duckduckgo = {}
+local plugin = {}
 
-duckduckgo.help = 'Usage: duckduckgo <search>'
+plugin.help = 'Usage: duckduckgo <search>'
 
 local plain = function(resp)
     local _, _, link = resp:find('</table>.-</table>.-<a rel="nofollow" href="(.-)" class=\'result%-link\'>')
@@ -16,7 +16,7 @@ local bang = function(resp)
     return data and data.Redirect and data.Redirect ~= '' and data.Redirect or 'No Results'
 end
 
-duckduckgo.main = function(args)
+plugin.main = function(args)
     local _, _, search = args.message:find('(.+)')
 
     if args.modules.config.debug then
@@ -42,4 +42,4 @@ duckduckgo.main = function(args)
     args.modules.irc.privmsg(args.connection, args.target, 'something went wrong with the request')
 end
 
-return duckduckgo
+return plugin

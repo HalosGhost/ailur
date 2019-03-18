@@ -2,11 +2,11 @@ local json = require 'json'
 local url = require 'socket.url'
 local https = require 'ssl.https'
 
-local mediawiki = {}
+local plugin = {}
 
-mediawiki.help = 'Usage: mediawiki <APIURL> <search>'
+plugin.help = 'Usage: mediawiki <APIURL> <search>'
 
-mediawiki.main = function(args)
+plugin.main = function(args)
     local _, _, apiurl, search = args.message:find('(%S+)%s+(.+)')
 
     if args.modules.config.debug then
@@ -33,4 +33,4 @@ mediawiki.main = function(args)
     end
 end
 
-return mediawiki
+return plugin

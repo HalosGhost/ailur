@@ -1,10 +1,10 @@
 -- bot management plugin
 
-local manage = {}
+local plugin = {}
 
-manage.commands = {}
+plugin.commands = {}
 
-manage.commands.update = function (args)
+plugin.commands.update = function (args)
     if not args.authorized then return end
 
     local _, _, status = os.execute('git pull origin master')
@@ -13,14 +13,14 @@ manage.commands.update = function (args)
     end
 end
 
-manage.commands.die = function (args)
+plugin.commands.die = function (args)
     if not args.authorized then return end
 
     args.connection:close()
     os.exit()
 end
 
-manage.commands.reload = function (args)
+plugin.commands.reload = function (args)
     if not args.authorized then return end
 
     local _, _, what = args.message:find('reload%s+(.+)')
@@ -50,20 +50,20 @@ manage.commands.reload = function (args)
     end
 end
 
-manage.commands.restart = function (args)
+plugin.commands.restart = function (args)
     if args.authorized then
         if args.modules.config.debug then print('restarting') end
         return true
     end
 end
 
-manage.commands.version = function (args)
+plugin.commands.version = function (args)
     local upt = io.popen('printf \'0.r%s.%s\' "$(git rev-list --count HEAD)" "$(git log -1 --pretty=format:%h)"')
     args.modules.irc.privmsg(args.connection, args.target, upt:read())
     upt:close()
 end
 
-manage.commands.list = function (args)
+plugin.commands.list = function (args)
     local list = ''
     local _, _, what = args.message:find('list%s*(%S*)')
 
@@ -83,24 +83,24 @@ manage.commands.list = function (args)
     args.modules.irc.privmsg(args.connection, args.target, list)
 end
 
-manage.commands.whoami = function (args)
+plugin.commands.whoami = function (args)
     local admin = args.authorized and ', an admin' or ''
     args.modules.irc.privmsg(args.connection, args.target, args.sender .. admin)
 end
 
 local h = ''
-for k in pairs(manage.commands) do
+for k in pairs(plugin.commands) do
     h = ('%s|%s'):format(h, k)
 end
-manage.help = ('usage: manage <%s>'):format(h:sub(2))
+plugin.help = ('usage: manage <%s>'):format(h:sub(2))
 
-manage.main = function (args)
+plugin.main = function (args)
     local _, _, action = args.message:find('(%S+)')
-    local f = manage.commands[action]
+    local f = plugin.commands[action]
 
     if f then return f(args) end
 
-    args.modules.irc.privmsg(args.connection, args.target, manage.help)
+    args.modules.irc.privmsg(args.connection, args.target, plugin.help)
 end
 
-return manage
+return plugin

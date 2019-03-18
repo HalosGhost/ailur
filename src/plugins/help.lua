@@ -1,12 +1,12 @@
-local help = {}
+local plugin = {}
 
-help.help = 'usage: help <plugin>'
+plugin.help = 'usage: help <plugin>'
 
-help.main = function(args)
+plugin.main = function(args)
     local _, _, mod = args.message:find('(%S+)')
 
     if not mod then
-        args.modules.irc.privmsg(args.connection, args.target, help.help)
+        args.modules.irc.privmsg(args.connection, args.target, plugin.help)
         return
     end
 
@@ -21,4 +21,4 @@ help.main = function(args)
     args.modules.irc.privmsg(args.connection, args.target, usage)
 end
 
-return help
+return plugin

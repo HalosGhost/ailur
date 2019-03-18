@@ -1,18 +1,18 @@
-local eval = {}
+local plugin = {}
 
-eval.help = 'eval <lua-expr>'
+plugin.help = 'eval <lua-expr>'
 
 -- Thouroughly copy tables to the safe env so that the
 -- sandbox can't change code outside of its environment.
-eval.deepcopy = function (orig)
+plugin.deepcopy = function (orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
         copy = {}
         for orig_key, orig_value in next, orig, nil do
-            copy[eval.deepcopy(orig_key)] = eval.deepcopy(orig_value)
+            copy[plugin.deepcopy(orig_key)] = plugin.deepcopy(orig_value)
         end
-        setmetatable(copy, eval.deepcopy(getmetatable(orig)))
+        setmetatable(copy, plugin.deepcopy(getmetatable(orig)))
     else -- number, string, boolean, etc
         copy = orig
     end
@@ -20,7 +20,7 @@ eval.deepcopy = function (orig)
 end
 
 -- A simple pretty printer for lua values.
-eval.inspect = function (thing)
+plugin.inspect = function (thing)
     if type(thing) == 'table' then
         local formats = {
             ['table'] = '{…}',
@@ -39,9 +39,9 @@ eval.inspect = function (thing)
     end
 end
 
-eval.main = function (args)
+plugin.main = function (args)
     if args.message == '' then
-        args.modules.irc.privmsg(args.connection, args.target, eval.help)
+        args.modules.irc.privmsg(args.connection, args.target, plugin.help)
         return
     end
 
@@ -49,12 +49,12 @@ eval.main = function (args)
         sender   = args.sender,
         target   = args.target,
         message  = args.message,
-        args     = args.authorized and eval.deepcopy(args) or nil,
-        bit32    = eval.deepcopy(bit32),
-        math     = eval.deepcopy(math),
+        args     = args.authorized and plugin.deepcopy(args) or nil,
+        bit32    = plugin.deepcopy(bit32),
+        math     = plugin.deepcopy(math),
         os       = { clock=os.clock, date=os.date, difftime=os.difftime, time=os.time },
-        string   = eval.deepcopy(string),
-        table    = eval.deepcopy(table),
+        string   = plugin.deepcopy(string),
+        table    = plugin.deepcopy(table),
         tonumber = tonumber,
         tostring = tostring,
         type     = type,
@@ -77,10 +77,10 @@ eval.main = function (args)
     -- use pcall so we can catch errors that would otherwise kill the bot
     local status, result = pcall(load(chunk, nil, 't', safe_env))
     if status then
-        result = eval.inspect(result)
+        result = plugin.inspect(result)
     end
 
     args.modules.irc.privmsg(args.connection, args.target, result)
 end
 
-return eval
+return plugin
