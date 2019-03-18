@@ -80,13 +80,13 @@ irc.react_to_privmsg = function (c, ms, text)
     local from_channel = target:find('^#')
 
     -- if whitelisted, put nick's last message in quotegrabs table
-    if from_channel and ms.irc_quotegrabs.whitelist_status(mask) then
+    if ms.plugins.quote and from_channel and ms.plugins.quote.whitelist_status(mask) then
         -- create the table for the channel if it doesn't exist
-        if not ms.irc_quotegrabs.last_msgs[target] then
-            ms.irc_quotegrabs.last_msgs[target] = {}
+        if not ms.plugins.quote.last_msgs[target] then
+            ms.plugins.quote.last_msgs[target] = {}
         end
 
-        ms.irc_quotegrabs.last_msgs[target][mask] = msg
+        ms.plugins.quote.last_msgs[target][mask] = msg
     end
 
     local tgt = from_channel and target or mask
