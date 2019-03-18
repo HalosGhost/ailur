@@ -24,7 +24,7 @@ weather.main = function (args)
     local body, code = https.request(geocode_url:format(url.escape(args.message),
                                                         args.modules.config.weather.geocode_key))
 
-    if body == nil then
+    if not body then
         args.modules.irc.privmsg(args.connection, args.target, 'error fetching location coords: ' .. code)
         return
     end
@@ -35,14 +35,14 @@ weather.main = function (args)
     local body, code = https.request(weather_url:format(args.modules.config.weather.darksky_key,
                                                         coords.lat, coords.lng))
 
-    if body == nil then
+    if not body then
         args.modules.irc.privmsg(args.connection, args.target, 'error fetching weather: ' .. code)
         return
     end
 
     local j = json.decode(body)
 
-    if j == nil then
+    if not j then
         args.modules.irc.privmsg(args.connection, args.target, 'error decoding json')
         return
     end
