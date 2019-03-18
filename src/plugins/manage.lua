@@ -24,19 +24,29 @@ manage.commands.reload = function (args)
     if not args.authorized then return end
 
     local _, _, what = args.message:find('reload%s+(.+)')
-    for k in pairs(args.modules) do
-        if what == k then
-            args.modules.irc.privmsg(args.connection, args.target, args.modules:extload(k))
-            return
+    if args.modules[what] then
+        if type(args.modules[what].dbcleanup) == 'function' then
+            args.modules[what].dbcleanup()
         end
-    end
 
-    for k in pairs(args.modules.plugins) do
-        if what == k then
-            args.modules.irc.privmsg(args.connection, args.target,
-                                     args.modules.extload(args.modules.plugins, k, 'plugins'))
-            return
+        args.modules.irc.privmsg(args.connection, args.target, args.modules:extload(what))
+
+        if type(args.modules[what].dbinit) == 'function' then
+            args.modules[what].dbinit()
         end
+    elseif args.modules.plugins[what] then
+        if type(args.modules.plugins[what].dbcleanup) == 'function' then
+            args.modules.plugins[what].dbcleanup()
+        end
+
+        args.modules.irc.privmsg(args.connection, args.target,
+                                 args.modules.extload(args.modules.plugins, what, 'plugins'))
+
+        if type(args.modules.plugins[what].dbinit) == 'function' then
+            args.modules.plugins[what].dbinit()
+        end
+    else
+        args.modules.irc.privmsg(args.connection, args.target 'no such module/plugin')
     end
 end
 
