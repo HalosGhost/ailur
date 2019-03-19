@@ -10,49 +10,49 @@ irc.init = function (irc_config)
     return conn
 end
 
-irc.conn = function (c, irc_config)
-    c:send(('NICK %s\r\n'):format(irc_config.handle))
-    c:send(('USER %s * 8 :%s\r\n'):format(irc_config.ident, irc_config.gecos))
+irc.conn = function (irc_config)
+    irc.connection:send(('NICK %s\r\n'):format(irc_config.handle))
+    irc.connection:send(('USER %s * 8 :%s\r\n'):format(irc_config.ident, irc_config.gecos))
 end
 
-irc.join = function (c, channel)
-    c:send(('JOIN %s\r\n'):format(channel))
+irc.join = function (channel)
+    irc.connection:send(('JOIN %s\r\n'):format(channel))
 end
 
-irc.joinall = function (c, channels)
+irc.joinall = function (channels)
     for _, v in pairs(channels) do
-        irc.join(c, v)
+        irc.join(v)
     end
 end
 
-irc.pong = function (c, sname)
-    c:send(('PONG %s\r\n'):format(sname))
+irc.pong = function (sname)
+    irc.connection:send(('PONG %s\r\n'):format(sname))
 end
 
-irc.privmsg = function (c, target, msg)
-    c:send(('PRIVMSG %s :%s\r\n'):format(target, msg))
+irc.privmsg = function (target, msg)
+    irc.connection:send(('PRIVMSG %s :%s\r\n'):format(target, msg))
 end
 
-irc.modeset = function (c, target, recipient, mode)
+irc.modeset = function (target, recipient, mode)
     if target:byte() == 35 then
-        c:send(('MODE %s %s %s\r\n'):format(target, mode, recipient))
+        irc.connection:send(('MODE %s %s %s\r\n'):format(target, mode, recipient))
     else
-        irc.privmsg(c, target, 'Cannot set modes in query')
+        irc.privmsg(target, 'Cannot set modes in query')
     end
 end
 
-irc.kick = function (c, target, recipient, message)
+irc.kick = function (target, recipient, message)
     if target:byte() == 35 then
-        c:send(('KICK %s %s :%s\r\n'):format(target, recipient, message))
+        irc.connection:send(('KICK %s %s :%s\r\n'):format(target, recipient, message))
     else
-        irc.privmsg(c, target, 'Cannot kick in query')
+        irc.privmsg(target, 'Cannot kick in query')
     end
 end
 
-irc.get_sname = function (c, ms)
+irc.get_sname = function (ms)
     local sname = ''
     while sname == '' do
-        local data = c:receive('*l')
+        local data = irc.connection:receive('*l')
         if ms.config.debug and data then print(data) end
 
         if data and (data:find('376') or data:find('422')) then
@@ -72,7 +72,7 @@ irc.authorized = function (irc_config, mask)
     return authed
 end
 
-irc.react_to_privmsg = function (c, ms, text)
+irc.react_to_privmsg = function (ms, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
     local authed = irc.authorized(ms.config.irc, mask .. hn)
@@ -112,7 +112,6 @@ irc.react_to_privmsg = function (c, ms, text)
 
     if plugin then
         local ret = plugin.main { modules = ms
-                                , connection = c
                                 , target = tgt
                                 , message = command
                                 , authorized = authed
@@ -121,11 +120,11 @@ irc.react_to_privmsg = function (c, ms, text)
 
         if ret then return false end
     elseif basic ~= nil then
-        irc.privmsg(c, tgt, basic)
+        irc.privmsg(tgt, basic)
     else
         for k, v in pairs(ms.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
-                local ret = v(ms, c, tgt, key, authed, mask)
+                local ret = v(ms, tgt, key, authed, mask)
                 if ret then return false end
             end
         end
@@ -134,49 +133,50 @@ irc.react_to_privmsg = function (c, ms, text)
     return true
 end
 
-irc.react_loop = function (c, sname, ms)
+irc.react_loop = function (sname, ms)
     math.randomseed(os.time())
 
     if ms.nickpass then
-        irc.privmsg(c, 'NickServ', 'identify ' .. ms.nickpass)
+        irc.privmsg('NickServ', 'identify ' .. ms.nickpass)
         ms.nickpass = nil -- make it harder to accidentally expose the nickpass, like with eval
     else
-        irc.joinall(c, ms.config.irc.channels)
+        irc.joinall(ms.config.irc.channels)
     end
 
     local keepalive = true
     while keepalive do
-        local data = c:receive('*l')
+        local data = irc.connection:receive('*l')
         if data then
             if ms.config.debug then io.stdout:write(data .. '\n') end
 
             if data == ('PING ' .. sname) then
-                irc.pong(c, sname)
+                irc.pong(sname)
             elseif data:find('PRIVMSG') then
-                keepalive = irc.react_to_privmsg(c, ms, data)
+                keepalive = irc.react_to_privmsg(ms, data)
             elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
-                irc.joinall(c, ms.config.irc.channels)
+                irc.joinall(ms.config.irc.channels)
             end
         end
     end
 end
 
 irc.main = function (ms)
-    local c = irc.init(ms.config.irc)
-    if not c then
+    irc.connection = irc.init(ms.config.irc)
+
+    if not irc.connection then
         print('failed to initialize irc network')
         return
     end
 
     ms.database.init(ms)
 
-    irc.conn(c, ms.config.irc)
+    irc.conn(ms.config.irc)
 
-    local sname = irc.get_sname(c, ms)
+    local sname = irc.get_sname(ms)
 
-    irc.react_loop(c, sname, ms)
+    irc.react_loop(sname, ms)
     ms.database.cleanup(ms)
-    c:close()
+    irc.connection:close()
 end
 
 return irc

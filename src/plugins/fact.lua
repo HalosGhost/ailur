@@ -51,7 +51,7 @@ plugin.commands = {}
 plugin.commands.print = function (args)
     local _, _, key = args.message:find('print%s+(.+)')
 
-    args.modules.irc.privmsg(args.connection, args.target, plugin.find(key))
+    args.modules.irc.privmsg(args.target, plugin.find(key))
 end
 
 plugin.commands.search = function (args)
@@ -65,7 +65,7 @@ plugin.commands.search = function (args)
         list = ("'%s' %s"):format(v, list)
     end
 
-    args.modules.irc.privmsg(args.connection, args.target, list)
+    args.modules.irc.privmsg(args.target, list)
 end
 
 plugin.commands.count = function (args)
@@ -75,7 +75,7 @@ plugin.commands.count = function (args)
     local key = key and '%' .. key .. '%' or '%'
     cnt:bind_names{ ['key'] = key }
     for c in cnt:urows() do
-        return args.modules.irc.privmsg(args.connection, args.target,
+        return args.modules.irc.privmsg(args.target,
                                         ('Found %d result%s'):format(c or '0', c == 1 and '' or 's'))
     end
 end
@@ -91,7 +91,7 @@ plugin.commands.add = function (args)
     ins:bind_names{ ['key'] = key, ['value'] = value }
     res = ins:step()
 
-    args.modules.irc.privmsg(args.connection, args.target, 
+    args.modules.irc.privmsg(args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
 end
 
@@ -102,7 +102,7 @@ plugin.commands.remove = function (args)
     del:bind_names{ ['key'] = key }
     local res = del:step()
 
-    args.modules.irc.privmsg(args.connection, args.target, 
+    args.modules.irc.privmsg(args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
 end
 
@@ -118,7 +118,7 @@ plugin.main = function (args)
 
     if f then return f(args, target) end
 
-    args.modules.irc.privmsg(args.connection, args.target, plugin.help)
+    args.modules.irc.privmsg(args.target, plugin.help)
 end
 
 return plugin

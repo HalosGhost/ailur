@@ -24,7 +24,7 @@ plugin.main = function(args)
     end
 
     if not search then
-        args.modules.irc.privmsg(args.connection, args.target, 'You want me to search for what?')
+        args.modules.irc.privmsg(args.target, 'You want me to search for what?')
         return
     end
 
@@ -35,11 +35,11 @@ plugin.main = function(args)
     local resp = https.request(target:format(url.escape(search)))
     if resp then
         if args.modules.config.debug then print(resp) end
-        args.modules.irc.privmsg(args.connection, args.target, search:find('^!') and bang(resp) or plain(resp))
+        args.modules.irc.privmsg(args.target, search:find('^!') and bang(resp) or plain(resp))
         return
     end
 
-    args.modules.irc.privmsg(args.connection, args.target, 'something went wrong with the request')
+    args.modules.irc.privmsg(args.target, 'something went wrong with the request')
 end
 
 return plugin
