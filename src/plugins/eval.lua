@@ -40,7 +40,7 @@ end
 
 plugin.main = function (args)
     if args.message == '' then
-        args.modules.irc.privmsg(args.connection, args.target, plugin.help)
+        args.modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
@@ -66,7 +66,7 @@ plugin.main = function (args)
     for _, pattern in pairs(naughty_statements) do
         local _, _, statement = chunk:find('(' .. pattern .. ')[%(%s]')
         if statement then
-            args.modules.irc.privmsg(args.connection, args.target,
+            args.modules.irc.privmsg(args.target,
                                      statement .. ' statements are not currently supported')
             return
         end
@@ -78,7 +78,7 @@ plugin.main = function (args)
         result = plugin.inspect(result)
     end
 
-    args.modules.irc.privmsg(args.connection, args.target, result)
+    args.modules.irc.privmsg(args.target, result)
 end
 
 return plugin

@@ -6,7 +6,7 @@ plugin.main = function(args)
     local _, _, mod = args.message:find('(%S+)')
 
     if not mod then
-        args.modules.irc.privmsg(args.connection, args.target, plugin.help)
+        args.modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
@@ -18,7 +18,7 @@ plugin.main = function(args)
         print(mod, args.modules.plugins[mod], usage)
     end
 
-    args.modules.irc.privmsg(args.connection, args.target, usage)
+    args.modules.irc.privmsg(args.target, usage)
 end
 
 return plugin

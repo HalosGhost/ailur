@@ -14,11 +14,11 @@ plugin.main = function(args)
     end
 
     if not apiurl then
-        args.modules.irc.privmsg(args.connection, args.target, 'You want me to search where?')
+        args.modules.irc.privmsg(args.target, 'You want me to search where?')
     end
 
     if not search then
-        args.modules.irc.privmsg(args.connection, args.target, 'You want me to search for what?')
+        args.modules.irc.privmsg(args.target, 'You want me to search for what?')
     end
 
     local act = '?action=opensearch&format=json&search='
@@ -28,7 +28,7 @@ plugin.main = function(args)
         local res = json.decode(resp)
         local lnk = (res[4][1] and res[4][1] ~= '') and res[4][1] or 'No results'
         local dsc = (res[3][1] and res[3][1] ~= '') and ' - ' .. res[3][1] or ''
-        args.modules.irc.privmsg(args.connection, args.target, ('<%s>%s'):format(lnk, dsc))
+        args.modules.irc.privmsg(args.target, ('<%s>%s'):format(lnk, dsc))
         return
     end
 end
