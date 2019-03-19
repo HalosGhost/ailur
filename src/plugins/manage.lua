@@ -67,12 +67,11 @@ plugin.commands.list = function (args)
     local list = ''
     local _, _, what = args.message:find('list%s*(%S*)')
 
-    local tables = {}
-    tables.all      = tables
-    tables.aliases  = args.modules.irc_aliases
-    tables.modules  = args.modules
-    tables.plugins  = args.modules.plugins
-    tables.config   = args.modules.config
+    local tables = { aliases = args.modules.irc_aliases
+                   , modules = args.modules
+                   , plugins = args.modules.plugins
+                   , config  = args.modules.config
+                   }
 
     local the_table = what and tables[what] or tables
 

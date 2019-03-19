@@ -69,7 +69,7 @@ end
 
 plugin.whitelist_status = function (nick)
     wl_sel:reset()
-    wl_sel:bind_names({ ['nick'] = nick })
+    wl_sel:bind_names{ ['nick'] = nick }
 
     for c in wl_sel:urows() do
         return c > 0
@@ -88,7 +88,7 @@ end
 
 plugin.commands.optin = function (args)
     wl_ins:reset()
-    wl_ins:bind_names({ ['nick'] = args.sender })
+    wl_ins:bind_names{ ['nick'] = args.sender }
     local res = wl_ins:step()
     args.modules.irc.privmsg(args.connection, args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
@@ -96,7 +96,7 @@ end
 
 plugin.commands.optout = function (args)
     wl_del:reset()
-    wl_del:bind_names({ ['nick'] = args.sender })
+    wl_del:bind_names{ ['nick'] = args.sender }
     local res = wl_del:step()
     args.modules.irc.privmsg(args.connection, args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
@@ -109,7 +109,7 @@ plugin.commands.grab = function (args, nick)
     if not last_msg then return end
 
     qg_ins:reset()
-    qg_ins:bind_names({ ['nick'] = nick, ['message'] = last_msg })
+    qg_ins:bind_names{ ['nick'] = nick, ['message'] = last_msg }
     local res = qg_ins:step()
     args.modules.irc.privmsg(args.connection, args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
@@ -118,7 +118,7 @@ end
 plugin.commands.last = function (args, nick)
     nick = ('%%%s%%'):format(nick)
     qg_sel_nick:reset()
-    qg_sel_nick:bind_names({ ['nick'] = nick })
+    qg_sel_nick:bind_names{ ['nick'] = nick }
     for id, nick, msg in qg_sel_nick:urows() do
         args.modules.irc.privmsg(args.connection, args.target,
                                  QUOTE_FMT:format(id, nick, msg))
@@ -130,7 +130,7 @@ plugin.commands.id = function (args, id)
     if id == '' then return end
 
     qg_sel_id:reset()
-    qg_sel_id:bind_names({ ['id'] = id })
+    qg_sel_id:bind_names{ ['id'] = id }
     for id, nick, msg in qg_sel_id:urows() do
         args.modules.irc.privmsg(args.connection, args.target,
                                  QUOTE_FMT:format(id, nick, msg))
@@ -141,7 +141,7 @@ end
 plugin.commands.random = function (args, nick)
     nick = ('%%%s%%'):format(nick)
     qg_sel_rand:reset()
-    qg_sel_rand:bind_names({ ['nick'] = nick })
+    qg_sel_rand:bind_names{ ['nick'] = nick }
     for id, nick, msg in qg_sel_rand:urows() do
         args.modules.irc.privmsg(args.connection, args.target,
                                  QUOTE_FMT:format(id, nick, msg))
@@ -152,7 +152,7 @@ end
 plugin.commands.search = function (args, search)
     search = ('%%%s%%'):format(search)
     qg_search:reset()
-    qg_search:bind_names({ ['search'] = search })
+    qg_search:bind_names{ ['search'] = search }
 
     local list = ''
     for id, nick, msg in qg_search:urows() do
@@ -167,7 +167,7 @@ plugin.commands.delete = function (args, id)
     if not args.authorized or id == '' then return end
 
     qg_del:reset()
-    qg_del:bind_names({ ['id'] = id })
+    qg_del:bind_names{ ['id'] = id }
     local res = qg_del:step()
     args.modules.irc.privmsg(args.connection, args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
@@ -177,7 +177,7 @@ local h = ''
 for k in pairs(plugin.commands) do
     h = ('%s|%s'):format(h, k)
 end
-plugin.help = ('usage: quote [%s] [target]'):format(h:sub(2))
+plugin.help = ('usage: quote <%s> [target]'):format(h:sub(2))
 
 plugin.main = function (args)
     local _, _, action, target = args.message:find('(%S+)%s*(%S*)')

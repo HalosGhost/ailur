@@ -40,7 +40,7 @@ end
 
 plugin.find = function (key)
     sel:reset()
-    sel:bind_names({ ['key'] = key })
+    sel:bind_names{ ['key'] = key }
     for v in sel:urows() do
         return v
     end
@@ -59,7 +59,7 @@ plugin.commands.search = function (args)
 
     key = key and '%' .. key .. '%' or '%'
     sim:reset()
-    sim:bind_names({ ['key'] = key })
+    sim:bind_names{ ['key'] = key }
     local list = ''
     for v in sim:urows() do
         list = ("'%s' %s"):format(v, list)
@@ -73,7 +73,7 @@ plugin.commands.count = function (args)
 
     cnt:reset()
     local key = key and '%' .. key .. '%' or '%'
-    cnt:bind_names({ ['key'] = key })
+    cnt:bind_names{ ['key'] = key }
     for c in cnt:urows() do
         return args.modules.irc.privmsg(args.connection, args.target,
                                         ('Found %d result%s'):format(c or '0', c == 1 and '' or 's'))
@@ -84,11 +84,11 @@ plugin.commands.add = function (args)
     local _, _, key, value = args.message:find("add%s+'(.+)'%s+'(.+)'")
 
     del:reset()
-    del:bind_names({ ['key'] = key })
+    del:bind_names{ ['key'] = key }
     local res = del:step()
 
     ins:reset()
-    ins:bind_names({ ['key'] = key, ['value'] = value })
+    ins:bind_names{ ['key'] = key, ['value'] = value }
     res = ins:step()
 
     args.modules.irc.privmsg(args.connection, args.target, 
@@ -99,7 +99,7 @@ plugin.commands.remove = function (args)
     local _, _, key = args.message:find("remove%s+'(.+)'")
 
     del:reset()
-    del:bind_names({ ['key'] = key })
+    del:bind_names{ ['key'] = key }
     local res = del:step()
 
     args.modules.irc.privmsg(args.connection, args.target, 
@@ -110,7 +110,7 @@ local h = ''
 for k in pairs(plugin.commands) do
     h = ('%s|%s'):format(h, k)
 end
-plugin.help = ('usage: fact <%s> [key] [value]'):format(h:sub(2))
+plugin.help = ('usage: fact <%s> [key] [value]'):format(h:sub(2))
 
 plugin.main = function (args)
     local _, _, action, target = args.message:find('(%S+)%s*(%S*)')
