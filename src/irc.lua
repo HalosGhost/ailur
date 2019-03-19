@@ -2,7 +2,6 @@ local irc = {}
 
 local socket = require 'socket'
 local ssl = require 'ssl'
-local sql = require 'lsqlite3'
 
 irc.init = function (irc_config)
     local bare = socket.connect(irc_config.address, irc_config.port)
@@ -64,7 +63,7 @@ irc.get_sname = function (c, ms)
     return sname
 end
 
-irc.authorized = function (c, irc_config, mask)
+irc.authorized = function (irc_config, mask)
     local authed = nil
     for k in pairs(irc_config.admins) do
         authed = authed or mask:find(k)
@@ -76,7 +75,7 @@ end
 irc.react_to_privmsg = function (c, ms, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
-    local authed = irc.authorized(c, ms.config.irc, mask .. hn)
+    local authed = irc.authorized(ms.config.irc, mask .. hn)
     local from_channel = target:find('^#')
 
     -- if whitelisted, put nick's last message in quotegrabs table
@@ -112,21 +111,21 @@ irc.react_to_privmsg = function (c, ms, text)
     end
 
     if plugin then
-        ret = plugin.main({
-            modules = ms,
-            connection = c,
-            target = tgt,
-            message = command,
-            authorized = authed,
-            sender = mask,
-        })
+        local ret = plugin.main { modules = ms
+                                , connection = c
+                                , target = tgt
+                                , message = command
+                                , authorized = authed
+                                , sender = mask
+                                }
+
         if ret then return false end
     elseif basic ~= nil then
         irc.privmsg(c, tgt, basic)
     else
         for k, v in pairs(ms.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
-                ret = v(ms, c, tgt, key, authed, mask)
+                local ret = v(ms, c, tgt, key, authed, mask)
                 if ret then return false end
             end
         end

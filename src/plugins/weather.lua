@@ -4,7 +4,7 @@ local json = require 'json'
 
 local plugin = {}
 
-plugin.help = 'usage: weather <location>'
+plugin.help = 'usage: weather <location>'
 
 plugin.main = function (args)
     if args.message == '' then

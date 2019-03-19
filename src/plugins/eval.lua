@@ -22,11 +22,10 @@ end
 -- A simple pretty printer for lua values.
 plugin.inspect = function (thing)
     if type(thing) == 'table' then
-        local formats = {
-            ['table'] = '{…}',
-            ['function'] = '<function>',
-            ['string'] = '%q',
-        }
+        local formats = { ['table'] = '{…}'
+                        , ['function'] = '<function>'
+                        , ['string'] = '%q'
+                        }
 
         local result = ''
         for k, v in pairs(thing) do
@@ -45,21 +44,20 @@ plugin.main = function (args)
         return
     end
 
-    local safe_env = {
-        sender   = args.sender,
-        target   = args.target,
-        message  = args.message,
-        args     = args.authorized and plugin.deepcopy(args) or nil,
-        bit32    = plugin.deepcopy(bit32),
-        math     = plugin.deepcopy(math),
-        os       = { clock=os.clock, date=os.date, difftime=os.difftime, time=os.time },
-        string   = plugin.deepcopy(string),
-        table    = plugin.deepcopy(table),
-        tonumber = tonumber,
-        tostring = tostring,
-        type     = type,
-        unpack   = unpack,
-    }
+    local safe_env = { sender   = args.sender
+                     , target   = args.target
+                     , message  = args.message
+                     , args     = args.authorized and plugin.deepcopy(args) or nil
+                     , bit32    = plugin.deepcopy(bit32)
+                     , math     = plugin.deepcopy(math)
+                     , os       = { clock=os.clock, date=os.date, difftime=os.difftime, time=os.time }
+                     , string   = plugin.deepcopy(string)
+                     , table    = plugin.deepcopy(table)
+                     , tonumber = tonumber
+                     , tostring = tostring
+                     , type     = type
+                     , unpack   = unpack
+                     }
 
     local chunk = ('return ' .. (args.message:find(';') and '(function() %s; end)()' or '%s')):format(args.message)
 

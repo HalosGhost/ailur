@@ -32,7 +32,7 @@ local h = ''
 for k in pairs(plugin.commands) do
     h = ('%s|%s'):format(h, k)
 end
-plugin.help = ('usage: configure [%s] [setting] [value]'):format(h:sub(2))
+plugin.help = ('usage: configure <%s> [setting] [value]'):format(h:sub(2))
 
 plugin.main = function (args)
     local _, _, action = args.message:find('(%S+)')
