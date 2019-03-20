@@ -29,7 +29,7 @@ The configuration file is ``config.lua`` and should be updated before running th
 Starting the Bot
 ~~~~~~~~~~~~~~~~
 
-In a terminal run the following command in the :bash:`src` directory:
+In a terminal run the following command in the ``src`` directory:
 
 .. code::
 
