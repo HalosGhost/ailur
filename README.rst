@@ -1,5 +1,3 @@
-.. role:: bash(code)
-   :language: bash
 Bot
 ===
 
@@ -26,14 +24,14 @@ Required libraries
 Configuration
 ~~~~~~~~~~~~~
 
-The configuration file is :bash:`config.lua` and should be updated before running the bot.
+The configuration file is ``config.lua`` and should be updated before running the bot.
 
 Starting the Bot
 ~~~~~~~~~~~~~~~~
 
 In a terminal run the following command in the :bash:`src` directory:
 
-.. code:: bash
+.. code::
 
     lua main.lua
 
