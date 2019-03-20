@@ -1,3 +1,5 @@
+.. role:: bash(code)
+   :language: bash
 Bot
 ===
 
@@ -19,8 +21,7 @@ Lua libraries used
 Configure and Run
 -----------------
 
-The configuration file is `config.lua` and should be updated before running the
-bot. To start the bot run:
+The configuration file is :bash:`config.lua` and should be updated before running the bot. To start the bot run:
 
 .. code:: bash
 
