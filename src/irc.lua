@@ -91,6 +91,12 @@ irc.react_to_privmsg = function (ms, text)
     local tgt = from_channel and target or mask
     local prefix = '^' .. (tgt:find('^#') and ms.config.irc.handle .. '.?%s+' or '')
 
+    if ms.plugins.macro then
+        for _, macro in ipairs(ms.plugins.macro.loaded or {}) do
+            msg = msg:gsub(macro.pattern, macro.substitution)
+        end
+    end
+
     if not msg:find(prefix) then return true end
 
     local _, _, key = msg:find(prefix .. '(.-)%s*$')
