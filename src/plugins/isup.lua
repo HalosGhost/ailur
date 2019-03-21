@@ -1,5 +1,5 @@
-url = require("socket.url")
-https = require("ssl.https")
+local url = require("socket.url")
+local https = require("ssl.https")
 
 
 local plugin = {}
@@ -19,17 +19,16 @@ plugin.main = function(args)
     end
     if not website then
         args.modules.irc.privmsg(args.target, 'Give me a website or hostname to check')
+        return
     end
     local address = website:find('^https?://') and website or ('http://%s'):format(website)
-    local response,httpcode = https.request(address)
+    local response, httpcode = https.request(address)
     if response then
         local code = string.sub(tostring(httpcode), 1, 1)
         local reply = messages[tonumber(code)]:format(httpcode)
         args.modules.irc.privmsg(args.target, reply)
-        return
     else
         args.modules.irc.privmsg(args.target, "The website is currently down")
-        return
     end
 end
 
