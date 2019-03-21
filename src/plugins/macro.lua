@@ -21,7 +21,7 @@ plugin.dbinit = function ()
 
     fetch_all = db:prepare('select id, pattern, substitution from macros order by id')
     insert = db:prepare('insert or replace into macros (pattern, substitution) values (:pattern, :substitution);')
-    delete = db:prepare('delete from macros where pattern = :pattern')
+    delete = db:prepare('delete from macros where pattern like :pattern')
 end
 
 plugin.dbcleanup = function ()
@@ -52,6 +52,11 @@ plugin.commands.delete = function (args)
     local res = delete:step()
 
     args.modules.irc.privmsg(args.target, res == sql.DONE and 'Tada!' or db:errmsg())
+end
+
+plugin.commands.clear = function (args)
+    plugin.loaded = nil
+    plugin.loaded = {}
 end
 
 plugin.commands.refresh = function (args)
