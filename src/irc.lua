@@ -34,7 +34,7 @@ irc.authenticate = function(irc_config)
     local authString = b64e(
         ("%s\x00%s\x00%s"):format(
         irc_config.handle,
-        irc_config.ident,
+        irc_config.handle,
         saslpass))
     irc.connection:send(('AUTHENTICATE %s\r\n'):format(authstring))
 end
