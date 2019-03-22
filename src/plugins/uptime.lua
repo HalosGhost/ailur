@@ -8,21 +8,26 @@ plugin.main = function (args)
         return
     end
 
-    local conversions = { {'second', 60}, {'minute', 60}, {'hour', 24}, {'day', 7}, {'week', 52} }
+    local conversions = { {'year',      60*60*24*7*52}
+                        , {'week',      60*60*24*7}
+                        , {'day',       60*60*24}
+                        , {'hour',      60*60}
+                        , {'minute',    60}
+                        , {'second',    1}
+                        }
 
-    local uptime = ''
+    local uptime = {}
     local diff = os.difftime(os.time(), STARTTIME)
 
     for _, v in pairs(conversions) do
-        local next_diff = diff // v[2]
-        diff = diff - next_diff * v[2]
-        uptime = ('%d %s%s, %s'):format(diff, v[1], diff == 1 and '' or 's', uptime)
-
-        if next_diff == 0 then break end
-        diff = next_diff
+        local conversion = diff // v[2]
+        if conversion ~= 0 then
+            table.insert(uptime, ('%d %s%s'):format(conversion, v[1], conversion == 1 and '' or 's'))
+            diff = diff - conversion * v[2]
+        end
     end
 
-    args.modules.irc.privmsg(args.target, ('up %s'):format(uptime:sub(0, #uptime-2)))
+    args.modules.irc.privmsg(args.target, 'up ' .. table.concat(uptime, ', '))
 end
 
 return plugin
