@@ -6,6 +6,18 @@ local fetch_all = nil
 local insert = nil
 local delete = nil
 
+plugin.loaded = {}
+
+local refresh = function ()
+    plugin.loaded = nil
+    plugin.loaded = {}
+
+    fetch_all:reset()
+    for _, p, s in fetch_all:urows() do
+        plugin.loaded[#plugin.loaded + 1] = { pattern = p, substitution = s }
+    end
+end
+
 plugin.dbinit = function ()
     local init = [=[
       create table if not exists macros (
@@ -22,6 +34,8 @@ plugin.dbinit = function ()
     fetch_all = db:prepare('select id, pattern, substitution from macros order by id')
     insert = db:prepare('insert or replace into macros (pattern, substitution) values (:pattern, :substitution);')
     delete = db:prepare('delete from macros where pattern like :pattern')
+
+    refresh()
 end
 
 plugin.dbcleanup = function ()
@@ -29,8 +43,6 @@ plugin.dbcleanup = function ()
     insert:finalize()
     delete:finalize()
 end
-
-plugin.loaded = {}
 
 plugin.commands = {}
 
@@ -57,16 +69,12 @@ end
 plugin.commands.clear = function (args)
     plugin.loaded = nil
     plugin.loaded = {}
+
+    args.modules.irc.privmsg(args.target, 'Tada!')
 end
 
 plugin.commands.refresh = function (args)
-    plugin.loaded = nil
-    plugin.loaded = {}
-
-    fetch_all:reset()
-    for _, p, s in fetch_all:urows() do
-        plugin.loaded[#plugin.loaded + 1] = { pattern = p, substitution = s }
-    end
+    refresh()
 
     args.modules.irc.privmsg(args.target, 'Tada!')
 end
