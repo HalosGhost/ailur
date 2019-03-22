@@ -219,10 +219,4 @@ aliases["pick%s+.+"] = function (ms, t, msg)
     ms.irc.privmsg(t, words[r])
 end
 
-aliases['uptime'] = function (ms, t)
-    local upt = io.popen('uptime -p')
-    ms.irc.privmsg(t, upt:read())
-    upt:close()
-end
-
 return aliases
