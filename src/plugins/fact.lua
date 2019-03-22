@@ -5,6 +5,7 @@ local cnt = nil
 local del = nil
 local sel = nil
 local sim = nil
+local lock = nil
 
 local plugin = {}
 
@@ -22,11 +23,12 @@ plugin.dbinit = function ()
         print('Failed to create table factoids')
     end
 
-    ins = db:prepare('insert or replace into factoids (key, value) values (:key, :value);')
+    ins = db:prepare('insert into factoids (key, value) values (:key, :value);')
     cnt = db:prepare('select count(*) from factoids where key like :key;')
-    del = db:prepare('delete from factoids where key = :key;')
+    del = db:prepare('delete from factoids where locked_by is null and key = :key;')
     sel = db:prepare('select value from factoids where key = :key;')
     sim = db:prepare('select key from factoids where key like :key;')
+    lock = db:prepare('update factoids set locked_by = :mask where key = :key;')
 end
 
 -- database cleanup
@@ -36,6 +38,7 @@ plugin.dbcleanup = function ()
     del:finalize()
     sel:finalize()
     sim:finalize()
+    lock:finalize()
 end
 
 plugin.find = function (key)
@@ -101,6 +104,28 @@ plugin.commands.remove = function (args)
     del:reset()
     del:bind_names{ ['key'] = key }
     local res = del:step()
+
+    args.modules.irc.privmsg(args.target,
+                             (res == sql.DONE and 'Tada!' or db:errmsg()))
+end
+
+plugin.commands.lock = function (args)
+    local _, _, key = args.message:find("lock%s+'(.*)'")
+
+    lock:reset()
+    lock:bind_names{ ['key'] = key, ['mask'] = args.sender }
+    local res = lock:step()
+
+    args.modules.irc.privmsg(args.target,
+                             (res == sql.DONE and 'Tada!' or db:errmsg()))
+end
+
+plugin.commands.unlock = function (args)
+    local _, _, key = args.message:find("unlock%s+'(.*)'")
+
+    lock:reset()
+    lock:bind_names{ ['key'] = key }
+    local res = lock:step()
 
     args.modules.irc.privmsg(args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
