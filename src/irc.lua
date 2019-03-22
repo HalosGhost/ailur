@@ -11,8 +11,37 @@ irc.init = function (irc_config)
 end
 
 irc.conn = function (irc_config)
+    -- the config would need irc_config.authtype, for now I'll set it for testing
+    -- this could be one of nicksserve, sasl or none
+    local authtype = 'sasl'
+    if authtype == 'sasl' then
+        irc.connection:send(('CAP REQ :sasl\r\n'))
+    end
     irc.connection:send(('NICK %s\r\n'):format(irc_config.handle))
     irc.connection:send(('USER %s * 8 :%s\r\n'):format(irc_config.ident, irc_config.gecos))
+end
+
+-- respond to server `ACK :sasl`
+irc.sasl_ack = function()
+    irc.connection:send('AUTHENTICATE PLAIN')
+end
+
+-- Respond to server `AUTHENTICATE +`
+irc.authenticate = function(irc_config)
+    -- config will need irc_config.saslpass, or alternatively nickpass
+    -- setting now for testing
+    saslpass = 'opensesame'
+    local authString = b64e(
+        ("%s\x00%s\x00%s"):format(
+        irc_config.handle,
+        irc_config.ident,
+        saslpass))
+    irc.connection:send(('AUTHENTICATE %s\r\n'):format(authstring))
+end
+
+-- Respond to server `903 :SASL authentication successful`
+irc.sasl_sucess = function()
+    irc.connection:send('CAP END\r\n')
 end
 
 irc.join = function (channel)
