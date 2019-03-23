@@ -188,8 +188,14 @@ irc.react_loop = function (sname, ms)
                 irc.pong(sname)
             elseif data:find('PRIVMSG') then
                 keepalive = irc.react_to_privmsg(ms, data)
-            elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
-                irc.joinall(ms.config.irc.channels)
+            elseif data:find('.*CAP %* ACK :sasl') then
+                irc.sasl_ack()
+            elseif data:find('AUTHENTICATE %+') then
+                irc.authenticate(ms.config.irc)
+            elseif data:find(':SASL authentication successful') then
+                irc.sasl_sucess()
+            --elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
+            --    irc.joinall(ms.config.irc.channels)
             end
         end
     end
