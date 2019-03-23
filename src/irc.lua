@@ -2,6 +2,8 @@ local irc = {}
 
 local socket = require 'socket'
 local ssl = require 'ssl'
+-- MIME is part of LuaSocket
+local mime = require("mime")
 
 irc.init = function (irc_config)
     local bare = socket.connect(irc_config.address, irc_config.port)
@@ -23,7 +25,7 @@ end
 
 -- respond to server `ACK :sasl`
 irc.sasl_ack = function()
-    irc.connection:send('AUTHENTICATE PLAIN')
+    irc.connection:send(('AUTHENTICATE PLAIN\r\n'))
 end
 
 -- Respond to server `AUTHENTICATE +`
@@ -31,12 +33,9 @@ irc.authenticate = function(irc_config)
     -- config will need irc_config.saslpass, or alternatively nickpass
     -- setting now for testing
     saslpass = 'opensesame'
-    local authString = b64e(
-        ("%s\x00%s\x00%s"):format(
-        irc_config.handle,
-        irc_config.handle,
-        saslpass))
-    irc.connection:send(('AUTHENTICATE %s\r\n'):format(authstring))
+    local authString = ("%s\\0%s\\0%s"):format( irc_config.handle, irc_config.handle, saslpass)
+    local encodedString = (mime.b64(authString))
+    irc.connection:send(('AUTHENTICATE %s\r\n'):format(encodedString))
 end
 
 -- Respond to server `903 :SASL authentication successful`
@@ -186,14 +185,14 @@ irc.react_loop = function (sname, ms)
 
             if data == ('PING ' .. sname) then
                 irc.pong(sname)
-            elseif data:find('PRIVMSG') then
-                keepalive = irc.react_to_privmsg(ms, data)
-            elseif data:find('.*CAP %* ACK :sasl') then
+            elseif data:find('CAP %* ACK :sasl') then
                 irc.sasl_ack()
             elseif data:find('AUTHENTICATE %+') then
                 irc.authenticate(ms.config.irc)
             elseif data:find(':SASL authentication successful') then
                 irc.sasl_sucess()
+            elseif data:find('PRIVMSG') then
+                keepalive = irc.react_to_privmsg(ms, data)
             --elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
             --    irc.joinall(ms.config.irc.channels)
             end
