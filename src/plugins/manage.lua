@@ -15,6 +15,7 @@ end
 
 plugin.commands.die = function (args)
     if not args.authorized then return end
+    args.modules.irc.quit('Good Bye')
 
     args.modules.irc.connection:close()
     os.exit()

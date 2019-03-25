@@ -13,34 +13,17 @@ irc.init = function (irc_config)
 end
 
 irc.conn = function (irc_config)
-    -- the config would need irc_config.authtype, for now I'll set it for testing
-    -- this could be one of nicksserve, sasl or none
-    local authtype = 'sasl'
-    if authtype == 'sasl' then
+    -- the config would need to set sasl, for now I'll set it for testing
+    local sasl = false
+    if sasl then
         irc.connection:send(('CAP REQ :sasl\r\n'))
     end
     irc.connection:send(('NICK %s\r\n'):format(irc_config.handle))
     irc.connection:send(('USER %s * 8 :%s\r\n'):format(irc_config.ident, irc_config.gecos))
 end
 
--- respond to server `ACK :sasl`
-irc.sasl_ack = function()
-    irc.connection:send(('AUTHENTICATE PLAIN\r\n'))
-end
-
--- Respond to server `AUTHENTICATE +`
-irc.authenticate = function(irc_config)
-    -- config will need irc_config.saslpass, or alternatively nickpass
-    -- setting now for testing
-    saslpass = 'opensesame'
-    local authString = ("%s\\0%s\\0%s"):format( irc_config.handle, irc_config.handle, saslpass)
-    local encodedString = (mime.b64(authString))
-    irc.connection:send(('AUTHENTICATE %s\r\n'):format(encodedString))
-end
-
--- Respond to server `903 :SASL authentication successful`
-irc.sasl_sucess = function()
-    irc.connection:send('CAP END\r\n')
+irc.invite = function (recipient, channel)
+    irc.connection:send(('INVITE %s %s\r\n'):format(recipient, channel))
 end
 
 irc.join = function (channel)
@@ -53,12 +36,12 @@ irc.joinall = function (channels)
     end
 end
 
-irc.pong = function (sname)
-    irc.connection:send(('PONG %s\r\n'):format(sname))
-end
-
-irc.privmsg = function (target, msg)
-    irc.connection:send(('PRIVMSG %s :%s\r\n'):format(target, msg))
+irc.kick = function (target, recipient, message)
+    if target:byte() == 35 then
+        irc.connection:send(('KICK %s %s :%s\r\n'):format(target, recipient, message))
+    else
+        irc.privmsg(target, 'Cannot kick in query')
+    end
 end
 
 irc.modeset = function (target, recipient, mode)
@@ -69,12 +52,47 @@ irc.modeset = function (target, recipient, mode)
     end
 end
 
-irc.kick = function (target, recipient, message)
-    if target:byte() == 35 then
-        irc.connection:send(('KICK %s %s :%s\r\n'):format(target, recipient, message))
-    else
-        irc.privmsg(target, 'Cannot kick in query')
-    end
+irc.names = function (channel)
+    irc.connection:send(('NAMES %s\r\n'):format(channel))
+end
+
+irc.nickset = function (nickname)
+    irc.connection:send(('NICK %s\r\n'):format(nickname))
+end
+
+irc.notice = function (target, msg)
+    irc.connection:send(('NOTICE %s :%s\r\n'):format(target, msg))
+end
+
+irc.part = function (channel)
+    irc.connection:send(('PART %s\r\n'):format(channel))
+end
+
+irc.pong = function (sname)
+    irc.connection:send(('PONG %s\r\n'):format(sname))
+end
+
+irc.privmsg = function (target, msg)
+    irc.connection:send(('PRIVMSG %s :%s\r\n'):format(target, msg))
+end
+
+irc.quit = function (msg)
+    irc.connection:send(('QUIT %s\r\n'):format(msg))
+    --irc.connection:close()
+    --os.exit()
+end
+
+irc.sasl_auth = function ()
+        -- config will need irc_conf.saslpass
+        -- setting now for testing
+        local saslpass = 'opensesame'
+        local authString = ("%s\\0%s\\0%s"):format( irc_conf.handle, irc_conf.handle, saslpass)
+        local encodedString = (mime.b64(authString))
+        irc.connection:send(('AUTHENTICATE %s\r\n'):format(encodedString))
+end
+
+irc.topic = function (channel, msg)
+    irc.connection:send(('TOPIC %s %s\r\n'):format(channel, msg))
 end
 
 irc.get_sname = function (ms)
@@ -119,7 +137,7 @@ irc.react_to_privmsg = function (ms, text)
     local tgt = from_channel and target or mask
     local prefix = '^' .. (tgt:find('^#') and ms.config.irc.handle .. '.?%s+' or '')
 
-    if ms.plugins.macro then
+    if not msg:find(prefix) and ms.plugins.macro then
         for _, macro in ipairs(ms.plugins.macro.loaded or {}) do
             msg = msg:gsub(macro.pattern, macro.substitution)
         end
@@ -185,16 +203,10 @@ irc.react_loop = function (sname, ms)
 
             if data == ('PING ' .. sname) then
                 irc.pong(sname)
-            elseif data:find('CAP %* ACK :sasl') then
-                irc.sasl_ack()
-            elseif data:find('AUTHENTICATE %+') then
-                irc.authenticate(ms.config.irc)
-            elseif data:find(':SASL authentication successful') then
-                irc.sasl_sucess()
             elseif data:find('PRIVMSG') then
                 keepalive = irc.react_to_privmsg(ms, data)
-            --elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
-            --    irc.joinall(ms.config.irc.channels)
+            elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
+                irc.joinall(ms.config.irc.channels)
             end
         end
     end
