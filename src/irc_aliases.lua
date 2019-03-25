@@ -14,7 +14,8 @@ end
 
 aliases['%-?%d+%.?%d*%s*.+%s+in%s+.+'] = function (ms, t, msg)
     local _, _, val, src, dest = msg:find('(%-?%d+%.?%d*)%s*(.+)%s+in%s+(.+)')
-    if ms.config.debug then
+    local config =  ms.config or ms.default_config
+    if config.debug then
         print(val, src, dest)
     end
 
@@ -42,12 +43,12 @@ aliases['%-?%d+%.?%d*%s*.+%s+in%s+.+'] = function (ms, t, msg)
         val_adj = val_adj or
         ms.units.parse_prefix(prefix, ms.units.iec_aliases, 2, ms.units.iec)
     end
-    if ms.config.debug then print(val_adj) end
+    if config.debug then print(val_adj) end
 
     local dest_unit, pos = ms.units.parse_unit(dest)
 
     if src_unit ~= dest_unit and (dest_unit == '' or not ms.units.conversion[src_unit][dest_unit]) then
-        if ms.config.debug then print(dest_unit) end
+        if config.debug then print(dest_unit) end
         ms.irc.privmsg(t, ('I cannot convert %s to %s'):format(src, dest))
         return
     end
