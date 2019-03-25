@@ -4,8 +4,8 @@ db = nil -- global database handle
 
 local database = {}
 
-database.init = function (ms)
-    db = sql.open(ms.config.dbpath)
+database.init = function (ms, config)
+    db = sql.open(config.dbpath)
 
     if not db then
         print('Failed to open the database')
