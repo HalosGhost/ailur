@@ -48,7 +48,7 @@ irc.kick = function (target, recipient, message)
     end
 end
 
-irc.modeset = function (target, recipient, mode)
+irc.mode = function (target, recipient, mode)
     if target:byte() == 35 then
         irc.connection:send(('MODE %s %s %s\r\n'):format(target, mode, recipient))
     else
@@ -60,7 +60,7 @@ irc.names = function (channel)
     irc.connection:send(('NAMES %s\r\n'):format(channel))
 end
 
-irc.nickset = function (nickname)
+irc.nick = function (nickname)
     irc.connection:send(('NICK %s\r\n'):format(nickname))
 end
 
