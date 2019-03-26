@@ -19,7 +19,7 @@ irc.action = function (target, msg)
     irc.connection:send(('PRIVMSG %s :\x01ACTION %s\x01\r\n'):format(target, msg))
 end
 
-irc.CTCP_query = function (client, query)
+irc.ctcp = function (client, query)
     -- VERSION, PING, SOURCE, CLIENTINFO, USERINFO, TIME, DCC are common
     -- clients can also add their own.
     -- https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html#rfc.appendix.A.2
