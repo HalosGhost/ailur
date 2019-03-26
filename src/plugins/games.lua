@@ -18,13 +18,16 @@ plugin.commands.test = function (args)
 end
 
 plugin.commands.roll = function (args)
-    local _, _, numdice numsides = args.message:find('roll%s+(%d+)d(%d+)')
+    local _, _, numdice, numsides = args.message:find('roll%s+(%d+)d(%d+)')
     local rands = ''
 
     numdice = math.tointeger(numdice)
     numsides = math.tointeger(numsides)
 
-    if invalid_num(numdice) or invalid_num(numsides) then return end
+    if invalid_num(numdice) or invalid_num(numsides) then 
+        args.modules.irc.privmsg(args.target, ('%s: Please tell me the number of dice and the number of sides, ie: "2d6" for two six sided dice'):format(args.sender))
+        return
+    end
 
     for i=1,numdice do
         rands = ('%d %s'):format(math.random(numsides), rands)
@@ -42,7 +45,11 @@ plugin.commands.coinflip = function (args)
         return
     end
 
-    numflips = math.tointeger(numflips)
+    if numflips then
+        numflips = math.tointeger(numflips)
+    else
+        numflips = 1
+    end
 
     if invalid_num(numflips) then return end
 
@@ -120,6 +127,7 @@ plugin.main = function (args)
     local _, _, action = args.message:find('(%S+)')
     local f = plugin.commands[action]
 
+    if f then return f(args) end
     args.modules.irc.privmsg(args.target, plugin.help)
 end
 
