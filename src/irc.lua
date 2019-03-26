@@ -82,8 +82,7 @@ end
 
 irc.quit = function (msg)
     irc.connection:send(('QUIT %s\r\n'):format(msg))
-    --irc.connection:close()
-    --os.exit()
+    irc.connection:close()
 end
 
 irc.topic = function (channel, msg)
