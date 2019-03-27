@@ -13,7 +13,7 @@ config.irc = { name = 'freenode'
                  { ['.*@archlinux/support/halosghost'] = 1
                  , ['.*@unaffiliated/meskarune'] = 2
                  , ['.*@durr/im/a/sheep'] = 3
-                 , ['.*!firrre@gateway/shell/firrre/x-gxndbnppnyunttmt'] = 4
+                 , ['.*!firrre@gateway/shell/firrre/x%-gxndbnppnyunttmt'] = 4
                  }
              , channels =
                  { '##meskarune'
