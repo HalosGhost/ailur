@@ -89,11 +89,11 @@ irc.topic = function (channel, msg)
     irc.connection:send(('TOPIC %s %s\r\n'):format(channel, msg))
 end
 
-irc.get_sname = function (ms)
+irc.get_sname = function (ms, config)
     local sname = ''
     while sname == '' do
         local data = irc.connection:receive('*l')
-        if ms.config.debug and data then print(data) end
+        if config.debug and data then print(data) end
 
         if data and (data:find('376') or data:find('422')) then
             _, _, sname = data:find('(%S+)')
@@ -112,10 +112,10 @@ irc.authorized = function (irc_config, mask)
     return authed
 end
 
-irc.react_to_privmsg = function (ms, text)
+irc.react_to_privmsg = function (ms, config, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
-    local authed = irc.authorized(ms.config.irc, mask .. hn)
+    local authed = irc.authorized(config.irc, mask .. hn)
     local from_channel = target:find('^#')
 
     -- if whitelisted, put nick's last message in quotegrabs table
@@ -129,7 +129,7 @@ irc.react_to_privmsg = function (ms, text)
     end
 
     local tgt = from_channel and target or mask
-    local prefix = '^' .. (tgt:find('^#') and ms.config.irc.handle .. '.?%s+' or '')
+    local prefix = '^' .. (tgt:find('^#') and config.irc.handle .. '.?%s+' or '')
 
     if not msg:find(prefix) and ms.plugins.macro then
         for _, macro in ipairs(ms.plugins.macro.loaded or {}) do
@@ -179,48 +179,50 @@ irc.react_to_privmsg = function (ms, text)
     return true
 end
 
-irc.react_loop = function (sname, ms)
+irc.react_loop = function (sname, ms, config)
     math.randomseed(os.time())
 
     if ms.nickpass then
         irc.privmsg('NickServ', 'identify ' .. ms.nickpass)
         ms.nickpass = nil -- make it harder to accidentally expose the nickpass, like with eval
     else
-        irc.joinall(ms.config.irc.channels)
+        irc.joinall(config.irc.channels)
     end
 
     local keepalive = true
     while keepalive do
         local data = irc.connection:receive('*l')
         if data then
-            if ms.config.debug then io.stdout:write(data .. '\n') end
+            if config.debug then io.stdout:write(data .. '\n') end
 
             if data == ('PING ' .. sname) then
                 irc.pong(sname)
             elseif data:find('PRIVMSG') then
-                keepalive = irc.react_to_privmsg(ms, data)
+                keepalive = irc.react_to_privmsg(ms, config, data)
             elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
-                irc.joinall(ms.config.irc.channels)
+                irc.joinall(config.irc.channels)
             end
         end
     end
 end
 
 irc.main = function (ms)
-    irc.connection = irc.init(ms.config.irc)
+    local config = ms.config or ms.default_config
+
+    irc.connection = irc.init(config.irc)
 
     if not irc.connection then
         print('failed to initialize irc network')
         return
     end
 
-    ms.database.init(ms)
+    ms.database.init(ms, config)
 
-    irc.conn(ms.config.irc)
+    irc.conn(config.irc)
 
-    local sname = irc.get_sname(ms)
+    local sname = irc.get_sname(ms, config)
 
-    irc.react_loop(sname, ms)
+    irc.react_loop(sname, ms, config)
     ms.database.cleanup(ms)
     irc.connection:close()
 end
