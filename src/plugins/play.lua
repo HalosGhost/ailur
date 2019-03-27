@@ -25,7 +25,7 @@ plugin.commands.roll = function (args)
     numsides = math.tointeger(numsides)
 
     if invalid_num(numdice) or invalid_num(numsides) then 
-        args.modules.irc.privmsg(args.target, ('%s: Please tell me the number of dice and the number of sides, ie: "2d6" for two six sided dice'):format(args.sender))
+        --args.modules.irc.privmsg(args.target, ('%s: Please tell me the number of dice and the number of sides, ie: "2d6" for two six sided dice'):format(args.sender))
         return
     end
 
@@ -40,18 +40,21 @@ end
 plugin.commands.coinflip = function (args)
     local _, _, numflips = args.message:find('coinflip%s+(%d+)')
 
-    if numflips:len() > 4 then
-        args.modules.irc.privmsg(args.target, 'Please give me a number less than 5 digits long.')
+    if numflips and numflips:len() > 4 then
+        --args.modules.irc.privmsg(args.target, 'Please give me a number less than 5 digits long.')
         return
     end
 
-    if numflips then
-        numflips = math.tointeger(numflips)
-    else
+    if not numflips or numflips == ' ' then
         numflips = 1
+    else
+        numflips = math.tointeger(numflips)
     end
 
-    if invalid_num(numflips) then return end
+    if invalid_num(numflips) then
+        --args.modules.irc.privmsg(args.target, ('%s: Tell me how many coinflips you want'):format(args.sender))
+        return
+    end
 
     local heads = 0
     local tails = 0
@@ -92,7 +95,7 @@ plugin.commands.magic8ball = function (args)
         }
     }
     if not message then
-        args.modules.irc.privmsg(args.target, ('%s: Ask me a question.'):format(args.sender))
+        --args.modules.irc.privmsg(args.target, ('%s: Ask me a question.'):format(args.sender))
         return
     end
 
