@@ -23,12 +23,14 @@ plugin.main = function(args)
 
     local act = '?action=opensearch&format=json&search='
     local resp = https.request(apiurl .. act .. url.escape(search))
-    if resp then
+    if resp and resp not nil then
         if args.modules.config.debug then print(resp) end
         local res = json.decode(resp)
         local lnk = (res[4][1] and res[4][1] ~= '') and res[4][1] or 'No results'
         local dsc = (res[3][1] and res[3][1] ~= '') and ' - ' .. res[3][1] or ''
         args.modules.irc.privmsg(args.target, ('<%s>%s'):format(lnk, dsc))
+        return
+    else
         return
     end
 end
