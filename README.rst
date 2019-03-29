@@ -24,7 +24,13 @@ Required libraries
 Configuration
 ~~~~~~~~~~~~~
 
-The configuration file is ``config.lua`` and should be updated before running the bot.
+Upstream provides a default configuration in ``default_config.lua``.
+This file should not be modified; rather, if you wish to provide your own configuration, copy the default configuration to ``config.lua`` and modify it to your liking:
+
+.. code::
+
+    $ cp default_config.lua config.lua
+    $ $EDITOR config.lua
 
 Starting the Bot
 ~~~~~~~~~~~~~~~~
