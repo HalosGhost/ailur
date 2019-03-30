@@ -85,22 +85,6 @@ aliases['units%s*.*'] = function (ms, t, msg)
     end; ms.irc.privmsg(t, list)
 end
 
-aliases['is.*'] = function (ms, t)
-    local prob = { 'certainly', 'possibly', 'categorically', 'negatively'
-                 , 'positively', 'without-a-doubt', 'maybe', 'perhaps', 'doubtfully'
-                 , 'likely', 'definitely', 'greatfully', 'thankfully', 'undeniably'
-                 , 'arguably'
-                 }
-
-    local case = { 'so', 'not', 'true', 'false' }
-    local punct = { '.', '!', '…' }
-
-    local r1 = math.random(#prob)
-    local r2 = math.random(#case)
-    local r3 = math.random(#punct)
-    ms.irc.privmsg(t, ('%s %s%s'):format(prob[r1], case[r2], punct[r3]))
-end
-
 aliases['say%s+.+'] = function (ms, t, msg)
     local _, _, m = msg:find('say%s+(.+)')
     ms.irc.privmsg(t, m)
@@ -125,38 +109,6 @@ end
 aliases['you.*'] = function (ms, t, msg, _, sndr)
     local _, _, attr = msg:find('you(.*)')
     ms.irc.privmsg(t, ('%s: No, \x1Dyou\x1D%s!'):format(sndr, attr or ''))
-end
-
-aliases['test%s*.*'] = function (ms, t, msg)
-    local _, _, test = msg:find('test%s*(.*)')
-    test = test == '' and test or (' ' .. test)
-
-    local prob = math.random()
-    local rest = { '3PASS', '5FAIL', '5\x02PANIC\x02' }
-    local res = prob < 0.01 and rest[3] or
-    prob < 0.49 and rest[2] or rest[1]
-
-    ms.irc.privmsg(t, ('Testing%s: [\x03%s\x03]'):format(test, res))
-end
-
-aliases['roll%s+%d+d%d+'] = function (ms, t, msg, _, sndr)
-    local _, _, numdice, numsides = msg:find('roll%s*(%d+)d(%d+)')
-    local rands = ''
-
-    numdice = math.tointeger(numdice)
-    numsides = math.tointeger(numsides)
-    local invalid = function (n)
-        return not (math.type(n) == 'integer' and n >= 1)
-    end
-
-    if invalid(numdice) or invalid(numsides) then return end
-
-    for i=1,numdice do
-        rands = ('%d %s'):format(math.random(numsides), rands)
-        if rands:len() > 510 then break end
-    end
-
-    ms.irc.privmsg(t, ('%s: %s'):format(sndr, rands))
 end
 
 aliases['bloat%s*.*'] = function (ms, t, msg, _, sndr)
