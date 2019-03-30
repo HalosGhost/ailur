@@ -128,12 +128,17 @@ local units = {
 plugin.help = 'Usage: convert <number> <from-unit> <to-unit>'
 
 plugin.main = function(args)
-    local _, _, val, src, dest = args.message:find('(%-?%d+%.?%d*)%s*(.+)%s+in%s+(.+)')
+    local _, _, val, src, dest = args.message:find('(%-?%d+%.?%d*)%s*(.+)%s+(.+)')
     if args.modules.config.debug then
         print(val, src, dest)
     end
 
-    if not tonumber(val) then
+    if val == nil or src == nil or dest == nil then
+        args.modules.irc.privmsg(args.target, 'Give me a request in the format <number> <from-unit> <to-unit>')
+        return
+    end
+
+    if not tonumber(val) and val then
         args.modules.irc.privmsg(args.target, val .. ' is not a number I recognize')
         return
     end
@@ -146,7 +151,7 @@ plugin.main = function(args)
 
     local src_unit, pos = parse_unit(src)
     if src_unit == '' or not conversion[src_unit] then
-        args.modules.irc.privmsg(args.target, 'I cannot convert ' .. src)
+        args.modules.irc.privmsg(args.target, 'I cannot convert to ' .. src)
         return
     end
 
@@ -157,7 +162,11 @@ plugin.main = function(args)
         val_adj = val_adj or
         parse_prefix(prefix, iec_aliases, 2, iec)
     end
-    if config.debug then print(val_adj) end
+    if args.modules.config.debug then print(val_adj) end
+    if val_adj == nil then
+        args.modules.irc.privmsg(args.target, 'I cannot convert that number')
+        return
+    end
 
     local dest_unit, pos = parse_unit(dest)
 
