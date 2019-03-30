@@ -14,7 +14,7 @@ plugin.help = 'Usage: isup <website>'
 
 plugin.main = function(args)
     local website = args.message
-    if args.modules.config.debug then
+    if args.conf.debug then
         print(website)
     end
     if not website then

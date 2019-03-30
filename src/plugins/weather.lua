@@ -12,9 +12,9 @@ plugin.main = function (args)
         return
     end
 
-    if not args.modules.config.weather
-        or not args.modules.config.weather.geocode_key
-        or not args.modules.config.weather.darksky_key then
+    if not args.conf.weather
+        or not args.conf.weather.geocode_key
+        or not args.conf.weather.darksky_key then
         args.modules.irc.privmsg(args.target,
                                  'please set config.weather.geocode_key and config.weather.darksky_key')
         return
@@ -22,7 +22,7 @@ plugin.main = function (args)
 
     local geocode_url = 'https://maps.google.com/maps/api/geocode/json?address=%s&key=%s'
     local body, code = https.request(geocode_url:format(url.escape(args.message),
-                                                        args.modules.config.weather.geocode_key))
+                                                        args.conf.weather.geocode_key))
 
     if not body then
         args.modules.irc.privmsg(args.target, 'error fetching location coords: ' .. code)
@@ -38,7 +38,7 @@ plugin.main = function (args)
     local coords = j.results[1].geometry.location
 
     local weather_url = 'https://api.darksky.net/forecast/%s/%s,%s?units=auto'
-    local body, code = https.request(weather_url:format(args.modules.config.weather.darksky_key,
+    local body, code = https.request(weather_url:format(args.conf.weather.darksky_key,
                                                         coords.lat, coords.lng))
 
     if not body then

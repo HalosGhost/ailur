@@ -158,6 +158,7 @@ irc.react_to_privmsg = function (ms, config, text)
 
     if plugin then
         local ret = plugin.main { modules = ms
+                                , conf = config
                                 , target = tgt
                                 , message = command
                                 , authorized = authed

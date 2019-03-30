@@ -4,25 +4,25 @@ plugin.commands = {}
 
 plugin.commands.get = function (args)
     local _, _, setting = args.message:find('get%s+(%S+)')
-    args.modules.irc.privmsg(args.target, tostring(args.modules.config[setting]))
+    args.modules.irc.privmsg(args.target, tostring(args.conf[setting]))
 end
 
 plugin.commands.type = function (args)
     local _, _, setting = args.message:find('type%s+(%S+)')
-    args.modules.irc.privmsg(args.target, type(args.modules.config[setting]))
+    args.modules.irc.privmsg(args.target, type(args.conf[setting]))
 end
 
 plugin.commands.set = function (args)
     local _, _, setting, value = args.message:find("set%s+(%S+)%s*(%S*)")
 
     if value == 'true' then
-        args.modules.config[setting] = true
+        args.conf[setting] = true
     elseif value == 'false' then
-        args.modules.config[setting] = false
+        args.conf[setting] = false
     elseif tonumber(value) then
-        args.modules.config[setting] = tonumber(value)
+        args.conf[setting] = tonumber(value)
     else
-        args.modules.config[setting] = value
+        args.conf[setting] = value
     end
 
     args.modules.irc.privmsg(args.target, 'Tada!')

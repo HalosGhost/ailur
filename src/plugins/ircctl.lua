@@ -7,14 +7,14 @@ plugin.commands = {}
 plugin.commands.kick = function (args)
     local _, _, recipient, message = args.message:find('kick%s+(%S+)%s*(.*)')
 
-    if args.modules.config.debug then print(('kicking %s'):format(recipient)) end
+    if args.conf.debug then print(('kicking %s'):format(recipient)) end
     args.modules.irc.kick(args.target, recipient, message or recipient)
 end
 
 plugin.commands['set-mode'] = function (args)
     local _, _, mode, recipient = args.message:find('([+-][bqvo])%s+(.+)')
 
-    if args.modules.config.debug then print(('setting %s to %s'):format(recipient, mode)) end
+    if args.conf.debug then print(('setting %s to %s'):format(recipient, mode)) end
     args.modules.irc.mode(args.target, recipient, mode)
 end
 
