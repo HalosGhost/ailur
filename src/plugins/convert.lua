@@ -134,24 +134,24 @@ plugin.main = function(args)
     end
 
     if val == nil or src == nil or dest == nil then
-        args.modules.irc.privmsg(args.target, 'Give me a request in the format <number> <from-unit> <to-unit>')
+        args.modules.irc.privmsg(args.target, ('%s: Give me a request in the format <number> <from-unit> <to-unit>'):format(args.sender))
         return
     end
 
     if not tonumber(val) and val then
-        args.modules.irc.privmsg(args.target, val .. ' is not a number I recognize')
+        args.modules.irc.privmsg(args.target, ('%s: %s is not a number I recognize'):format(args:sender, val))
         return
     end
     val = tonumber(val)
 
     if src == dest then
-        args.modules.irc.privmsg(args.target, ('… %g %s… obviously…'):format(val, src))
+        args.modules.irc.privmsg(args.target, ('%s: … %g %s… obviously…'):format(args.sender, val, src))
         return
     end
 
     local src_unit, pos = parse_unit(src)
     if src_unit == '' or not conversion[src_unit] then
-        args.modules.irc.privmsg(args.target, 'I cannot convert to ' .. src)
+        args.modules.irc.privmsg(args.target, ('%s: I cannot convert %s to %s'):format(args.sender, src, dest))
         return
     end
 
@@ -164,7 +164,7 @@ plugin.main = function(args)
     end
     if args.modules.config.debug then print(val_adj) end
     if val_adj == nil then
-        args.modules.irc.privmsg(args.target, 'I cannot convert that number')
+        args.modules.irc.privmsg(args.target, ('%s: I cannot convert that number'):format(args.sender))
         return
     end
 
@@ -172,7 +172,7 @@ plugin.main = function(args)
 
     if src_unit ~= dest_unit and (dest_unit == '' or not conversion[src_unit][dest_unit]) then
         if args.modules.config.debug then print(dest_unit) end
-        args.modules.irc.privmsg(args.target, ('I cannot convert %s to %s'):format(src, dest))
+        args.modules.irc.privmsg(args.target, ('%s: I cannot convert %s to %s'):format(args.sender, src, dest))
         return
     end
 
@@ -189,8 +189,8 @@ plugin.main = function(args)
     and (val_adj * val / dest_adj)
     or (conversion[src_unit][dest_unit](val_adj * val) / dest_adj)
 
-    args.modules.irc.privmsg(args.target, ('%g %s is %g %s%s')
-                             :format(val, src, new_val, dest_prefix, dest_unit))
+    args.modules.irc.privmsg(args.target, ('%s: %g %s is %g %s%s')
+                             :format(args.sender, val, src, new_val, dest_prefix, dest_unit))
 end
 
 return plugin
