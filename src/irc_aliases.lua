@@ -44,14 +44,6 @@ aliases['bloat%s*.*'] = function (ms, t, msg, _, sndr)
     ms.irc.privmsg(t, target .. ' is bloat.')
 end
 
-aliases['[ <]?https?://[^> ]+.*'] = function (ms, t, msg)
-    local _, _, url = msg:find('[ <]?(https?://[^> ]+).*')
-    if url then
-        local title = ms.get_url_title(url)
-        ms.irc.privmsg(t, title)
-    end
-end
-
 aliases['rot13%s.*'] = function (ms, t, msg)
     local _, _, text = msg:find('rot13%s(.*)')
     if text then
