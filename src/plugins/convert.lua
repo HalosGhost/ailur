@@ -133,7 +133,7 @@ plugin.main = function(args)
         print(val, src, dest)
     end
 
-    if val == nil or src == nil or dest == nil then
+    if not val or not src or not dest then
         args.modules.irc.privmsg(args.target, ('%s: Give me a request in the format <number> <from-unit> <to-unit>'):format(args.sender))
         return
     end
