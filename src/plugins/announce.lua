@@ -10,7 +10,7 @@ plugin.help = 'Usage: announce <url>'
 plugin.main = function(args)
     local _, _, url = args.message:find('(.+)')
 
-    if args.modules.config.debug then
+    if args.conf.debug then
         print(url)
     end
 
@@ -30,7 +30,7 @@ plugin.main = function(args)
         local resp, code, headers, status = https.request(options)
         if resp then
             title = body and body[1] and body[1]:match('<title.*>(.-)</title>') or 'Could not grab title'
-            if args.modules.config.debug then print(title) end
+            if args.conf.debug then print(title) end
             if code == 200 then
                 args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, title))
                 return

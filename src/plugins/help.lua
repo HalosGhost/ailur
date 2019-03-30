@@ -14,7 +14,7 @@ plugin.main = function(args)
         and args.modules.plugins[mod].help
         or 'No help available on that topic'
 
-    if args.modules.config.debug then
+    if args.conf.debug then
         print(mod, args.modules.plugins[mod], usage)
     end
 
