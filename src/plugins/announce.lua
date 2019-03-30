@@ -21,11 +21,9 @@ plugin.main = function(args)
 
     if url:find('^.-[ <]?https?://[^> ]+.*') then
         url = url:match('^.-[ <]?https?://[^> ]+.*')
-    elseif url:find(' www%..*') then
-        url = url:match(' www%..*')
         url = 'http://' .. url
     else
-        url = 'http://www.' .. url
+        url = 'http://' .. url
     end
     if url then
         local body = {}
