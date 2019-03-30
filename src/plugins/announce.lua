@@ -20,8 +20,7 @@ plugin.main = function(args)
     end
 
     if url:find('^.-[ <]?https?://[^> ]+.*') then
-        url = url:match('^.-[ <]?https?://[^> ]+.*')
-        url = 'http://' .. url
+        _, _, url = url:find('^.-[ <]?(https?://[^> ]+).*')
     else
         url = 'http://' .. url
     end
