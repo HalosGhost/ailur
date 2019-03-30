@@ -139,7 +139,7 @@ plugin.main = function(args)
     end
 
     if not tonumber(val) and val then
-        args.modules.irc.privmsg(args.target, ('%s: %s is not a number I recognize'):format(args:sender, val))
+        args.modules.irc.privmsg(args.target, ('%s: %s is not a number I recognize'):format(args.sender, val))
         return
     end
     val = tonumber(val)
