@@ -1,3 +1,5 @@
+local plugin = {}
+
 local conversion = {}
 
 conversion['°C'] = {}
@@ -123,4 +125,72 @@ local units = {
     parse_prefix = parse_prefix,
 }
 
-return units
+plugin.help = 'Usage: convert <number> <from-unit> <to-unit>'
+
+plugin.main = function(args)
+    local _, _, val, src, dest = args.message:find('(%-?%d+%.?%d*)%s*(.+)%s+(.+)')
+    if args.modules.config.debug then
+        print(val, src, dest)
+    end
+
+    if not val or not src or not dest then
+        args.modules.irc.privmsg(args.target, ('%s: Give me a request in the format <number> <from-unit> <to-unit>'):format(args.sender))
+        return
+    end
+
+    if not tonumber(val) and val then
+        args.modules.irc.privmsg(args.target, ('%s: %s is not a number I recognize'):format(args.sender, val))
+        return
+    end
+    val = tonumber(val)
+
+    if src == dest then
+        args.modules.irc.privmsg(args.target, ('%s: … %g %s… obviously…'):format(args.sender, val, src))
+        return
+    end
+
+    local src_unit, pos = parse_unit(src)
+    if src_unit == '' or not conversion[src_unit] then
+        args.modules.irc.privmsg(args.target, ('%s: I cannot convert %s to %s'):format(args.sender, src, dest))
+        return
+    end
+
+    local val_adj = 1
+    if pos > 1 then
+        local prefix = src:sub(1, pos - 1)
+        val_adj = parse_prefix(prefix, si_aliases, 10, si)
+        val_adj = val_adj or
+        parse_prefix(prefix, iec_aliases, 2, iec)
+    end
+    if args.modules.config.debug then print(val_adj) end
+    if val_adj == nil then
+        args.modules.irc.privmsg(args.target, ('%s: I cannot convert that number'):format(args.sender))
+        return
+    end
+
+    local dest_unit, pos = parse_unit(dest)
+
+    if src_unit ~= dest_unit and (dest_unit == '' or not conversion[src_unit][dest_unit]) then
+        if args.modules.config.debug then print(dest_unit) end
+        args.modules.irc.privmsg(args.target, ('%s: I cannot convert %s to %s'):format(args.sender, src, dest))
+        return
+    end
+
+    local dest_adj = 1
+    local dest_prefix = ''
+    if pos > 1 then
+        dest_prefix = dest:sub(1, pos - 1)
+        dest_adj = parse_prefix(dest_prefix, si_aliases, 10, si)
+        dest_adj = dest_adj or
+        parse_prefix(dest_prefix, iec_aliases, 2, iec)
+    end
+
+    local new_val = src_unit == dest_unit
+    and (val_adj * val / dest_adj)
+    or (conversion[src_unit][dest_unit](val_adj * val) / dest_adj)
+
+    args.modules.irc.privmsg(args.target, ('%s: %g %s is %g %s%s')
+                             :format(args.sender, val, src, new_val, dest_prefix, dest_unit))
+end
+
+return plugin
