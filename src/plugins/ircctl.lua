@@ -15,7 +15,7 @@ plugin.commands['set-mode'] = function (args)
     local _, _, mode, recipient = args.message:find('([+-][bqvo])%s+(.+)')
 
     if args.modules.config.debug then print(('setting %s to %s'):format(recipient, mode)) end
-    args.modules.irc.modeset(args.target, recipient, mode)
+    args.modules.irc.mode(args.target, recipient, mode)
 end
 
 plugin.commands.join = function (args)

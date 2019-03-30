@@ -15,6 +15,21 @@ irc.conn = function (irc_config)
     irc.connection:send(('USER %s * 8 :%s\r\n'):format(irc_config.ident, irc_config.gecos))
 end
 
+irc.action = function (target, msg)
+    irc.connection:send(('PRIVMSG %s :\x01ACTION %s\x01\r\n'):format(target, msg))
+end
+
+irc.ctcp = function (client, query)
+    -- VERSION, PING, SOURCE, CLIENTINFO, USERINFO, TIME, DCC are common
+    -- clients can also add their own.
+    -- https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html#rfc.appendix.A.2
+    irc.connection:send(('PRIVMSG %s :\x01%s\x01\r\n'):format(target, query))
+end
+
+irc.invite = function (recipient, channel)
+    irc.connection:send(('INVITE %s %s\r\n'):format(recipient, channel))
+end
+
 irc.join = function (channel)
     irc.connection:send(('JOIN %s\r\n'):format(channel))
 end
@@ -25,6 +40,38 @@ irc.joinall = function (channels)
     end
 end
 
+irc.kick = function (target, recipient, message)
+    if target:byte() == 35 then
+        irc.connection:send(('KICK %s %s :%s\r\n'):format(target, recipient, message))
+    else
+        irc.privmsg(target, 'Cannot kick in query')
+    end
+end
+
+irc.mode = function (target, recipient, mode)
+    if target:byte() == 35 then
+        irc.connection:send(('MODE %s %s %s\r\n'):format(target, mode, recipient))
+    else
+        irc.privmsg(target, 'Cannot set modes in query')
+    end
+end
+
+irc.names = function (channel)
+    irc.connection:send(('NAMES %s\r\n'):format(channel))
+end
+
+irc.nick = function (nickname)
+    irc.connection:send(('NICK %s\r\n'):format(nickname))
+end
+
+irc.notice = function (target, msg)
+    irc.connection:send(('NOTICE %s :%s\r\n'):format(target, msg))
+end
+
+irc.part = function (channel)
+    irc.connection:send(('PART %s\r\n'):format(channel))
+end
+
 irc.pong = function (sname)
     irc.connection:send(('PONG %s\r\n'):format(sname))
 end
@@ -33,20 +80,13 @@ irc.privmsg = function (target, msg)
     irc.connection:send(('PRIVMSG %s :%s\r\n'):format(target, msg))
 end
 
-irc.modeset = function (target, recipient, mode)
-    if target:byte() == 35 then
-        irc.connection:send(('MODE %s %s %s\r\n'):format(target, mode, recipient))
-    else
-        irc.privmsg(target, 'Cannot set modes in query')
-    end
+irc.quit = function (msg)
+    irc.connection:send(('QUIT %s\r\n'):format(msg))
+    irc.connection:close()
 end
 
-irc.kick = function (target, recipient, message)
-    if target:byte() == 35 then
-        irc.connection:send(('KICK %s %s :%s\r\n'):format(target, recipient, message))
-    else
-        irc.privmsg(target, 'Cannot kick in query')
-    end
+irc.topic = function (channel, msg)
+    irc.connection:send(('TOPIC %s %s\r\n'):format(channel, msg))
 end
 
 irc.get_sname = function (ms, config)
