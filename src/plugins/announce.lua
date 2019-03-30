@@ -19,8 +19,8 @@ plugin.main = function(args)
         return
     end
 
-    if url:find('[ <]?https?://[^> ]+.*') then
-        url = url:match('[ <]?https?://[^> ]+.*')
+    if url:find('^.-[ <]?https?://[^> ]+.*') then
+        url = url:match('^.-[ <]?https?://[^> ]+.*')
     elseif url:find(' www%..*') then
         url = url:match(' www%..*')
         url = 'http://' .. url
