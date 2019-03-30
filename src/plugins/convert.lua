@@ -190,7 +190,7 @@ plugin.main = function(args)
     or (conversion[src_unit][dest_unit](val_adj * val) / dest_adj)
 
     args.modules.irc.privmsg(args.target, ('%s: %g %s is %g %s%s')
-                              :format(args.sender, val, src, new_val, dest_prefix, dest_unit))
+                             :format(args.sender, val, src, new_val, dest_prefix, dest_unit))
 end
 
 return plugin
