@@ -44,33 +44,6 @@ aliases['bloat%s*.*'] = function (ms, t, msg, _, sndr)
     ms.irc.privmsg(t, target .. ' is bloat.')
 end
 
-aliases['rot13%s.*'] = function (ms, t, msg)
-    local _, _, text = msg:find('rot13%s(.*)')
-    if text then
-        local chars = {}
-        for i=1,text:len() do
-            chars[i] = text:byte(i)
-        end
-
-        local rotted = ""
-        for i=1,#chars do
-            local letter = chars[i]
-            if letter >= 65 and letter < 91 then
-                local offset = letter - 65
-                letter = string.char(65 + ((offset + 13) % 26))
-            elseif letter >= 97 and letter < 123 then
-                local offset = letter - 97
-                letter = string.char(97 + ((offset + 13) % 26))
-            else
-                letter = string.char(chars[i])
-            end
-            rotted = rotted .. letter
-        end
-
-        ms.irc.privmsg(t, rotted)
-    end
-end
-
 aliases['judges'] = function (ms, t, _, _, sndr)
     ms.irc.privmsg(t, ('So close, but %s won by a nose!'):format(sndr))
 end
@@ -78,17 +51,5 @@ end
 aliases['wiki%s+.+'] = mediawiki_alias('wiki%s+(.+)', 'https://en.wikipedia.org/w/api.php')
 
 aliases['archwiki%s+.+'] = mediawiki_alias('archwiki%s+(.+)', 'https://wiki.archlinux.org/api.php')
-
-aliases["pick%s+.+"] = function (ms, t, msg)
-    local _, _, str = msg:find("pick%s+(.+)")
-    local words = {}
-    if str then
-        for i in str:gmatch("%S+") do
-            words[#words + 1] = i
-        end
-    end
-    local r = math.random(#words)
-    ms.irc.privmsg(t, words[r])
-end
 
 return aliases

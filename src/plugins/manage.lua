@@ -52,7 +52,7 @@ end
 
 plugin.commands.restart = function (args)
     if args.authorized then
-        if args.modules.config.debug then print('restarting') end
+        if args.conf.debug then print('restarting') end
         return true
     end
 end
@@ -70,7 +70,7 @@ plugin.commands.list = function (args)
     local tables = { aliases = args.modules.irc_aliases
                    , modules = args.modules
                    , plugins = args.modules.plugins
-                   , config  = args.modules.config
+                   , config  = args.conf
                    }
 
     local the_table = what and tables[what] or tables

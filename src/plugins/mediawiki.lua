@@ -9,7 +9,7 @@ plugin.help = 'Usage: mediawiki <APIURL> <search>'
 plugin.main = function(args)
     local _, _, apiurl, search = args.message:find('^[ ]?(https?://[^> ]+)%s+(.+)')
 
-    if args.modules.config.debug then
+    if args.conf.debug then
         print(apiurl, query)
     end
 
@@ -29,7 +29,7 @@ plugin.main = function(args)
         args.modules.irc.privmsg(args.target, ('%s: Network request failed.'):format(args.sender))
         return
     else
-        if args.modules.config.debug then print(resp) end
+        if args.conf.debug then print(resp) end
         local res = json.decode(resp)
         if not res or res == nil then
             args.modules.irc.privmsg(args.target, ('%s: Please give me a working API url.'):format(args.sender))

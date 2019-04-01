@@ -125,6 +125,49 @@ plugin.commands.is = function (args)
     args.modules.irc.privmsg(args.target, ('%s: %s %s%s'):format(args.sender, prob[r1], case[r2], punct[r3]))
 end
 
+plugin.commands.rot13 = function (args)
+    local _, _, text = args.message:find('rot13%s(.*)')
+    if text then
+        local chars = {}
+        for i=1,text:len() do
+            chars[i] = text:byte(i)
+        end
+
+        local rotted = ""
+        for i=1,#chars do
+            local letter = chars[i]
+            if letter >= 65 and letter < 91 then
+                local offset = letter - 65
+                letter = string.char(65 + ((offset + 13) % 26))
+            elseif letter >= 97 and letter < 123 then
+                local offset = letter - 97
+                letter = string.char(97 + ((offset + 13) % 26))
+            else
+                letter = string.char(chars[i])
+            end
+            rotted = rotted .. letter
+        end
+        args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, rotted))
+    else
+        return
+    end
+end
+
+plugin.commands.pick = function (args)
+    local _, _, str = args.message:find("pick%s+(.+)")
+    local words = {}
+    if str then
+        for i in str:gmatch("%S+") do
+            words[#words + 1] = i
+        end
+    else
+        args.modules.irc.privmsg(args.target, ('%s: Please give me some things to choose from.'):format(args.sender))
+        return
+    end
+    local r = math.random(#words)
+    args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, words[r]))
+end
+
 local h = ''
 for k in pairs(plugin.commands) do
     h = ('%s|%s'):format(h, k)

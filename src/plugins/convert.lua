@@ -129,7 +129,7 @@ plugin.help = 'Usage: convert <number> <from-unit> <to-unit>'
 
 plugin.main = function(args)
     local _, _, val, src, dest = args.message:find('(%-?%d+%.?%d*)%s*(.+)%s+(.+)')
-    if args.modules.config.debug then
+    if args.conf.debug then
         print(val, src, dest)
     end
 
@@ -162,7 +162,7 @@ plugin.main = function(args)
         val_adj = val_adj or
         parse_prefix(prefix, iec_aliases, 2, iec)
     end
-    if args.modules.config.debug then print(val_adj) end
+    if args.conf.debug then print(val_adj) end
     if val_adj == nil then
         args.modules.irc.privmsg(args.target, ('%s: I cannot convert that number'):format(args.sender))
         return
@@ -171,7 +171,7 @@ plugin.main = function(args)
     local dest_unit, pos = parse_unit(dest)
 
     if src_unit ~= dest_unit and (dest_unit == '' or not conversion[src_unit][dest_unit]) then
-        if args.modules.config.debug then print(dest_unit) end
+        if args.conf.debug then print(dest_unit) end
         args.modules.irc.privmsg(args.target, ('%s: I cannot convert %s to %s'):format(args.sender, src, dest))
         return
     end
