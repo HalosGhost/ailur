@@ -25,13 +25,13 @@ plugin.main = function(args)
 
     local act = '?action=opensearch&format=json&search='
     local resp = https.request(apiurl .. act .. url.escape(search))
-    if not resp or resp == nil then
+    if not resp then
         args.modules.irc.privmsg(args.target, ('%s: Network request failed.'):format(args.sender))
         return
     else
         if args.conf.debug then print(resp) end
         local res = json.decode(resp)
-        if not res or res == nil then
+        if not res then
             args.modules.irc.privmsg(args.target, ('%s: Please give me a working API url.'):format(args.sender))
             return
         elseif res["error"] then
