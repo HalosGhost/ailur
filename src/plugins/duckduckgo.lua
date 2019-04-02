@@ -19,7 +19,7 @@ end
 plugin.main = function(args)
     local _, _, search = args.message:find('(.+)')
 
-    if args.modules.config.debug then
+    if args.conf.debug then
         print(search)
     end
 
@@ -34,7 +34,7 @@ plugin.main = function(args)
 
     local resp = https.request(target:format(url.escape(search)))
     if resp then
-        if args.modules.config.debug then print(resp) end
+        if args.conf.debug then print(resp) end
         args.modules.irc.privmsg(args.target, search:find('^!') and bang(resp) or plain(resp))
         return
     end
