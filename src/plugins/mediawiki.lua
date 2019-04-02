@@ -7,7 +7,7 @@ local plugin = {}
 plugin.help = 'Usage: mediawiki <APIURL> <search>'
 
 plugin.main = function(args)
-    local _, _, apiurl, search = args.message:find('^[ ]?(https?://[^> ]+)%s+(.+)')
+    local _, _, apiurl, search = args.message:find('^(https?://%S+)%s+(%S+)')
 
     if args.conf.debug then
         print(apiurl, query)
