@@ -48,8 +48,4 @@ aliases['judges'] = function (ms, t, _, _, sndr)
     ms.irc.privmsg(t, ('So close, but %s won by a nose!'):format(sndr))
 end
 
-aliases['wiki%s+.+'] = mediawiki_alias('wiki%s+(.+)', 'https://en.wikipedia.org/w/api.php')
-
-aliases['archwiki%s+.+'] = mediawiki_alias('archwiki%s+(.+)', 'https://wiki.archlinux.org/api.php')
-
 return aliases
