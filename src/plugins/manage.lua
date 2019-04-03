@@ -46,7 +46,7 @@ plugin.commands.reload = function (args)
             args.modules.plugins[what].dbinit()
         end
     else
-        args.modules.irc.privmsg(args.target 'no such module/plugin')
+        args.modules.irc.privmsg(args.target, 'no such module/plugin')
     end
 end
 
