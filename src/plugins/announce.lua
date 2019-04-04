@@ -56,9 +56,10 @@ plugin.main = function(args)
         args.modules.irc.privmsg(args.target, 'error: too many redirects')
     end
 
-    local title = html_unescape(body:match('<title.->(.-)</title>')) or 'Could not grab title'
+    local title = body:match('<title.->(.-)</title>')
+    if not title then return end
 
-    args.modules.irc.privmsg(args.target, ('[%s]'):format(title))
+    args.modules.irc.privmsg(args.target, ('[%s]'):format(html_unescape(title)))
 end
 
 return plugin
