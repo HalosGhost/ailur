@@ -1,21 +1,29 @@
 -- URL announcements - follows http->https redirects but not www
 
 local https = require 'ssl.https'
-local ltn12 = require 'ltn12'
 
 local plugin = {}
+
+local entitySwap = function (orig, n, s)
+    local entityMap = { lt='<', gt='>', amp='&', quot='"', apos='\'' }
+
+    return (n == '' and entityMap[s])
+           or (n == '#' and tonumber(s)) and string.char(s)
+           or (n == '#x' and tonumber(s, 16)) and string.char(tonumber(s, 16))
+           or orig
+end
+
+local html_unescape = function (str)
+    return str:gsub('(&(#?x?)([%d%a]+);)', entitySwap)
+end
 
 plugin.help = 'Usage: announce <url>'
 
 plugin.main = function(args)
     local _, _, url = args.message:find('(.+)')
 
-    if args.conf.debug then
-        print(url)
-    end
-
     if not url then
-        args.modules.irc.privmsg(args.target, ('%s: Please give me a url.'):format(args.sender))
+        args.modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
@@ -24,27 +32,33 @@ plugin.main = function(args)
     else
         url = 'http://' .. url
     end
-    if url then
-        local body = {}
-        local options = { ['url']  = url, ['sink'] = ltn12.sink.table(body) }
-        local resp, code, headers, status = https.request(options)
-        if resp then
-            title = body and body[1] and body[1]:match('<title.*>(.-)</title>') or 'Could not grab title'
-            if args.conf.debug then print(title) end
-            if code == 200 then
-                args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, title))
-                return
-            else
-                args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, status))
-                return
-            end
-            return
-        else
-            args.modules.irc.privmsg(args.target, ('%s: Something went wrong with the request'):format(args.sender))
+
+    local body, headers
+    local status = 300
+    local redirects = 0
+
+    while status // 100 == 3 and redirects < 3 do
+        if not url then return end
+        body, status, headers = https.request(url)
+
+        if not body or not status or (status ~= 200 and status // 100 ~= 3) then
+            args.modules.irc.privmsg(args.target, ('error: %s'):format(status))
             return
         end
-        return
+
+        if status // 100 == 3 then
+            url = headers.location
+            redirects = redirects + 1
+        end
     end
+
+    if redirects == 3 then
+        args.modules.irc.privmsg(args.target, 'error: too many redirects')
+    end
+
+    local title = html_unescape(body:match('<title.->(.-)</title>')) or 'Could not grab title'
+
+    args.modules.irc.privmsg(args.target, ('[%s]'):format(title))
 end
 
 return plugin
