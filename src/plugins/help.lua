@@ -3,7 +3,7 @@ local plugin = {}
 plugin.help = 'usage: help <plugin>'
 
 plugin.main = function(args)
-    local _, _, mod = args.message:find('(%S+)')
+    local _, _, mod, subarg = args.message:find('(%S+)%s*(%S*)')
 
     if not mod then
         args.modules.irc.privmsg(args.target, plugin.help)
@@ -14,11 +14,18 @@ plugin.main = function(args)
         and args.modules.plugins[mod].help
         or 'No help available on that topic'
 
-    if args.conf.debug then
-        print(mod, args.modules.plugins[mod], usage)
+    local res = usage
+    if type(usage) == 'function' then
+        res = usage(subarg)
+    elseif type(usage) == 'table' then
+        res = usage[subarg]
     end
 
-    args.modules.irc.privmsg(args.target, usage)
+    if args.conf.debug then
+        print(mod, args.modules.plugins[mod], usage, res)
+    end
+
+    args.modules.irc.privmsg(args.target, res)
 end
 
 return plugin
