@@ -133,7 +133,7 @@ plugin.commands.close =  function (args)
             :format(args.sender, list_polls()))
         return
     end
-    if plugin.polls[pollid].poll_creator == args.sender then
+    if plugin.polls[pollid].poll_creator == args.sender or args.authorized then
         args.modules.irc.privmsg(args.target,
             ('%s: Poll %s closed. Tally: %s')
             :format(args.sender, pollid, get_tally(pollid)))
