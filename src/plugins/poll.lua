@@ -20,18 +20,18 @@ plugin.commands.open =  function (args)
             :format(args.sender))
         return
     end
-    if polls.pollid then
+    if plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target,
             ('%s: Poll %s already exists.'):format(args.sender, pollid))
         return
     end
-    polls.pollid = {poll_creator = args.sender, choices = {}, votes = {}}
+    plugin.polls[pollid] = {poll_creator = args.sender, choices = {}, votes = {}}
     for i in responses:gmatch('([^,%s]+)') do
-        plugin.polls.pollid.choices[#plugin.polls.pollid.choices + 1] = i
+        plugin.polls[pollid].choices[#plugin.polls[pollid].choices + 1] = i
     end
     args.modules.irc.privmsg(args.target,
         ('%s: Poll %s created by %s')
-        :format(args.sender, pollid, plugin.polls.pollid.poll_creator))
+        :format(args.sender, pollid, plugin.polls[pollid].poll_creator))
 end
 
 plugin.commands.info = function (args)
@@ -40,16 +40,17 @@ plugin.commands.info = function (args)
         args.modules.irc.privmsg(args.target, ('%s: Please give me the name of a poll.'):format(args.sender))
         return
     end
-    if not plugin.polls.pollid then
+    if not plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target, ('%s: Poll %s does not exist.'):format(args.sender, pollid))
         return
-    else
-        local ballot = ''
-        for i in plugin.polls.pollid.choices do ballot = ballot .. ('%s '):format(i) end
-        args.modules.irc.privmsg(args.target,
-            ('%s: Poll %s created by %s. Ballot: %s')
-            :format(args.sender, pollid, plugin.polls.pollid.poll_creator, ballot))
     end
+    local ballot = ''
+    for k,v in pairs(plugin.polls[pollid].choices) do
+        ballot = ballot .. ('%s '):format(v)
+    end
+    args.modules.irc.privmsg(args.target,
+        ('%s: Poll %s created by %s. Ballot: %s')
+        :format(args.sender, pollid, plugin.polls[pollid].poll_creator, ballot))
 end
 
 plugin.commands.vote =  function (args)
@@ -61,15 +62,15 @@ plugin.commands.vote =  function (args)
             :format(args.sender))
         return
     end
-    if not plugin.polls.pollid then
+    if not plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target,
             ('%s: Poll %s does not exist.'):format(args.sender, pollid))
         return
     end
-    if not table.contains(polls.pollid.choices, vote) then
+    if not table_contains(plugin.polls[pollid].choices, vote) then
         local ballot = ''
-        for i in plugin.polls.pollid.choices do
-            ballot = ballot .. ('%s '):format(i)
+        for k,v in pairs(plugin.polls[pollid].choices) do
+            ballot = ballot .. ('%s '):format(v)
         end
         args.modules.irc.privmsg(args.target,
             ('%s: You cannot vote for that option. Ballot: %s')
@@ -77,14 +78,14 @@ plugin.commands.vote =  function (args)
         return
     end
     local reply = ''
-    if not plugin.polls.pollid.votes.voter then
+    if not plugin.polls[pollid].votes.voter then
         reply = ('%s: Vote %s added for poll %s')
                 :format(args.sender, vote, pollid)
     else
         reply = ('%s: Vote updated for poll %s')
                 :format(args.sender, pollid)
     end
-    plugin.polls.pollid.votes.voter = vote
+    plugin.polls[pollid].votes.voter = vote
     args.modules.irc.privmsg(args.target, reply)
 end
 
@@ -95,7 +96,7 @@ plugin.commands.tally =  function (args)
             ('%s: Please give me the name of a poll.'):format(args.sender))
         return
     end
-    if not plugin.polls.pollid then
+    if not plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target,
         ('%s: That poll doesn\'t exist.'):format(args.sender))
         return
@@ -110,7 +111,7 @@ plugin.commands.close =  function (args)
             ('%s: Please give me the name of a poll.'):format(args.sender))
         return
     end
-    if not plugin.polls.pollid then
+    if not plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target,
         ('%s: That poll doesn\'t exist.'):format(args.sender))
         return
