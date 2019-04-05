@@ -15,8 +15,8 @@ local function list_polls()
     for k,v in pairs(plugin.polls) do
         current_polls = current_polls .. ('%s '):format(k)
     end
-    if not current_polls then
-        return 'no current polls'
+    if current_polls == '' then
+        return 'none'
     else
         return current_polls
     end
