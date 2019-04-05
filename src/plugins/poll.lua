@@ -13,7 +13,7 @@ end
 local function list_polls()
     current_polls = ''
     for k,v in pairs(plugin.polls) do
-        current_polls = current_polls .. ('%s '):format(v)
+        current_polls = current_polls .. ('%s '):format(k)
     end
     if not current_polls then
         return 'no current polls'
@@ -93,7 +93,8 @@ plugin.commands.vote =  function (args)
     end
     if not plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target,
-            ('%s: Poll %s does not exist. Current polls: %s'):format(args.sender, pollid, list_polls()))
+            ('%s: Poll %s does not exist. Current polls: %s')
+            :format(args.sender, pollid, list_polls()))
         return
     end
     if not table_contains(plugin.polls[pollid].choices, vote) then
@@ -122,22 +123,25 @@ plugin.commands.close =  function (args)
     local _, _, pollid = args.message:find("close%s+(%S+)")
     if not pollid then
         args.modules.irc.privmsg(args.target,
-            ('%s: Please give me the name of a poll.'):format(args.sender))
+            ('%s: Please give me the name of a poll. Current polls: %s')
+            :format(args.sender, list_polls()))
         return
     end
     if not plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target,
-        ('%s: That poll doesn\'t exist.'):format(args.sender))
+            ('%s: That poll doesn\'t exist. Current polls: %s')
+            :format(args.sender, list_polls()))
         return
     end
     if plugin.polls[pollid].poll_creator == args.sender then
         args.modules.irc.privmsg(args.target,
-        ('%s: Poll %s closed. Tally: %s'):format(args.sender, pollid, get_tally(pollid)))
+            ('%s: Poll %s closed. Tally: %s')
+            :format(args.sender, pollid, get_tally(pollid)))
         plugin.polls[pollid] = nil
     else
         args.modules.irc.privmsg(args.target,
-        ('%s: %s is the poll creator, you don\'t have permission to do that.')
-        :format(args.sender, plugin.polls[pollid].poll_creator))
+            ('%s: %s is the poll creator, you don\'t have permission to do that.')
+            :format(args.sender, plugin.polls[pollid].poll_creator))
     end
 end
 
