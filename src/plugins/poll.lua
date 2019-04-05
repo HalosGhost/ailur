@@ -10,6 +10,23 @@ local function table_contains(t, element)
   return false
 end
 
+local function get_tally(poll_name)
+    local results = {}
+    for k,v in pairs(plugin.polls[poll_name].choices) do
+        results[v] = 0
+    end
+    for k,v in pairs(plugin.polls[poll_name].votes) do
+        if results[v] then
+            results[v] = results[v] + 1
+        end
+    end
+    local tally = ''
+    for k,v in pairs(results) do
+        tally = tally .. ('%s[%d] '):format(k, v)
+    end
+    return tally
+end
+
 plugin.polls = {}
 
 plugin.commands.open =  function (args)
@@ -44,13 +61,9 @@ plugin.commands.info = function (args)
         args.modules.irc.privmsg(args.target, ('%s: Poll %s does not exist.'):format(args.sender, pollid))
         return
     end
-    local ballot = ''
-    for k,v in pairs(plugin.polls[pollid].choices) do
-        ballot = ballot .. ('%s '):format(v)
-    end
     args.modules.irc.privmsg(args.target,
-        ('%s: Poll %s created by %s. Ballot: %s')
-        :format(args.sender, pollid, plugin.polls[pollid].poll_creator, ballot))
+        ('%s: Poll %s created by %s. Tally: %s')
+        :format(args.sender, pollid, plugin.polls[pollid].poll_creator, get_tally(pollid)))
 end
 
 plugin.commands.vote =  function (args)
@@ -89,21 +102,6 @@ plugin.commands.vote =  function (args)
     args.modules.irc.privmsg(args.target, reply)
 end
 
-plugin.commands.tally =  function (args)
-    local _, _, pollid = args.message:find("tally%s+(%S+)")
-    if not pollid then
-        args.modules.irc.privmsg(args.target,
-            ('%s: Please give me the name of a poll.'):format(args.sender))
-        return
-    end
-    if not plugin.polls[pollid] then
-        args.modules.irc.privmsg(args.target,
-        ('%s: That poll doesn\'t exist.'):format(args.sender))
-        return
-    end
-    -- function to figure out the tally and print it
-end
-
 plugin.commands.close =  function (args)
     local _, _, pollid = args.message:find("close%s+(%S+)")
     if not pollid then
@@ -116,15 +114,14 @@ plugin.commands.close =  function (args)
         ('%s: That poll doesn\'t exist.'):format(args.sender))
         return
     end
-    -- function to figure out the tally and print it
     if plugin.polls[pollid].poll_creator == args.sender then
-        plugin.polls[pollid] = nil
         args.modules.irc.privmsg(args.target,
-        ('%s: Poll %s closed.'):format(args.sender, pollid))
+        ('%s: Poll %s closed. Tally: %s'):format(args.sender, pollid, get_tally(pollid)))
+        plugin.polls[pollid] = nil
     else
         args.modules.irc.privmsg(args.target,
         ('%s: %s is the poll creator, you don\'t have permission to do that.')
-        :format(args.sender, plugin.polls.pollid.poll_creator))
+        :format(args.sender, plugin.polls[pollid].poll_creator))
     end
 end
 
