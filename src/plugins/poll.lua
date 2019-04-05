@@ -10,6 +10,18 @@ local function table_contains(t, element)
   return false
 end
 
+local function list_polls()
+    current_polls = ''
+    for k,v in pairs(plugin.polls) do
+        current_polls = current_polls .. ('%s '):format(v)
+    end
+    if not current_polls then
+        return 'no current polls'
+    else
+        return current_polls
+    end
+end
+
 local function get_tally(poll_name)
     local results = {}
     for k,v in pairs(plugin.polls[poll_name].choices) do
@@ -54,11 +66,15 @@ end
 plugin.commands.info = function (args)
     local _, _, pollid = args.message:find("info%s+(%S+)")
     if not pollid then
-        args.modules.irc.privmsg(args.target, ('%s: Please give me the name of a poll.'):format(args.sender))
+        args.modules.irc.privmsg(args.target,
+            ('%s: Please give me the name of a poll. Current polls: %s')
+            :format(args.sender, list_polls()))
         return
     end
     if not plugin.polls[pollid] then
-        args.modules.irc.privmsg(args.target, ('%s: Poll %s does not exist.'):format(args.sender, pollid))
+        args.modules.irc.privmsg(args.target,
+            ('%s: Poll %s does not exist. Current polls: %s')
+            :format(args.sender, pollid, list_polls()))
         return
     end
     args.modules.irc.privmsg(args.target,
@@ -77,7 +93,7 @@ plugin.commands.vote =  function (args)
     end
     if not plugin.polls[pollid] then
         args.modules.irc.privmsg(args.target,
-            ('%s: Poll %s does not exist.'):format(args.sender, pollid))
+            ('%s: Poll %s does not exist. Current polls: %s'):format(args.sender, pollid, list_polls()))
         return
     end
     if not table_contains(plugin.polls[pollid].choices, vote) then
@@ -91,14 +107,14 @@ plugin.commands.vote =  function (args)
         return
     end
     local reply = ''
-    if not plugin.polls[pollid].votes.voter then
+    if not plugin.polls[pollid].votes[voter] then
         reply = ('%s: Vote %s added for poll %s')
                 :format(args.sender, vote, pollid)
     else
         reply = ('%s: Vote updated for poll %s')
                 :format(args.sender, pollid)
     end
-    plugin.polls[pollid].votes.voter = vote
+    plugin.polls[pollid].votes[voter] = vote
     args.modules.irc.privmsg(args.target, reply)
 end
 
