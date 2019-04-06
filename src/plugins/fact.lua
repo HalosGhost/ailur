@@ -5,6 +5,7 @@ local cnt = nil
 local del = nil
 local sel = nil
 local sim = nil
+local info = nil
 local lock = nil
 
 local plugin = {}
@@ -28,6 +29,7 @@ plugin.dbinit = function ()
     del = db:prepare('delete from factoids where locked_by is null and key = :key;')
     sel = db:prepare('select value from factoids where key = :key;')
     sim = db:prepare('select key from factoids where key like :key;')
+    info = db:prepare('select locked_by from factoids where key like :key;')
     lock = db:prepare('update factoids set locked_by = :mask where key = :key;')
 end
 
@@ -38,6 +40,7 @@ plugin.dbcleanup = function ()
     del:finalize()
     sel:finalize()
     sim:finalize()
+    info:finalize()
     lock:finalize()
 end
 
@@ -107,6 +110,18 @@ plugin.commands.delete = function (args)
 
     args.modules.irc.privmsg(args.target,
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
+end
+
+plugin.commands.info = function (args)
+    local _, _, key = args.message:find("info%s+'(.*)'")
+    info:reset()
+    info:bind_names{ ['key'] = key }
+    for v in info:urows() do
+        args.modules.irc.privmsg(args.target, ('locked by: %s'):format(v))
+        return
+    end
+
+    args.modules.irc.privmsg(args.target, 'fact not locked')
 end
 
 plugin.commands.lock = function (args)
