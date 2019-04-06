@@ -18,7 +18,7 @@ plugin.main = function(args)
     if type(usage) == 'function' then
         res = usage(subarg)
     elseif type(usage) == 'table' then
-        res = usage[subarg]
+        res = usage[subarg or mod]
     end
 
     if args.conf.debug then
