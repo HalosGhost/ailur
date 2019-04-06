@@ -57,7 +57,7 @@ plugin.commands = {}
 plugin.commands.print = function (args)
     local _, _, key = args.message:find('print%s+(.+)')
 
-    args.modules.irc.privmsg(args.target, plugin.find(key))
+    modules.irc.privmsg(args.target, plugin.find(key))
 end
 
 plugin.commands.search = function (args)
@@ -71,7 +71,7 @@ plugin.commands.search = function (args)
         list = ("'%s' %s"):format(v, list)
     end
 
-    args.modules.irc.privmsg(args.target, list)
+    modules.irc.privmsg(args.target, list)
 end
 
 plugin.commands.count = function (args)
@@ -81,8 +81,7 @@ plugin.commands.count = function (args)
     local key = key and '%' .. key .. '%' or '%'
     cnt:bind_names{ ['key'] = key }
     for c in cnt:urows() do
-        return args.modules.irc.privmsg(args.target,
-                                        ('Found %d result%s'):format(c or '0', c == 1 and '' or 's'))
+        return modules.irc.privmsg(args.target, ('Found %d result%s'):format(c or '0', c == 1 and '' or 's'))
     end
 end
 
@@ -97,8 +96,7 @@ plugin.commands.add = function (args)
     ins:bind_names{ ['key'] = key, ['value'] = value }
     res = ins:step()
 
-    args.modules.irc.privmsg(args.target,
-                             (res == sql.DONE and 'Tada!' or db:errmsg()))
+    modules.irc.privmsg(args.target, (res == sql.DONE and 'Tada!' or db:errmsg()))
 end
 
 plugin.commands.delete = function (args)
@@ -108,8 +106,7 @@ plugin.commands.delete = function (args)
     del:bind_names{ ['key'] = key }
     local res = del:step()
 
-    args.modules.irc.privmsg(args.target,
-                             (res == sql.DONE and 'Tada!' or db:errmsg()))
+    modules.irc.privmsg(args.target, (res == sql.DONE and 'Tada!' or db:errmsg()))
 end
 
 plugin.commands.info = function (args)
@@ -117,11 +114,11 @@ plugin.commands.info = function (args)
     info:reset()
     info:bind_names{ ['key'] = key }
     for v in info:urows() do
-        args.modules.irc.privmsg(args.target, ('locked by: %s'):format(v))
+        modules.irc.privmsg(args.target, ('locked by: %s'):format(v))
         return
     end
 
-    args.modules.irc.privmsg(args.target, 'fact not locked')
+    modules.irc.privmsg(args.target, 'fact not locked')
 end
 
 plugin.commands.lock = function (args)
@@ -131,8 +128,7 @@ plugin.commands.lock = function (args)
     lock:bind_names{ ['key'] = key, ['mask'] = args.sender }
     local res = lock:step()
 
-    args.modules.irc.privmsg(args.target,
-                             (res == sql.DONE and 'Tada!' or db:errmsg()))
+    modules.irc.privmsg(args.target, (res == sql.DONE and 'Tada!' or db:errmsg()))
 end
 
 plugin.commands.unlock = function (args)
@@ -142,8 +138,7 @@ plugin.commands.unlock = function (args)
     lock:bind_names{ ['key'] = key }
     local res = lock:step()
 
-    args.modules.irc.privmsg(args.target,
-                             (res == sql.DONE and 'Tada!' or db:errmsg()))
+    modules.irc.privmsg(args.target, (res == sql.DONE and 'Tada!' or db:errmsg()))
 end
 
 local h = ''
@@ -158,7 +153,7 @@ plugin.main = function (args)
 
     if f then return f(args, target) end
 
-    args.modules.irc.privmsg(args.target, plugin.help)
+    modules.irc.privmsg(args.target, plugin.help)
 end
 
 return plugin

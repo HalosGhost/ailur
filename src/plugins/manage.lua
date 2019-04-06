@@ -9,14 +9,14 @@ plugin.commands.update = function (args)
 
     local _, _, status = os.execute('git pull origin master')
     if status == 0 then
-        args.modules.irc.privmsg(args.target, "Tada!")
+        modules.irc.privmsg(args.target, "Tada!")
     end
 end
 
 plugin.commands.die = function (args)
     if not args.authorized then return end
 
-    args.modules.irc.connection:close()
+    modules.irc.connection:close()
     os.exit()
 end
 
@@ -24,29 +24,28 @@ plugin.commands.reload = function (args)
     if not args.authorized then return end
 
     local _, _, what = args.message:find('reload%s+(.+)')
-    if args.modules[what] then
-        if type(args.modules[what].dbcleanup) == 'function' then
-            args.modules[what].dbcleanup()
+    if modules[what] then
+        if type(modules[what].dbcleanup) == 'function' then
+            modules[what].dbcleanup()
         end
 
-        args.modules.irc.privmsg(args.target, args.modules:extload(what))
+        modules.irc.privmsg(args.target, modules:extload(what))
 
-        if type(args.modules[what].dbinit) == 'function' then
-            args.modules[what].dbinit()
+        if type(modules[what].dbinit) == 'function' then
+            modules[what].dbinit()
         end
-    elseif args.modules.plugins[what] then
-        if type(args.modules.plugins[what].dbcleanup) == 'function' then
-            args.modules.plugins[what].dbcleanup()
+    elseif modules.plugins[what] then
+        if type(modules.plugins[what].dbcleanup) == 'function' then
+            modules.plugins[what].dbcleanup()
         end
 
-        args.modules.irc.privmsg(args.target,
-                                 args.modules.extload(args.modules.plugins, what, 'plugins'))
+        modules.irc.privmsg(args.target, modules.extload(modules.plugins, what, 'plugins'))
 
-        if type(args.modules.plugins[what].dbinit) == 'function' then
-            args.modules.plugins[what].dbinit()
+        if type(modules.plugins[what].dbinit) == 'function' then
+            modules.plugins[what].dbinit()
         end
     else
-        args.modules.irc.privmsg(args.target, 'no such module/plugin')
+        modules.irc.privmsg(args.target, 'no such module/plugin')
     end
 end
 
@@ -59,7 +58,7 @@ end
 
 plugin.commands.version = function (args)
     local upt = io.popen('printf \'0.r%s.%s\' "$(git rev-list --count HEAD)" "$(git log -1 --pretty=format:%h)"')
-    args.modules.irc.privmsg(args.target, upt:read())
+    modules.irc.privmsg(args.target, upt:read())
     upt:close()
 end
 
@@ -67,9 +66,9 @@ plugin.commands.list = function (args)
     local list = ''
     local _, _, what = args.message:find('list%s*(%S*)')
 
-    local tables = { aliases = args.modules.irc_aliases
-                   , modules = args.modules
-                   , plugins = args.modules.plugins
+    local tables = { aliases = modules.irc_aliases
+                   , modules = modules
+                   , plugins = modules.plugins
                    , config  = args.conf
                    }
 
@@ -79,12 +78,12 @@ plugin.commands.list = function (args)
         list = ("'%s' %s"):format(k, list)
     end
 
-    args.modules.irc.privmsg(args.target, list)
+    modules.irc.privmsg(args.target, list)
 end
 
 plugin.commands.whoami = function (args)
     local admin = args.authorized and ', an admin' or ''
-    args.modules.irc.privmsg(args.target, args.sender .. admin)
+    modules.irc.privmsg(args.target, args.sender .. admin)
 end
 
 local h = ''
@@ -99,7 +98,7 @@ plugin.main = function (args)
 
     if f then return f(args) end
 
-    args.modules.irc.privmsg(args.target, plugin.help)
+    modules.irc.privmsg(args.target, plugin.help)
 end
 
 return plugin

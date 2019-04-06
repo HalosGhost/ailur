@@ -18,7 +18,7 @@ plugin.main = function(args)
         print(website)
     end
     if not website then
-        args.modules.irc.privmsg(args.target, 'Give me a website or hostname to check')
+        modules.irc.privmsg(args.target, 'Give me a website or hostname to check')
         return
     end
     local address = website:find('^https?://') and website or ('http://%s'):format(website)
@@ -26,9 +26,9 @@ plugin.main = function(args)
     if response then
         local code = string.sub(tostring(httpcode), 1, 1)
         local reply = messages[tonumber(code)]:format(httpcode)
-        args.modules.irc.privmsg(args.target, reply)
+        modules.irc.privmsg(args.target, reply)
     else
-        args.modules.irc.privmsg(args.target, "The website is currently down")
+        modules.irc.privmsg(args.target, "The website is currently down")
     end
 end
 

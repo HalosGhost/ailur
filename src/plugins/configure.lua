@@ -4,12 +4,12 @@ plugin.commands = {}
 
 plugin.commands.get = function (args)
     local _, _, setting = args.message:find('get%s+(%S+)')
-    args.modules.irc.privmsg(args.target, tostring(args.conf[setting]))
+    modules.irc.privmsg(args.target, tostring(args.conf[setting]))
 end
 
 plugin.commands.type = function (args)
     local _, _, setting = args.message:find('type%s+(%S+)')
-    args.modules.irc.privmsg(args.target, type(args.conf[setting]))
+    modules.irc.privmsg(args.target, type(args.conf[setting]))
 end
 
 plugin.commands.set = function (args)
@@ -25,7 +25,7 @@ plugin.commands.set = function (args)
         args.conf[setting] = value
     end
 
-    args.modules.irc.privmsg(args.target, 'Tada!')
+    modules.irc.privmsg(args.target, 'Tada!')
 end
 
 local h = ''
@@ -40,7 +40,7 @@ plugin.main = function (args)
 
     if args.authorized and f then return f(args) end
 
-    args.modules.irc.privmsg(args.target, plugin.help)
+    modules.irc.privmsg(args.target, plugin.help)
 end
 
 return plugin
