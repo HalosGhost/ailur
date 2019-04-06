@@ -1,5 +1,6 @@
 local irc = {}
 
+local plugins
 local socket = require 'socket'
 local ssl = require 'ssl'
 
@@ -89,7 +90,7 @@ irc.topic = function (channel, msg)
     irc.connection:send(('TOPIC %s %s\r\n'):format(channel, msg))
 end
 
-irc.get_sname = function (ms, config)
+irc.get_sname = function (config)
     local sname = ''
     while sname == '' do
         local data = irc.connection:receive('*l')
@@ -112,27 +113,27 @@ irc.authorized = function (irc_config, mask)
     return authed
 end
 
-irc.react_to_privmsg = function (ms, config, text)
+irc.react_to_privmsg = function (config, text)
     local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
     local _, _, mask, hn, target, msg = text:find(ptn)
     local authed = irc.authorized(config.irc, mask .. hn)
     local from_channel = target:find('^#')
 
     -- if whitelisted, put nick's last message in quotegrabs table
-    if ms.plugins.quote and from_channel and ms.plugins.quote.whitelist_status(mask) then
+    if plugins.quote and from_channel and plugins.quote.whitelist_status(mask) then
         -- create the table for the channel if it doesn't exist
-        if not ms.plugins.quote.last_msgs[target] then
-            ms.plugins.quote.last_msgs[target] = {}
+        if not plugins.quote.last_msgs[target] then
+            plugins.quote.last_msgs[target] = {}
         end
 
-        ms.plugins.quote.last_msgs[target][mask] = msg
+        plugins.quote.last_msgs[target][mask] = msg
     end
 
     local tgt = from_channel and target or mask
     local prefix = '^' .. (tgt:find('^#') and config.irc.handle .. '.?%s+' or '')
 
-    if not msg:find(prefix) and ms.plugins.macro then
-        for _, macro in ipairs(ms.plugins.macro.loaded or {}) do
+    if not msg:find(prefix) and plugins.macro then
+        for _, macro in ipairs(plugins.macro.loaded or {}) do
             msg = msg:gsub(macro.pattern, macro.substitution)
         end
     end
@@ -144,21 +145,20 @@ irc.react_to_privmsg = function (ms, config, text)
 
     local _, _, namespace, command = key:find('%s*(%S+)%s*(.*)')
     local basic = nil
-    if type(ms.plugins.fact) == 'table' and type(ms.plugins.fact.find) == 'function' then
-        basic = ms.plugins.fact.find(key:gsub("^%s*(.-)%s*$", "%1"))
+    if type(plugins.fact) == 'table' and type(plugins.fact.find) == 'function' then
+        basic = plugins.fact.find(key:gsub("^%s*(.-)%s*$", "%1"))
     end
 
     local plugin = nil
-    for k in pairs(ms.plugins) do
+    for k in pairs(plugins) do
         if k == namespace then
-            plugin = ms.plugins[namespace]
+            plugin = plugins[namespace]
             break
         end
     end
 
     if plugin then
-        local ret = plugin.main { modules = ms
-                                , conf = config
+        local ret = plugin.main { conf = config
                                 , target = tgt
                                 , message = command
                                 , authorized = authed
@@ -169,9 +169,9 @@ irc.react_to_privmsg = function (ms, config, text)
     elseif basic ~= nil then
         irc.privmsg(tgt, basic)
     else
-        for k, v in pairs(ms.irc_aliases) do
+        for k, v in pairs(modules.irc_aliases) do
             if key:find('^%s*' .. k .. '$') then
-                local ret = v(ms, tgt, key, authed, mask)
+                local ret = v(tgt, key, authed, mask)
                 if ret then return false end
             end
         end
@@ -180,12 +180,12 @@ irc.react_to_privmsg = function (ms, config, text)
     return true
 end
 
-irc.react_loop = function (sname, ms, config)
+irc.react_loop = function (sname, config)
     math.randomseed(os.time())
 
-    if ms.nickpass then
-        irc.privmsg('NickServ', 'identify ' .. ms.nickpass)
-        ms.nickpass = nil -- make it harder to accidentally expose the nickpass, like with eval
+    if modules.nickpass then
+        irc.privmsg('NickServ', 'identify ' .. modules.nickpass)
+        modules.nickpass = nil -- make it harder to accidentally expose the nickpass, like with eval
     else
         irc.joinall(config.irc.channels)
     end
@@ -199,7 +199,7 @@ irc.react_loop = function (sname, ms, config)
             if data == ('PING ' .. sname) then
                 irc.pong(sname)
             elseif data:find('PRIVMSG') then
-                keepalive = irc.react_to_privmsg(ms, config, data)
+                keepalive = irc.react_to_privmsg(config, data)
             elseif data:find('^:NickServ.*NOTICE.*You are now identified for %S+%.$') then
                 irc.joinall(config.irc.channels)
             end
@@ -207,8 +207,9 @@ irc.react_loop = function (sname, ms, config)
     end
 end
 
-irc.main = function (ms)
-    local config = ms.config or ms.default_config
+irc.main = function ()
+    local config = modules.config or modules.default_config
+    plugins = modules.plugins
 
     irc.connection = irc.init(config.irc)
 
@@ -217,14 +218,14 @@ irc.main = function (ms)
         return
     end
 
-    ms.database.init(ms, config)
+    modules.database.init(config)
 
     irc.conn(config.irc)
 
-    local sname = irc.get_sname(ms, config)
+    local sname = irc.get_sname(config)
 
-    irc.react_loop(sname, ms, config)
-    ms.database.cleanup(ms)
+    irc.react_loop(sname, config)
+    modules.database.cleanup()
     irc.connection:close()
 end
 

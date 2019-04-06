@@ -4,7 +4,7 @@ local plugin = {}
 
 plugin.main = function (args)
     if not STARTTIME then
-        args.modules.irc.privmsg(args.target, 'error: STARTTIME global var not defined')
+        modules.irc.privmsg(args.target, 'error: STARTTIME global var not defined')
         return
     end
 
@@ -27,7 +27,7 @@ plugin.main = function (args)
         end
     end
 
-    args.modules.irc.privmsg(args.target, 'up ' .. table.concat(uptime, ', '))
+    modules.irc.privmsg(args.target, 'up ' .. table.concat(uptime, ', '))
 end
 
 return plugin

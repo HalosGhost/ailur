@@ -23,7 +23,7 @@ plugin.main = function(args)
     local _, _, url = args.message:find('(.+)')
 
     if not url then
-        args.modules.irc.privmsg(args.target, plugin.help)
+        modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
@@ -42,7 +42,7 @@ plugin.main = function(args)
         body, status, headers = https.request(url)
 
         if not body or not status or (status ~= 200 and status // 100 ~= 3) then
-            args.modules.irc.privmsg(args.target, ('error: %s'):format(status))
+            modules.irc.privmsg(args.target, ('error: %s'):format(status))
             return
         end
 
@@ -53,13 +53,13 @@ plugin.main = function(args)
     end
 
     if redirects == 3 then
-        args.modules.irc.privmsg(args.target, 'error: too many redirects')
+        modules.irc.privmsg(args.target, 'error: too many redirects')
     end
 
     local title = body:match('<title.->(.-)</title>')
     if not title then return end
 
-    args.modules.irc.privmsg(args.target, ('[%s]'):format(html_unescape(title)))
+    modules.irc.privmsg(args.target, ('[%s]'):format(html_unescape(title)))
 end
 
 return plugin

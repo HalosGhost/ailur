@@ -1,23 +1,23 @@
 local aliases = {}
 
-aliases['say%s+.+'] = function (ms, t, msg)
+aliases['say%s+.+'] = function (t, msg)
     local _, _, m = msg:find('say%s+(.+)')
-    ms.irc.privmsg(t, m)
+    modules.irc.privmsg(t, m)
 end
 
-aliases['act%s+.+'] = function (ms, t, msg)
+aliases['act%s+.+'] = function (t, msg)
     local _, _, m = msg:find('act%s+(.+)')
-    ms.irc.privmsg(t, ('\x01ACTION %s\x01'):format(m))
+    modules.irc.privmsg(t, ('\x01ACTION %s\x01'):format(m))
 end
 
-aliases['give%s+%S+.+'] = function (ms, t, msg, _, sndr)
+aliases['give%s+%S+.+'] = function (t, msg, _, sndr)
     local _, _, to, what = msg:find('give%s+(%S+)%s+(.*)')
     if what then
         local thing = nil
-        if type(ms.plugins.fact) == 'table' and type(ms.plugins.fact.find) == 'function' then
-            thing = ms.plugins.fact.find(what:gsub("^%s*(.-)%s*$", "%1"))
+        if type(modules.plugins.fact) == 'table' and type(modules.plugins.fact.find) == 'function' then
+            thing = modules.plugins.fact.find(what:gsub("^%s*(.-)%s*$", "%1"))
         end
-        ms.irc.privmsg(t, to .. ': ' .. (thing or (sndr .. ' wanted you to have ' .. what)))
+        modules.irc.privmsg(t, to .. ': ' .. (thing or (sndr .. ' wanted you to have ' .. what)))
     end
 end
 
