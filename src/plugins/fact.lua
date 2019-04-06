@@ -98,8 +98,8 @@ plugin.commands.add = function (args)
                              (res == sql.DONE and 'Tada!' or db:errmsg()))
 end
 
-plugin.commands.remove = function (args)
-    local _, _, key = args.message:find("remove%s+'(.+)'")
+plugin.commands.delete = function (args)
+    local _, _, key = args.message:find("delete%s+'(.+)'")
 
     del:reset()
     del:bind_names{ ['key'] = key }
