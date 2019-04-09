@@ -168,13 +168,6 @@ irc.react_to_privmsg = function (config, text)
         if ret then return false end
     elseif basic ~= nil then
         irc.privmsg(tgt, basic)
-    else
-        for k, v in pairs(modules.irc_aliases) do
-            if key:find('^%s*' .. k .. '$') then
-                local ret = v(tgt, key, authed, mask)
-                if ret then return false end
-            end
-        end
     end
 
     return true
