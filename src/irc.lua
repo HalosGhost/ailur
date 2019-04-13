@@ -149,14 +149,7 @@ irc.react_to_privmsg = function (config, text)
         basic = plugins.fact.find(key:gsub("^%s*(.-)%s*$", "%1"))
     end
 
-    local plugin = nil
-    for k in pairs(plugins) do
-        if k == namespace then
-            plugin = plugins[namespace]
-            break
-        end
-    end
-
+    local plugin = plugins[namespace]
     if plugin then
         local ret = plugin.main { conf = config
                                 , target = tgt
