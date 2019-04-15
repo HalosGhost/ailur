@@ -8,15 +8,14 @@ plugin.help = 'usage: weather <location>'
 
 plugin.main = function (args)
     if args.message == '' then
-        args.modules.irc.privmsg(args.target, plugin.help)
+        modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
     if not args.conf.weather
         or not args.conf.weather.geocode_key
         or not args.conf.weather.darksky_key then
-        args.modules.irc.privmsg(args.target,
-                                 'please set config.weather.geocode_key and config.weather.darksky_key')
+        modules.irc.privmsg(args.target, 'please set config.weather.geocode_key and config.weather.darksky_key')
         return
     end
 
@@ -25,13 +24,13 @@ plugin.main = function (args)
                                                         args.conf.weather.geocode_key))
 
     if not body then
-        args.modules.irc.privmsg(args.target, 'error fetching location coords: ' .. code)
+        modules.irc.privmsg(args.target, 'error fetching location coords: ' .. code)
         return
     end
 
     local j = json.decode(body)
     if j.status ~= 'OK' then
-        args.modules.irc.privmsg(args.target, 'error fetching location coords: ' .. j.status)
+        modules.irc.privmsg(args.target, 'error fetching location coords: ' .. j.status)
         return
     end
 
@@ -42,21 +41,21 @@ plugin.main = function (args)
                                                         coords.lat, coords.lng))
 
     if not body then
-        args.modules.irc.privmsg(args.target, 'error fetching weather: ' .. code)
+        modules.irc.privmsg(args.target, 'error fetching weather: ' .. code)
         return
     end
 
     local j = json.decode(body)
 
     if not j then
-        args.modules.irc.privmsg(args.target, 'error decoding json')
+        modules.irc.privmsg(args.target, 'error decoding json')
         return
     end
 
     local temp_units = j.flags.units == 'us' and '°F' or '°C'
     local result = ('%s %.0f%s'):format(j.currently.summary, j.currently.temperature, temp_units)
 
-    args.modules.irc.privmsg(args.target, result)
+    modules.irc.privmsg(args.target, result)
 end
 
 return plugin

@@ -4,7 +4,7 @@ db = nil -- global database handle
 
 local database = {}
 
-database.init = function (ms, config)
+database.init = function (config)
     db = sql.open(config.dbpath)
 
     if not db then
@@ -12,32 +12,32 @@ database.init = function (ms, config)
     end
 
     -- run the dbinit() function that any module exposes
-    for m in pairs(ms) do
-        if type(ms[m]) == 'table' and type(ms[m].dbinit) == 'function' then
-            ms[m].dbinit()
+    for _, module in pairs(modules) do
+        if type(module) == 'table' and type(module.dbinit) == 'function' then
+            module.dbinit()
         end
     end
 
     -- run the dbinit() function that any plugin exposes
-    for p in pairs(ms.plugins) do
-        if type(ms.plugins[p]) == 'table' and type(ms.plugins[p].dbinit) == 'function' then
-            ms.plugins[p].dbinit()
+    for _, plugin in pairs(modules.plugins) do
+        if type(plugin) == 'table' and type(plugin.dbinit) == 'function' then
+            plugin.dbinit()
         end
     end
 end
 
-database.cleanup = function (ms)
+database.cleanup = function ()
     -- run the dbcleanup() function that any module exposes
-    for m in pairs(ms) do
-        if type(ms[m]) == 'table' and type(ms[m].dbcleanup) == 'function' then
-            ms[m].dbcleanup()
+    for _, module in pairs(modules) do
+        if type(module) == 'table' and type(module.dbcleanup) == 'function' then
+            module.dbcleanup()
         end
     end
 
     -- run the dbcleanup() function that any plugin exposes
-    for p in pairs(ms.plugins) do
-        if type(ms.plugins[p]) == 'table' and type(ms.plugins[p].dbcleanup) == 'function' then
-            ms.plugins[p].dbcleanup()
+    for _, plugin in pairs(modules.plugins) do
+        if type(plugin) == 'table' and type(plugin.dbcleanup) == 'function' then
+            plugin.dbcleanup()
         end
     end
 

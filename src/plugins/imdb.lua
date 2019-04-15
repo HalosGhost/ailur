@@ -10,12 +10,12 @@ plugin.main = function(args)
     local _, _, search = args.message:find('(.+)')
 
     if args.message == '' then
-        args.modules.irc.privmsg(args.target, plugin.help)
+        modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
     if not args.conf.imdb or not args.conf.imdb.omdb_key then
-        args.modules.irc.privmsg(args.target, ('%s: Please set config.imdb.omdb_key'):format(args.sender))
+        modules.irc.privmsg(args.target, ('%s: Please set config.imdb.omdb_key'):format(args.sender))
         return
     end
 
@@ -28,7 +28,7 @@ plugin.main = function(args)
         local results = json.decode(response)
         if results.Error then
             local err = results.Error
-            args.modules.irc.privmsg(args.target, ('%s: error: %s'):format(args.sender, err))
+            modules.irc.privmsg(args.target, ('%s: error: %s'):format(args.sender, err))
             return
         else
             local title = results.Title
@@ -36,7 +36,7 @@ plugin.main = function(args)
             local description = results.Plot or ''
             local description = (results.Plot and results.Plot ~= '') and results.Plot or 'No plot information.'
             local movID = results.imdbID
-            args.modules.irc.privmsg(args.target, ('%s: %s %s %s - https://www.imdb.com/title/%s'):format(args.sender, title, year, description, movID))
+            modules.irc.privmsg(args.target, ('%s: %s %s %s - https://www.imdb.com/title/%s'):format(args.sender, title, year, description, movID))
         end
     end
 end

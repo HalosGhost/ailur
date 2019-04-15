@@ -53,7 +53,7 @@ plugin.commands.add = function (args)
     insert:bind_names{ pattern = pat, substitution = sub }
     local res = insert:step()
 
-    args.modules.irc.privmsg(args.target, res == sql.DONE and 'Tada!' or db:errmsg())
+    modules.irc.privmsg(args.target, res == sql.DONE and 'Tada!' or db:errmsg())
 end
 
 plugin.commands.delete = function (args)
@@ -63,20 +63,20 @@ plugin.commands.delete = function (args)
     delete:bind_names{ pattern = pat }
     local res = delete:step()
 
-    args.modules.irc.privmsg(args.target, res == sql.DONE and 'Tada!' or db:errmsg())
+    modules.irc.privmsg(args.target, res == sql.DONE and 'Tada!' or db:errmsg())
 end
 
 plugin.commands.clear = function (args)
     plugin.loaded = nil
     plugin.loaded = {}
 
-    args.modules.irc.privmsg(args.target, 'Tada!')
+    modules.irc.privmsg(args.target, 'Tada!')
 end
 
 plugin.commands.refresh = function (args)
     refresh()
 
-    args.modules.irc.privmsg(args.target, 'Tada!')
+    modules.irc.privmsg(args.target, 'Tada!')
 end
 
 plugin.commands.list = function (args)
@@ -88,7 +88,7 @@ plugin.commands.list = function (args)
 
     l = l ~= '' and l or 'No macros loaded'
 
-    args.modules.irc.privmsg(args.target, l)
+    modules.irc.privmsg(args.target, l)
 end
 
 local h = ''
@@ -103,7 +103,7 @@ plugin.main = function (args)
 
     if args.authorized and f then return f(args, target) end
 
-    args.modules.irc.privmsg(args.target, plugin.help)
+    modules.irc.privmsg(args.target, plugin.help)
 end
 
 return plugin

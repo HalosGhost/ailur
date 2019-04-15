@@ -14,7 +14,7 @@ plugin.commands.test = function (args)
     local rest = { '3PASS', '5FAIL', '5\x02PANIC\x02' }
     local res = prob < 0.01 and rest[3] or
     prob < 0.49 and rest[2] or rest[1]
-    args.modules.irc.privmsg(args.target, ('%s: Testing %s: [\x03%s\x03]'):format(args.sender, message, res))
+    modules.irc.privmsg(args.target, ('%s: Testing %s: [\x03%s\x03]'):format(args.sender, message, res))
 end
 
 plugin.commands.roll = function (args)
@@ -25,7 +25,7 @@ plugin.commands.roll = function (args)
     numsides = math.tointeger(numsides)
 
     if invalid_num(numdice) or invalid_num(numsides) then 
-        --args.modules.irc.privmsg(args.target, ('%s: Please tell me the number of dice and the number of sides, ie: "2d6" for two six sided dice'):format(args.sender))
+        --modules.irc.privmsg(args.target, ('%s: Please tell me the number of dice and the number of sides, ie: "2d6" for two six sided dice'):format(args.sender))
         return
     end
 
@@ -34,14 +34,14 @@ plugin.commands.roll = function (args)
         if rands:len() > 510 then break end
     end
 
-    args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, rands))
+    modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, rands))
 end
 
 plugin.commands.coinflip = function (args)
     local _, _, numflips = args.message:find('coinflip%s+(%d+)')
 
     if numflips and numflips:len() > 4 then
-        --args.modules.irc.privmsg(args.target, 'Please give me a number less than 5 digits long.')
+        --modules.irc.privmsg(args.target, 'Please give me a number less than 5 digits long.')
         return
     end
 
@@ -52,7 +52,7 @@ plugin.commands.coinflip = function (args)
     end
 
     if invalid_num(numflips) then
-        --args.modules.irc.privmsg(args.target, ('%s: Tell me how many coinflips you want'):format(args.sender))
+        --modules.irc.privmsg(args.target, ('%s: Tell me how many coinflips you want'):format(args.sender))
         return
     end
 
@@ -68,7 +68,7 @@ plugin.commands.coinflip = function (args)
         end
     end
 
-    args.modules.irc.privmsg(args.target, ('%s: heads: %d tails: %d'):format(args.sender, heads, tails))
+    modules.irc.privmsg(args.target, ('%s: heads: %d tails: %d'):format(args.sender, heads, tails))
 end
 
 plugin.commands.magic8ball = function (args)
@@ -95,7 +95,7 @@ plugin.commands.magic8ball = function (args)
         }
     }
     if not message then
-        --args.modules.irc.privmsg(args.target, ('%s: Ask me a question.'):format(args.sender))
+        --modules.irc.privmsg(args.target, ('%s: Ask me a question.'):format(args.sender))
         return
     end
 
@@ -106,7 +106,7 @@ plugin.commands.magic8ball = function (args)
     else
         reply = predictions.unknown[math.random(10)]
     end
-    args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, reply))
+    modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, reply))
 end
 
 plugin.commands.is = function (args)
@@ -122,7 +122,7 @@ plugin.commands.is = function (args)
     local r1 = math.random(#prob)
     local r2 = math.random(#case)
     local r3 = math.random(#punct)
-    args.modules.irc.privmsg(args.target, ('%s: %s %s%s'):format(args.sender, prob[r1], case[r2], punct[r3]))
+    modules.irc.privmsg(args.target, ('%s: %s %s%s'):format(args.sender, prob[r1], case[r2], punct[r3]))
 end
 
 plugin.commands.rot13 = function (args)
@@ -147,7 +147,7 @@ plugin.commands.rot13 = function (args)
             end
             rotted = rotted .. letter
         end
-        args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, rotted))
+        modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, rotted))
     else
         return
     end
@@ -161,11 +161,11 @@ plugin.commands.pick = function (args)
             words[#words + 1] = i
         end
     else
-        args.modules.irc.privmsg(args.target, ('%s: Please give me some things to choose from.'):format(args.sender))
+        modules.irc.privmsg(args.target, ('%s: Please give me some things to choose from.'):format(args.sender))
         return
     end
     local r = math.random(#words)
-    args.modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, words[r]))
+    modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, words[r]))
 end
 
 local h = ''
@@ -180,7 +180,7 @@ plugin.main = function (args)
     local f = plugin.commands[action]
 
     if f then return f(args) end
-    args.modules.irc.privmsg(args.target, plugin.help)
+    modules.irc.privmsg(args.target, plugin.help)
 end
 
 return plugin

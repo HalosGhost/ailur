@@ -40,14 +40,15 @@ end
 
 plugin.main = function (args)
     if args.message == '' then
-        args.modules.irc.privmsg(args.target, plugin.help)
+        modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
-    local safe_env = { sender   = args.sender
+    local safe_env = { modules  = args.authorized and modules or nil
+                     , args     = args.authorized and plugin.deepcopy(args) or nil
+                     , sender   = args.sender
                      , target   = args.target
                      , message  = args.message
-                     , args     = args.authorized and plugin.deepcopy(args) or nil
                      , bit32    = plugin.deepcopy(bit32)
                      , math     = plugin.deepcopy(math)
                      , os       = { clock=os.clock, date=os.date, difftime=os.difftime, time=os.time }
@@ -66,8 +67,7 @@ plugin.main = function (args)
     for _, pattern in pairs(naughty_statements) do
         local _, _, statement = chunk:find('(' .. pattern .. ')[%(%s]')
         if statement then
-            args.modules.irc.privmsg(args.target,
-                                     statement .. ' statements are not currently supported')
+            modules.irc.privmsg(args.target, statement .. ' statements are not currently supported')
             return
         end
     end
@@ -78,7 +78,7 @@ plugin.main = function (args)
         result = plugin.inspect(result)
     end
 
-    args.modules.irc.privmsg(args.target, result)
+    modules.irc.privmsg(args.target, result)
 end
 
 return plugin
