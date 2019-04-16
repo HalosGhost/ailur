@@ -9,12 +9,6 @@ config.irc = { name = 'freenode'
              , handle = 'pandactl'
              , ident = 'pandactl'
              , gecos = '🐼'
-             , admins =
-                 { ['.*@archlinux/support/halosghost'] = 1
-                 , ['.*@unaffiliated/meskarune'] = 2
-                 , ['.*@durr/im/a/sheep'] = 3
-                 , ['.*!firrre@gateway/shell/firrre/x%-gxndbnppnyunttmt'] = 4
-                 }
              , channels =
                  { '##meskarune'
                  }
