@@ -1,13 +1,36 @@
 local url = require 'socket.url'
 local https = require 'ssl.https'
 local json = require 'json'
+local sql = require 'lsqlite3'
 
 local plugin = {}
 
-plugin.help = 'usage: weather <location>'
+plugin.dbinit = function ()
+    modules.user_settings.add('weather_location', 'text')
+end
+
+plugin.help = 'usage: weather [set] [location]'
 
 plugin.main = function (args)
-    if args.message == '' then
+    local _, _, action, setting = args.message:find('(%S+)%s*(.*)')
+    local usermask = ('%s@%s'):format(args.sender_user, args.sender_host)
+
+    if action == 'set' then
+        if setting == '' then
+            modules.irc.privmsg(args.target, plugin.help)
+            return
+        end
+
+        local res = modules.user_settings.set(usermask, 'weather_location', setting)
+        modules.irc.privmsg(args.target, (res == sql.DONE) and 'Tada!' or db:errmsg())
+        return
+    end
+
+    local location = args.message == ''
+        and modules.user_settings.get(usermask, 'weather_location')
+        or args.message
+
+    if not location or location == '' then
         modules.irc.privmsg(args.target, plugin.help)
         return
     end
@@ -20,8 +43,7 @@ plugin.main = function (args)
     end
 
     local geocode_url = 'https://maps.google.com/maps/api/geocode/json?address=%s&key=%s'
-    local body, code = https.request(geocode_url:format(url.escape(args.message),
-                                                        args.conf.weather.geocode_key))
+    local body, code = https.request(geocode_url:format(url.escape(location), args.conf.weather.geocode_key))
 
     if not body then
         modules.irc.privmsg(args.target, 'error fetching location coords: ' .. code)
@@ -35,6 +57,7 @@ plugin.main = function (args)
     end
 
     local coords = j.results[1].geometry.location
+    local address = j.results[1].formatted_address
 
     local weather_url = 'https://api.darksky.net/forecast/%s/%s,%s?units=auto'
     local body, code = https.request(weather_url:format(args.conf.weather.darksky_key,
@@ -53,7 +76,7 @@ plugin.main = function (args)
     end
 
     local temp_units = j.flags.units == 'us' and '°F' or '°C'
-    local result = ('%s %.0f%s'):format(j.currently.summary, j.currently.temperature, temp_units)
+    local result = ('%s: %s %.0f%s'):format(address, j.currently.summary, j.currently.temperature, temp_units)
 
     modules.irc.privmsg(args.target, result)
 end
