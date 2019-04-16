@@ -20,13 +20,6 @@ user_settings.dbinit = function ()
     end
 end
 
-user_settings.dbcleanup = function ()
-    user_setting_sel:finalize()
-    if user_setting_ins then user_setting_ins:finalize() end
-    if column_check then column_check:finalize() end
-    if column_add then column_add:finalize() end
-end
-
 user_settings.add = function (setting, definition)
     column_check = db:prepare(('select %s from users limit 1'):format(setting))
     column_add = db:prepare(('alter table users add column %s %s'):format(setting, definition))
@@ -37,13 +30,16 @@ user_settings.add = function (setting, definition)
             print(('failed to add user setting \'%s\': %s'):format(setting, db:errmsg()))
         end
     end
+
+    column_check:finalize()
+    column_add:finalize()
 end
 
 user_settings.get = function (mask, setting)
     user_setting_sel = db:prepare(('select %s from users where usermask = :mask'):format(setting))
-    user_setting_sel:reset()
     user_setting_sel:bind_names{ mask = mask }
     for v in user_setting_sel:urows() do
+        user_setting_sel:finalize()
         return v
     end
 end
@@ -62,6 +58,7 @@ user_settings.set = function (mask, setting, value)
         print(('failed to set user setting \'%s\' to \'%s\': %s'):format(setting, value, db:errmsg()))
     end
 
+    user_setting_ins:finalize()
     return res
 end
 
