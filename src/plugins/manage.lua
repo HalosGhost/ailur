@@ -83,7 +83,7 @@ end
 
 plugin.commands.whoami = function (args)
     local admin = args.authorized and ', an admin' or ''
-    modules.irc.privmsg(args.target, args.sender .. admin)
+    modules.irc.privmsg(args.target, ('%s!%s@%s%s'):format(args.sender, args.sender_user, args.sender_host, admin))
 end
 
 local h = ''

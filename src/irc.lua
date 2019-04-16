@@ -104,32 +104,28 @@ irc.get_sname = function (config)
     return sname
 end
 
-irc.authorized = function (irc_config, mask)
-    local authed = nil
-    for k in pairs(irc_config.admins) do
-        authed = authed or mask:find(k)
-    end
-
-    return authed
+irc.authorized = function (user, host)
+    local mask = ('%s@%s'):format(user, host)
+    return modules.user_settings.get(mask, 'admin') == 1
 end
 
 irc.react_to_privmsg = function (config, text)
-    local ptn = '^:([^!]+)(%S+) %S+ (%S+) :(.*)'
-    local _, _, mask, hn, target, msg = text:find(ptn)
-    local authed = irc.authorized(config.irc, mask .. hn)
+    local ptn = '^:(%S-)!(%S-)@(%S-) %S+ (%S+) :(.*)'
+    local _, _, nick, user, host, target, msg = text:find(ptn)
+    local authed = irc.authorized(user, host)
     local from_channel = target:find('^#')
 
     -- if whitelisted, put nick's last message in quotegrabs table
-    if plugins.quote and from_channel and plugins.quote.whitelist_status(mask) then
+    if plugins.quote and from_channel and plugins.quote.whitelist_status(nick) then
         -- create the table for the channel if it doesn't exist
         if not plugins.quote.last_msgs[target] then
             plugins.quote.last_msgs[target] = {}
         end
 
-        plugins.quote.last_msgs[target][mask] = msg
+        plugins.quote.last_msgs[target][nick] = msg
     end
 
-    local tgt = from_channel and target or mask
+    local tgt = from_channel and target or nick
     local prefix = '^' .. (tgt:find('^#') and config.irc.handle .. '.?%s+' or '')
 
     if not msg:find(prefix) and plugins.macro then
@@ -155,7 +151,9 @@ irc.react_to_privmsg = function (config, text)
                                 , target = tgt
                                 , message = command
                                 , authorized = authed
-                                , sender = mask
+                                , sender = nick
+                                , sender_user = user
+                                , sender_host = host
                                 }
 
         if ret then return false end
