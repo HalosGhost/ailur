@@ -11,6 +11,18 @@ end
 
 plugin.help = 'usage: weather [set] [location]'
 
+plugin.icons = { ["clear-day"] = '☀ '
+               , ["clear-night"] = '🌙'
+               , ["rain"] = '🌧 '
+               , ["snow"] = '❄ '
+               , ["sleet"] = '💧'
+               , ["wind"] = '💨'
+               , ["fog"] = '🌫'
+               , ["cloudy"] = '☁ '
+               , ["partly-cloudy-day"] = '⛅'
+               , ["partly-cloudy-night"] = '☁ '
+               }
+
 plugin.main = function (args)
     local _, _, action, setting = args.message:find('(%S+)%s*(.*)')
     local usermask = ('%s@%s'):format(args.sender_user, args.sender_host)
@@ -77,7 +89,8 @@ plugin.main = function (args)
 
     local celsius = j.currently.temperature
     local fahrenheit = (celsius * 9/5) + 32
-    local result = ('\x0315\x1d%s:\x0f %s %.1f°C (%.1f°F)'):format(address, j.currently.summary, celsius, fahrenheit)
+    local icon = plugin.icons[j.currently.icon]
+    local result = ('\x0315\x1d%s:\x0f %s %s %.1f°C (%.1f°F)'):format(address, icon, j.currently.summary, celsius, fahrenheit)
     result = result:gsub('cloud', 'butt'):gsub('Cloud', 'Butt')
 
     modules.irc.privmsg(args.target, result)
