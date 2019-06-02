@@ -31,8 +31,8 @@ user_settings.add = function (setting, definition)
         end
     end
 
-    column_check:finalize()
-    column_add:finalize()
+    if column_check then column_check:finalize() end
+    if column_add then column_add:finalize() end
 end
 
 user_settings.get = function (mask, setting)
