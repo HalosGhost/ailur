@@ -75,8 +75,10 @@ plugin.main = function (args)
         return
     end
 
-    local temp_units = j.flags.units == 'us' and '°F' or '°C'
-    local result = ('%s: %s %.0f%s'):format(address, j.currently.summary, j.currently.temperature, temp_units)
+    local celsius = j.currently.temperature
+    local fahrenheit = (celsius * 9/5) + 32
+    local result = ('\x0315\x1d%s:\x0f %s %.1f°C (%.1f°F)'):format(address, j.currently.summary, celsius, fahrenheit)
+    result = result:gsub('cloud', 'butt'):gsub('Cloud', 'Butt')
 
     modules.irc.privmsg(args.target, result)
 end
