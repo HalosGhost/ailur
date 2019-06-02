@@ -59,7 +59,7 @@ plugin.main = function (args)
     local coords = j.results[1].geometry.location
     local address = j.results[1].formatted_address
 
-    local weather_url = 'https://api.darksky.net/forecast/%s/%s,%s?units=auto'
+    local weather_url = 'https://api.darksky.net/forecast/%s/%s,%s?units=si'
     local body, code = https.request(weather_url:format(args.conf.weather.darksky_key,
                                                         coords.lat, coords.lng))
 
