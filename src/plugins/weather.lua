@@ -5,15 +5,13 @@ local sql = require 'lsqlite3'
 
 local plugin = {}
 
-plugin.dbinit = function ()
-    modules.user_settings.add('weather_location', 'text')
-end
+plugin.help = 'usage: weather [location]'
 
-plugin.help = 'usage: weather [set] [location]'
+plugin.user_settings = { 'location' }
 
 plugin.icons = { ["clear-day"] = '☀ '
                , ["clear-night"] = '🌙'
-               , ["rain"] = '🌧 '
+               , ["rain"] = '🌧 '   -- unicode gets super screwy on this line sometimes
                , ["snow"] = '❄ '
                , ["sleet"] = '💧'
                , ["wind"] = '💨'
@@ -24,22 +22,8 @@ plugin.icons = { ["clear-day"] = '☀ '
                }
 
 plugin.main = function (args)
-    local _, _, action, setting = args.message:find('(%S+)%s*(.*)')
-    local usermask = ('%s@%s'):format(args.sender_user, args.sender_host)
-
-    if action == 'set' then
-        if setting == '' then
-            modules.irc.privmsg(args.target, plugin.help)
-            return
-        end
-
-        local res = modules.user_settings.set(usermask, 'weather_location', setting)
-        modules.irc.privmsg(args.target, (res == sql.DONE) and 'Tada!' or db:errmsg())
-        return
-    end
-
     local location = args.message == ''
-        and modules.user_settings.get(usermask, 'weather_location')
+        and modules.users.get_setting(args.usermask, 'weather', 'location')
         or args.message
 
     if not location or location == '' then

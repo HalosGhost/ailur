@@ -104,15 +104,11 @@ irc.get_sname = function (config)
     return sname
 end
 
-irc.authorized = function (user, host)
-    local mask = ('%s@%s'):format(user, host)
-    return modules.user_settings.get(mask, 'admin') == 1
-end
-
 irc.react_to_privmsg = function (config, text)
     local ptn = '^:(%S-)!(%S-)@(%S-) %S+ (%S+) :(.*)'
     local _, _, nick, user, host, target, msg = text:find(ptn)
-    local authed = irc.authorized(user, host)
+    local usermask = ('%s@%s'):format(user, host)
+    local authed = modules.users.is_admin(usermask)
     local from_channel = target:find('^#')
 
     -- if whitelisted, put nick's last message in quotegrabs table
@@ -154,6 +150,7 @@ irc.react_to_privmsg = function (config, text)
                                 , sender = nick
                                 , sender_user = user
                                 , sender_host = host
+                                , usermask = usermask
                                 }
 
         if ret then return false end

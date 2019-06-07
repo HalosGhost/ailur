@@ -5,11 +5,14 @@ db = nil -- global database handle
 local database = {}
 
 database.init = function (config)
-    db = sql.open(config.dbpath)
+    local code, err
+    db, code, err = sql.open(config.dbpath)
 
     if not db then
-        print('Failed to open the database')
+        error(('Failed to open the database: %d: %d'):format(code, err))
     end
+
+    db:exec('PRAGMA foreign_keys = 1;')
 
     -- run the dbinit() function that any module exposes
     for _, module in pairs(modules) do
