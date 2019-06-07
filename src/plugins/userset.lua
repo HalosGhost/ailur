@@ -14,6 +14,7 @@ plugin.commands.set = function (args, plugin, setting, value)
         value = false
     elseif tonumber(value) then
         value = tonumber(value)
+    end
 
     local res, err = modules.users.set_setting(args.usermask, plugin, setting, value)
     modules.irc.privmsg(args.target, res or ('error: ' .. err))
