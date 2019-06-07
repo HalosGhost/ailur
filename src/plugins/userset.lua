@@ -8,6 +8,13 @@ plugin.commands.get = function (args, plugin, setting)
 end
 
 plugin.commands.set = function (args, plugin, setting, value)
+    if value == 'true' then
+        value = true
+    elseif value == 'false' then
+        value = false
+    elseif tonumber(value) then
+        value = tonumber(value)
+
     local res, err = modules.users.set_setting(args.usermask, plugin, setting, value)
     modules.irc.privmsg(args.target, res or ('error: ' .. err))
 end
