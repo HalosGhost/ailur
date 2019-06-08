@@ -27,8 +27,7 @@ end
 plugin.help = ('usage: userset <%s> [plugin.setting [value]]'):format(h:sub(2))
 
 plugin.main = function (args)
-    local _, _, action, plugin_name, setting, value = args.message:find('(%S+)%s+(%S+)%.(%S+)%s*(.*)')
-    if not args.authorized then return end
+    local _, _, action, plugin_name, setting, value = args.message:find('(%S+)%s+(%S+)%.(%S+)%s*(%S*)')
 
     local f = plugin.commands[action]
     if f then return f(args, plugin_name, setting, value) end
