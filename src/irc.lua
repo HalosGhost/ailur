@@ -6,9 +6,13 @@ local ssl = require 'ssl'
 
 irc.init = function (irc_config)
     local bare = socket.connect(irc_config.address, irc_config.port)
-    local conn = ssl.wrap(bare, irc_config.sslparams)
-    conn:dohandshake()
-    return conn
+    if irc_config.use_ssl then
+        local conn = ssl.wrap(bare, irc_config.sslparams)
+        conn:dohandshake()
+        return conn
+    else
+        return bare
+    end
 end
 
 irc.conn = function (irc_config)
