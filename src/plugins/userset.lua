@@ -2,35 +2,95 @@ local plugin = {}
 
 plugin.commands = {}
 
-plugin.commands.get = function (args, plugin, setting)
-    local res, err = modules.users.get_setting(args.usermask, plugin, setting)
+-- Get the value of a user setting
+plugin.commands.get = function (args, plugin_name, setting)
+    if plugin_name == '' or setting == '' then
+        modules.irc.privmsg(args.target, plugin.help)
+        return
+    end
+
+    local res, err = modules.users.get_setting(args.usermask, plugin_name, setting)
     modules.irc.privmsg(args.target, res or ('error: ' .. err))
 end
 
-plugin.commands.set = function (args, plugin, setting, value)
-    if value == 'true' then
+-- Set a user setting. The user does not need to already exist in the users table.
+plugin.commands.set = function (args, plugin_name, setting, value)
+    if plugin_name == '' or setting == '' or value == '' then
+        modules.irc.privmsg(args.target, plugin.help)
+        return
+    end
+
+    if value == 'true' or value == 'on' then
         value = true
-    elseif value == 'false' then
+    elseif value == 'false' or value == 'off' then
         value = false
     elseif tonumber(value) then
         value = tonumber(value)
     end
 
-    local res, err = modules.users.set_setting(args.usermask, plugin, setting, value)
+    local res, err = modules.users.set_setting(args.usermask, plugin_name, setting, value)
     modules.irc.privmsg(args.target, res or ('error: ' .. err))
+end
+
+-- List available user settings
+plugin.commands.list = function (args, plugin_name)
+    local plugin = modules.plugins[plugin_name]
+    if plugin_name ~= '' and not plugin then
+        modules.irc.privmsg(args.target, 'no such plugin')
+        return
+    end
+
+    -- if the user supplied a plugin, just look at those
+    local list_plugin_settings = plugin and type(plugin.user_settings) == 'table'
+    if list_plugin_settings then
+        local settings = {}
+        for _, setting in pairs(plugin.user_settings) do
+            local value = modules.users.get_setting(args.usermask, plugin_name, setting)
+            if value then
+                setting = setting .. (' = %s'):format(value)
+            end
+
+            settings[#settings+1] = setting
+        end
+
+        settings = table.concat(settings, ', ')
+        modules.irc.privmsg(args.target, settings)
+        return
+    end
+
+    local settings = {}
+    for plugin_name, plugin in pairs(modules.plugins) do
+        if type(plugin.user_settings) == 'table' then
+            for _, setting in pairs(plugin.user_settings) do
+                local element = ('%s.%s'):format(plugin_name, setting)
+                local value = modules.users.get_setting(args.usermask, plugin_name, setting)
+                if value then
+                    element = element .. (' = %s'):format(value)
+                end
+
+                settings[#settings+1] = element
+            end
+        end
+    end
+
+    settings = table.concat(settings, ', ')
+    modules.irc.privmsg(args.target, settings)
 end
 
 local h = ''
 for k in pairs(plugin.commands) do
     h = ('%s|%s'):format(h, k)
 end
-plugin.help = ('usage: userset <%s> [plugin.setting [value]]'):format(h:sub(2))
+plugin.help = ('usage: userset <%s> [plugin [setting [value]]]'):format(h:sub(2))
 
 plugin.main = function (args)
-    local _, _, action, plugin_name, setting, value = args.message:find('(%S+)%s+(%S+)%.(%S+)%s*(%S*)')
+    local _, _, action, plugin_name, setting, value =
+        args.message:find('(%S+)%s*(%S*)%s*(%S*)%s*(.*)')
 
-    local f = plugin.commands[action]
-    if f then return f(args, plugin_name, setting, value) end
+    if action then
+        local f = plugin.commands[action]
+        if f then return f(args, plugin_name, setting, value) end
+    end
 
     modules.irc.privmsg(args.target, plugin.help)
 end
