@@ -143,22 +143,22 @@ irc.react_to_privmsg = function (config, text)
 
     local plugin = plugins[namespace]
     if plugin then
-        -- wrap up all pcall results in a list
-        local results = { pcall(plugin.main, { conf = config
-                                             , target = tgt
-                                             , message = command
-                                             , authorized = authed
-                                             , sender = nick
-                                             , sender_user = user
-                                             , sender_host = host
-                                             , usermask = usermask
-                                             })}
+        -- catch lua errors for poorly-written plugins
+        local lua_success, data = pcall(plugin.main, { conf = config
+                                                     , target = tgt
+                                                     , message = command
+                                                     , authorized = authed
+                                                     , sender = nick
+                                                     , sender_user = user
+                                                     , sender_host = host
+                                                     , usermask = usermask
+                                                     })
 
-        -- send the lua error message in the case of a malformed plugin
-        -- else, check to see if the bot should restart like normal
-        if not results[1] then
-            irc.privmsg(tgt, results[2])
-        elseif results[2] then
+        if not lua_success then
+            -- display lua error message
+            irc.privmsg(tgt, data)
+        elseif data then
+            -- restart bot
             return false
         end
     elseif basic ~= nil then
