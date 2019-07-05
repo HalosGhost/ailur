@@ -1,5 +1,7 @@
 -- fun but pointless games
 
+local modules = modules
+
 local invalid_num = function (n)
     return not (math.type(n) == 'integer' and n >= 1)
 end
@@ -24,12 +26,12 @@ plugin.commands.roll = function (args)
     numdice = math.tointeger(numdice)
     numsides = math.tointeger(numsides)
 
-    if invalid_num(numdice) or invalid_num(numsides) then 
+    if invalid_num(numdice) or invalid_num(numsides) then
         --modules.irc.privmsg(args.target, ('%s: Please tell me the number of dice and the number of sides, ie: "2d6" for two six sided dice'):format(args.sender))
         return
     end
 
-    for i=1,numdice do
+    for _ = 1, numdice do
         rands = ('%d %s'):format(math.random(numsides), rands)
         if rands:len() > 510 then break end
     end
@@ -59,8 +61,8 @@ plugin.commands.coinflip = function (args)
     local heads = 0
     local tails = 0
 
-    for i=1, numflips do
-        flip = math.random(2)
+    for _ = 1, numflips do
+        local flip = math.random(2)
         if flip == 1 then
             heads = heads + 1
         else
@@ -99,6 +101,7 @@ plugin.commands.magic8ball = function (args)
         return
     end
 
+    local reply
     if message and message:len() % 3 == 0 then
         reply = predictions.positive[math.random(10)]
     elseif message and message:len() % 3 == 1 then
@@ -106,6 +109,7 @@ plugin.commands.magic8ball = function (args)
     else
         reply = predictions.unknown[math.random(10)]
     end
+
     modules.irc.privmsg(args.target, ('%s: %s'):format(args.sender, reply))
 end
 

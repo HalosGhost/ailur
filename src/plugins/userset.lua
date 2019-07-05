@@ -1,3 +1,5 @@
+local modules = modules
+
 local plugin = {}
 
 plugin.commands = {}
@@ -34,17 +36,17 @@ end
 
 -- List available user settings
 plugin.commands.list = function (args, plugin_name)
-    local plugin = modules.plugins[plugin_name]
-    if plugin_name ~= '' and not plugin then
+    local tgt_plugin = modules.plugins[plugin_name]
+    if plugin_name ~= '' and not tgt_plugin then
         modules.irc.privmsg(args.target, 'no such plugin')
         return
     end
 
     -- if the user supplied a plugin, just look at those
-    local list_plugin_settings = plugin and type(plugin.user_settings) == 'table'
+    local list_plugin_settings = tgt_plugin and type(tgt_plugin.user_settings) == 'table'
     if list_plugin_settings then
         local settings = {}
-        for _, setting in pairs(plugin.user_settings) do
+        for _, setting in pairs(tgt_plugin.user_settings) do
             local value = modules.users.get_setting(args.usermask, plugin_name, setting)
             if value then
                 setting = setting .. (' = %s'):format(value)
@@ -59,9 +61,9 @@ plugin.commands.list = function (args, plugin_name)
     end
 
     local settings = {}
-    for plugin_name, plugin in pairs(modules.plugins) do
-        if type(plugin.user_settings) == 'table' then
-            for _, setting in pairs(plugin.user_settings) do
+    for plugin_name, tgt_plugin in pairs(modules.plugins) do
+        if type(tgt_plugin.user_settings) == 'table' then
+            for _, setting in pairs(tgt_plugin.user_settings) do
                 local element = ('%s.%s'):format(plugin_name, setting)
                 local value = modules.users.get_setting(args.usermask, plugin_name, setting)
                 if value then

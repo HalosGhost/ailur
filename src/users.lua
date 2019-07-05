@@ -1,3 +1,5 @@
+local modules = modules
+local plugins = modules.plugins
 local sql = require 'lsqlite3'
 
 local user_sel
@@ -137,18 +139,18 @@ users.get_setting = function (usermask, plugin, key)
     for v in setting_sel:urows() do return v end
 end
 
-users.set_setting = function (usermask, plugin, key, value)
+users.set_setting = function (usermask, plugin_name, key, value)
     if not users.user_exists(usermask) then
         users.add_user(usermask)
     end
 
-    if not (modules.plugins[plugin] and modules.plugins[plugin].user_settings
-            and in_table(modules.plugins[plugin].user_settings, key)) then
+    local plugin = plugins[plugin_name]
+    if not (plugin and plugin.user_settings and in_table(plugin.user_settings, key)) then
         return nil, 'no such setting'
     end
 
     setting_ins:reset()
-    setting_ins:bind_names{ usermask=usermask, plugin=plugin, key=key, value=value }
+    setting_ins:bind_names{ usermask=usermask, plugin=plugin_name, key=key, value=value }
     return check(setting_ins:step())
 end
 

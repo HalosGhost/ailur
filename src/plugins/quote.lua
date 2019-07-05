@@ -1,3 +1,4 @@
+local modules = modules
 local sql = require 'lsqlite3'
 
 local wl_ins = nil

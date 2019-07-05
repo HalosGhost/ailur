@@ -1,5 +1,6 @@
 local irc = {}
 
+local modules = modules
 local plugins
 local socket = require 'socket'
 local ssl = require 'ssl'

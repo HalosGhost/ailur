@@ -1,5 +1,6 @@
 -- URL announcements - follows http->https redirects but not www
 
+local modules = modules
 local https = require 'ssl.https'
 
 local plugin = {}

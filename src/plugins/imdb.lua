@@ -1,3 +1,4 @@
+local modules = modules
 local json = require 'json'
 local url = require 'socket.url'
 local https = require 'ssl.https'
@@ -33,7 +34,6 @@ plugin.main = function(args)
         else
             local title = results.Title
             local year = results.Year and ('(%s):'):format(results.Year) or ''
-            local description = results.Plot or ''
             local description = (results.Plot and results.Plot ~= '') and results.Plot or 'No plot information.'
             local movID = results.imdbID
             modules.irc.privmsg(args.target, ('%s: %s %s %s - https://www.imdb.com/title/%s'):format(args.sender, title, year, description, movID))

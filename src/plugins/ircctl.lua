@@ -1,5 +1,7 @@
 -- channel moderation
 
+local modules = modules
+
 local plugin = {}
 
 plugin.commands = {}

@@ -1,3 +1,4 @@
+local modules = modules
 local sql = require 'lsqlite3'
 
 local ins = nil
@@ -78,7 +79,7 @@ plugin.commands.count = function (args)
     local _, _, key = args.message:find('count%s+(.+)')
 
     cnt:reset()
-    local key = key and '%' .. key .. '%' or '%'
+    key = key and '%' .. key .. '%' or '%'
     cnt:bind_names{ ['key'] = key }
     for c in cnt:urows() do
         return modules.irc.privmsg(args.target, ('Found %d result%s'):format(c or '0', c == 1 and '' or 's'))

@@ -1,3 +1,5 @@
+local modules = modules
+
 local plugin = {}
 
 plugin.commands = {}

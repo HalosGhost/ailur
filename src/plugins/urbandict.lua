@@ -1,3 +1,4 @@
+local modules = modules
 local json = require 'json'
 local url = require 'socket.url'
 local https = require 'ssl.https'
@@ -21,11 +22,11 @@ plugin.main = function(args)
     if response then
         local results = json.decode(response)
         if not results.list[1] then
-            args.modules.irc.privmsg(args.target, ('%s: no results'):format(args.sender, err))
+            modules.irc.privmsg(args.target, ('%s: no results'):format(args.sender))
             return
         else
             local definition = string.gsub(results.list[1].definition, '\r\n', '')
-            args.modules.irc.privmsg(args.target, ('%s: %s - %s'):format(args.sender, search, definition))
+            modules.irc.privmsg(args.target, ('%s: %s - %s'):format(args.sender, search, definition))
         end
     end
 end
