@@ -9,8 +9,8 @@ local entitySwap = function (orig, n, s)
     local entityMap = { lt='<', gt='>', amp='&', quot='"', apos='\'' }
 
     return (n == '' and entityMap[s])
-           or (n == '#' and tonumber(s)) and string.char(s)
-           or (n == '#x' and tonumber(s, 16)) and string.char(tonumber(s, 16))
+           or (n == '#' and tonumber(s)) and utf8.char(s)
+           or (n == '#x' and tonumber(s, 16)) and utf8.char(tonumber(s, 16))
            or orig
 end
 
@@ -21,18 +21,18 @@ end
 plugin.help = 'Usage: announce <url>'
 
 plugin.main = function(args)
-    local _, _, url = args.message:find('(.+)')
+    local _, _, target = args.message:find('(.+)')
 
-    if not url then
+    if not target then
         modules.irc.privmsg(args.target, plugin.help)
         return
     end
 
-    if url:find('^.-[ <]?https?://[^> ]+.*') then
-        _, _, url = url:find('^.-[ <]?(https?://[^> ]+).*')
-    else
-        url = 'http://' .. url
-    end
+    local _, _, url = target:find('^.-[ <]?(https?://[^> ]+).*')
+    url = url or 'http://' .. target
+
+    -- remove possible text anchor
+    url = url:gsub('#[^/]+$', '')
 
     local body, headers
     local status = 300
@@ -53,11 +53,20 @@ plugin.main = function(args)
         end
     end
 
-    if redirects == 3 then
+    if redirects >= 3 then
         modules.irc.privmsg(args.target, 'error: too many redirects')
+        return
     end
 
-    local title = body:match('<title.->(.-)</title>')
+    -- remove optional spaces from the tags
+    body = body:gsub('\n', ' ')
+    body = body:gsub(' *< *', '<')
+    body = body:gsub(' *> *', '>')
+
+    -- put all tags in lowercase
+    body = body:gsub('(<[^ >]+)', string.lower)
+
+    local title = body:match('<title>(.+)</title>')
     if not title then return end
 
     modules.irc.privmsg(args.target, ('[%s]'):format(html_unescape(title)))
