@@ -66,7 +66,7 @@ plugin.main = function(args)
     -- put all tags in lowercase
     body = body:gsub('(<[^ >]+)', string.lower)
 
-    local title = body:match('<title>(.+)</title>')
+    local title = body:match('<title>(.-)</title>')
     if not title then return end
 
     modules.irc.privmsg(args.target, ('[%s]'):format(html_unescape(title)))
