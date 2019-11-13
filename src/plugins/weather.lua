@@ -1,7 +1,7 @@
+local modules = modules
 local url = require 'socket.url'
 local https = require 'ssl.https'
 local json = require 'json'
-local sql = require 'lsqlite3'
 
 local plugin = {}
 
@@ -74,7 +74,8 @@ plugin.main = function (args)
     local celsius = j.currently.temperature
     local fahrenheit = (celsius * 9/5) + 32
     local icon = plugin.icons[j.currently.icon]
-    local result = ('\x0315\x1d%s:\x0f %s %s %.1f°C (%.1f°F)'):format(address, icon, j.currently.summary, celsius, fahrenheit)
+    local result = ('\x0315\x1d%s:\x0f %s %s %.1f°C (%.1f°F)')
+                    :format(address, icon, j.currently.summary, celsius, fahrenheit)
     result = result:gsub('cloud', 'butt'):gsub('Cloud', 'Butt')
 
     modules.irc.privmsg(args.target, result)

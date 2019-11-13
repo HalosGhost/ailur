@@ -1,10 +1,13 @@
-STARTTIME = STARTTIME or os.time()
+local modules = modules
+
+-- make global so that it survives restarts
+START_TIME = START_TIME or os.time()
 
 local plugin = {}
 
 plugin.main = function (args)
-    if not STARTTIME then
-        modules.irc.privmsg(args.target, 'error: STARTTIME global var not defined')
+    if not START_TIME then
+        modules.irc.privmsg(args.target, 'error: START_TIME global var not defined')
         return
     end
 
@@ -17,7 +20,7 @@ plugin.main = function (args)
                         }
 
     local uptime = {}
-    local diff = os.difftime(os.time(), STARTTIME)
+    local diff = os.difftime(os.time(), START_TIME)
 
     for _, v in pairs(conversions) do
         local conversion = diff // v[2]

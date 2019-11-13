@@ -1,39 +1,38 @@
+local modules = modules
+
 local plugin = {}
+
 plugin.commands = {}
 
-local function table_contains(t, element)
-  for _, value in pairs(t) do
-    if value == element then
-      return true
-    end
-  end
-  return false
-end
-
-local function list_polls()
-    current_polls = ''
-    for k,v in pairs(plugin.polls) do
-        current_polls = current_polls .. ('%s '):format(k)
-    end
-    if current_polls == '' then
-        return 'none'
-    else
-        return current_polls
+local function table_contains (t, element)
+    for _, v in pairs(t) do
+        if v == element then return true end
     end
 end
 
-local function get_tally(poll_name)
+local function list_polls (polls)
+    local current_polls = {}
+    for k in pairs(polls) do
+        current_polls[#current_polls+1] = k
+    end
+
+    return #current_polls == 0 and 'none' or table.concat(current_polls, ' ')
+end
+
+local function get_tally (poll_name)
     local results = {}
-    for k,v in pairs(plugin.polls[poll_name].choices) do
+    for _, v in pairs(plugin.polls[poll_name].choices) do
         results[v] = 0
     end
-    for k,v in pairs(plugin.polls[poll_name].votes) do
+
+    for _, v in pairs(plugin.polls[poll_name].votes) do
         if results[v] then
             results[v] = results[v] + 1
         end
     end
+
     local tally = ''
-    for k,v in pairs(results) do
+    for k, v in pairs(results) do
         tally = tally .. ('%s[%d] '):format(k, v)
     end
     return tally
@@ -99,7 +98,7 @@ plugin.commands.vote =  function (args)
     end
     if not table_contains(plugin.polls[pollid].choices, vote) then
         local ballot = ''
-        for k,v in pairs(plugin.polls[pollid].choices) do
+        for _, v in pairs(plugin.polls[pollid].choices) do
             ballot = ballot .. ('%s '):format(v)
         end
         modules.irc.privmsg(args.target,
@@ -107,7 +106,8 @@ plugin.commands.vote =  function (args)
             :format(args.sender, ballot))
         return
     end
-    local reply = ''
+
+    local reply
     if not plugin.polls[pollid].votes[voter] then
         reply = ('%s: Vote %s added for poll %s')
                 :format(args.sender, vote, pollid)

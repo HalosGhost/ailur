@@ -1,3 +1,4 @@
+local modules = modules
 local sql = require 'lsqlite3'
 
 db = nil -- global database handle

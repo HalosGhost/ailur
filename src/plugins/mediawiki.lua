@@ -1,6 +1,7 @@
-local json = require 'json'
-local url = require 'socket.url'
-local https = require 'ssl.https'
+local modules = modules
+local json    = require 'json'
+local url     = require 'socket.url'
+local https   = require 'ssl.https'
 
 local plugin = {}
 
