@@ -12,6 +12,7 @@ irc.init = function (irc_config)
         conn:dohandshake()
         return conn
     else
+        print("WARNING: You have not configured TLS; Your connection will be insecure!")
         return bare
     end
 end
