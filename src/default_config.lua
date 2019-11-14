@@ -12,6 +12,7 @@ config.irc = { name = 'freenode'
              , channels =
                  { '##meskarune'
                  }
+             , use_ssl = true
              , sslparams =
                  { mode = 'client'
                  , protocol = 'tlsv1_2'
